@@ -18,6 +18,7 @@ function validarIngresoConfigurarMisa(f){
             _validar = true;
         }
     }
+    else _validar=true ;
     return _validar;
 }
 $(function(){
