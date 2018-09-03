@@ -1,0 +1,87 @@
+<?php
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/provincias.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/cantones.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/parroquias.php');
+
+ ?>
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Direcciones
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li  class="active"><a onclick="cargandoProvincias('#contenedorTablaProvincias');obtenerProvincias();" style="cursor: pointer;" href="#tabProvincias" data-toggle="tab" aria-expanded="true">PROVINCIAS</a></li>
+                            <li  class=""  ><a onclick="cargandoCantones('#formIngresarCantones');obtenerFormCantones();"  style="cursor: pointer;" href="#tabCantones" data-toggle="tab" aria-expanded="false">CANTONES</a></li>
+                            <li  class=""><a onclick="cargandoCantones('#formIngresarParroquias');obtenerFormParroquias();" style="cursor: pointer;" href="#tabParroquias" data-toggle="tab" aria-expanded="false">PARRÓQUIAS</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active"  id="tabProvincias">
+                                <div id="mensajeFormProvincias"> </div>
+                                <form class="col-lg-12" id="formIngresarProvincias" method="post" action="<?php echo $this->basePath();?>/provincias/ingresarprovincia">
+
+                                </form>
+                                <div class="col-lg-12" id="contenedorTablaProvincias">
+                                    
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tabCantones">
+                                <div id="mensajeFormCantones"> </div>
+                                <form id="formIngresarCantones" method="post" action="<?php echo $this->basePath();?>/cantones/ingresarcanton">
+
+                                </form>
+                                <div class="col-lg-12" id="contenedorTablaCantones">
+                                    
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tabParroquias">
+                                <div id="mensajeFormParroquias"> </div>
+                                <form id="formIngresarParroquias" method="post" action="<?php echo $this->basePath();?>/parroquias/ingresarparroquia">
+<!--                                    <div class="form-group col-lg-4">
+                                        <label for="selectProvincias">PROVINCIAS</label>
+                                        <select id="selectProvincias" name="selectProvincias" class="form-control">
+                                            <option value="0">SELECCIONE UNA PROVINCIA</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label for="selectCantones">CANTONES</label>
+                                        <select id="selectCantones" name="selectCantones" class="form-control">
+                                            <option value="0">SELECCIONE UN CANTÓN</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label for="nombreParroquia">NOMBRE DE LA PARRÓQUIA</label>
+                                        <input maxlength="200" type="text" id="nombreParroquia" name="nombreParroquia" class="form-control">
+                                    </div>-->
+                                    
+                                </form>
+                                <div class="col-lg-12" id="contenedorTablaParroquias">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+    cargandoProvincias('#contenedorTablaProvincias');
+    obtenerProvincias();
+});
+
+</script>

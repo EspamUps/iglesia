@@ -1,0 +1,87 @@
+<?php
+$optionSelectMisas = $this->optionSelectMisas;
+$optionSelectLugaresMisa = $this->optionSelectLugaresMisa;
+
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/configurarmisas/configurarmisas.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/configurarmisas/sacerdotes.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            CONFIGURAR MISAS
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarConfigurarMisa"> </div>
+                    <form onsubmit="return validarIngresoConfigurarMisa(this)" method="post" action="<?php echo $this->basePath()?>/configurarmisa/ingresarconfigurarmisa" id="formIngresarConfigurarMisa">
+                        <div class="col-lg-6 form-group">
+                            <label>IDENTIFICACIÓN DEL SACERDOTE</label>
+                            <input onkeyup="filtrarSacerdotePorIdentificacion();"  autofocus="" type="text" class="form-control" id="identificacion" name="identificacion">
+                            <input type="hidden" name="idSacerdoteEncriptado" id="idSacerdoteEncriptado">
+                            <label for="selectMisas">SELECCIONE UN LUGAR</label>
+                            <select onchange="filtrarDatosLugarMisa();" class="form-control" id="selectLugarMisa" name="selectLugarMisa">
+                                <?php echo $optionSelectLugaresMisa;?>
+                            </select>
+                            <label for="selectMisas">SELECCIONE UNA MISA</label>
+                            <select class="form-control" id="selectMisas" name="selectMisas">
+                                <?php echo $optionSelectMisas;?>
+                            </select>
+                            <label for="descripcionMisa">DESCRIPCIÓN DE LA MISA</label>
+                            <textarea   rows="4" class="form-control" id="descripcionMisa" name="descripcionMisa" style="resize: none;" maxlength="300"></textarea>
+                            
+                            <label for="fecha">FECHA MISA</label>
+                            <input type="date" id="fechaMisa" name="fechaMisa" class="form-control">
+                            <label for="horaInicio">HORA INICIO</label>
+                            <input type="time" id="horaInicio" name="horaInicio" class="form-control">
+                            <label for="horaFin">HORA FIN</label>
+                            <input type="time" id="horaFin" name="horaFin" class="form-control">
+                            <label for="valorMisa">PRECIO DE LA MISA</label>
+                            <input value="0.00" min="0.00" step="0.01" type="number" id="valorMisa" name="valorMisa" class="form-control">
+                            <br>
+                            <button data-loading-text="GUARDANDO..." class="btn btn-primary pull-right btn-flat" id="btnGuardarConfigurarMisa" name="btnGuardarConfigurarMisa"><i class="fa fa-save"></i>GUARDAR</button>
+                        </div> <br>
+                        <div class="col-lg-6 form-group">
+                            <div id="mensajeContenedorDatos"> </div>
+                            <div id="contenedorDatosSacerdote"> </div>
+                            <div id="contenedorDatosLugar"> </div>
+                        </div>
+<!--                        <div class="col-lg-4 form-group">
+                            
+                            
+                        </div>-->
+           
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaMisas"> </div>
+                    <div id="contenedorTablaMisas"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+<!--
+<script type="text/javascript">  
+$(document).ready(function(){
+    cargandoLugaresMisa("#contenedorTablaLugaresMisa");
+   obtenerLugaresMisa(); 
+});
+
+
+</script>-->
+    

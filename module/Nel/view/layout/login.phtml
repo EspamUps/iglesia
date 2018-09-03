@@ -1,0 +1,156 @@
+<?php 
+echo $this->doctype(); 
+use Zend\Session\Container;
+$sesionUsuario = new Container('sesionparroquia');
+if(!$sesionUsuario->offsetExists('idUsuario')){
+?>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SGP</title>
+    <link rel="icon" type="image/png" href="<?php echo $this->basePath();?>/public/librerias/images/pagina/logoiglesia.png" />
+        <!-- Le styles -->
+        <?php echo $this->headLink()
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/responsive.css')
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/main.css')
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/animate.css')
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/price-range.css')
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/prettyPhoto.css')
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/font-awesome.min.css')
+                ->prependStylesheet($this->basePath() . '/public/librerias/css/bootstrap.min.css');
+                ?>
+        
+
+                <?php echo $this->headScript()  
+                ->prependFile($this->basePath() . '/public/librerias/js/jquery.form.js')   
+                ->prependFile($this->basePath() . '/public/librerias/js/main.js')   
+                ->prependFile($this->basePath() . '/public/librerias/js/jquery.prettyPhoto.js')   
+                ->prependFile($this->basePath() . '/public/librerias/js/price-range.js')   
+                ->prependFile($this->basePath() . '/public/librerias/js/jquery.scrollUp.min.js') 
+                ->prependFile($this->basePath() . '/public/librerias/js/bootstrap.min.js')   
+                ->prependFile($this->basePath() . '/public/librerias/js/jquery-2.1.1.min.js'); ?>
+    </head>
+    
+    <body>
+        <style type="text/css">
+            .bordeImagen{
+                background:none;
+            }
+
+            .bordeImagen:hover{
+                background:  #2c4762;
+            }
+            
+        </style>
+    <header id="header"><!--header-->
+        <div class="header_top"><!--header_top-->
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="contactinfo">
+                            <ul class="nav nav-pills">
+                                <li><a href="#"><i class="fa fa-phone"></i> +593 99 029 6319</a></li>
+                                <li><a href="#"><i class="fa fa-envelope"></i> junimaci-22@live.com</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+<!--                        <div class="social-icons pull-right">
+                            <ul class="nav navbar-nav">
+                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                            </ul>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div><!--/header_top-->
+		
+        <div class="header-middle"><!--header-middle-->
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="logo pull-left">
+                            <a href="<?php echo $this->basePath();?>/inicio/inicio"><span>SGP</span></a>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+<!--                        <div class="shop-menu pull-right">
+                            <ul class="nav navbar-nav">
+                                <li><a href="informacion.php"><i class="fa fa-user"></i>Información</a></li>
+                            </ul>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+  
+    
+    <?php echo $this->content; ?>
+    
+
+    <br>
+    <footer id="footer"><!--Footer-->
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="companyinfo">
+                            <h2><span>SGP</span></h2>
+                            <p>Sistema de gestión parroquial</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-7">
+
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="address">
+                            <img src="<?php echo $this->basePath();?>/public/librerias/images/pagina/logoiglesia.png" alt="">
+                            <p>Ecuador</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		
+        <div class="footer-widget">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="single-widget">
+                            <h2>Políticas</h2>
+                            <ul class="nav nav-pills nav-stacked">
+<!--                                <li><a href="<?php echo $this->basePath();?>/legal/terminosycondiciones">Términos de servicio</a></li>
+                                <li><a href="<?php echo $this->basePath();?>/legal/privacidad">Política de privacidad</a></li>
+                                <li><a href="<?php echo $this->basePath();?>/legal/reembolso">Política de reembolso</a></li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row">
+                </div>
+            </div>
+        </div>
+		
+    </footer>      
+        <?php echo $this->inlineScript() ?>
+    </body>          
+</html>
+<?php
+}else if($sesionUsuario->offsetExists('idUsuario')){
+?>  
+    <script>window.location='<?php echo $this->basePath();?>/administrador/inicio'</script>";
+<?php } ?>
+    

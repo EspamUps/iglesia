@@ -1,0 +1,87 @@
+<?php
+//estas librerias php son llamadas ya que contienen los metodos ajax para obtener y envias
+//datos al respectivo controlador
+$optionSelectProvincias = $this->optionSelectProvincias;
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/personas.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
+?>
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Usuarios
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresoPersona"> </div>
+                    <form  onsubmit="return validarIngresoPersona(this)" id="formIngresoPersona" method="post" action="<?php echo $this->basePath();?>/persona/ingresarpersona">
+                        <div class="form-group col-lg-6">
+                            <label for="identificacion">IDENTIFICACIÓN</label>
+                            <input onkeydown="validarNumeros('identificacion')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
+                            <label for="primerNombre">PRIMER NOMBRE</label>
+                            <input maxlength="50" autocomplete="off"  type="text" id="primerNombre" name="primerNombre" class="form-control">
+                            <label for="segundoNombre">SEGUNDO NOMBRE</label>
+                            <input maxlength="50" autocomplete="off"  type="text" id="segundoNombre" name="segundoNombre" class="form-control">
+                            <label for="primerApellido">PRIMER APELLIDO</label>
+                            <input maxlength="50" autocomplete="off"  type="text" id="primerApellido" name="primerApellido" class="form-control">
+                            <label for="segundoApellido">SEGUNDO APELLIDO</label>
+                            <input maxlength="50" autocomplete="off"  type="text" id="segundoApellido" name="segundoApellido" class="form-control">
+                            <label for="fechaNacimiento">FECHA DE NACIMIENTO</label>
+                            <input  type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control">
+                        </div>
+
+
+                        <div class="form-group col-lg-6">
+                            <label for="telefono">TELÉFONO</label>
+                            <input onkeydown="validarNumeros('telefono')" maxlength="20" autocomplete="off"  type="text" id="telefono" name="telefono" class="form-control">
+                            <label for="selectProvincias">PROVINCIA</label>
+                            <select onchange="filtrarConfigurarCantonProvinciaPorProvincia();" id="selectProvincias" name="selectProvincias" class="form-control"><?php echo $optionSelectProvincias;?></select>
+                            <label for="selectCantones">CANTÓN</label>
+                            <select onchange="filtrarConfigurarParroquiaCantonPorConfigurarCantonProvincia();" id="selectCantones" name="selectCantones" class="form-control">
+                                <option value="0">SELECCIONE UN CANTÓN</option>
+                            </select>
+                            <label for="selectParroquias">PARRÓQUIA</label>
+                            <select id="selectParroquias" name="selectParroquias" class="form-control">
+                                <option value="0">SELECCIONE UNA PARRÓQUIA</option>
+                            </select>
+                            <label for="direccion">DIRECCIÓN</label>
+                            <input maxlength="200" autocomplete="off"  type="text" id="direccion" name="direccion" class="form-control">
+                            <label for="referencia">REFERENCIA</label>
+                            <input maxlength="200" autocomplete="off"  type="text" id="referencia" name="referencia" class="form-control">
+                        </div>
+                        <div class="form-group col-lg-12">
+                            <button data-loading-text="GUARDANDO..." id="btnGuardarPersona" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row">
+                <div id="mensajeTablaPersonas">
+                    
+                </div>
+                <div  class="col-lg-12">
+                    <div id="contenedorTablaPersonas"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+    cargandoPersonas('#contenedorTablaPersonas');
+    obtenerPersonas();
+});
+
+</script>

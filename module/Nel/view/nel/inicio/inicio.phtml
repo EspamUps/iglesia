@@ -1,0 +1,24 @@
+<?php 
+$mensaje = $this->mensaje;
+$$nombreUsuario = $this->nombreUsuario;
+$contrasena = $this->contrasena;
+
+?>
+
+<div class="features_items"><!--features_items-->
+    <h2 class="title text-center">SISTEMA DE GESTIÓN PARROQUIAL</h2>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <div class="login-form text-center">
+            <h2>INGRESA A TU CUENTA</h2>
+            <div id="mensaje"><?php echo $mensaje;?></div>
+            <form action="<?php echo $this->basePath();?>/inicio/inicio" method="post" id="formLogin">
+                <input type="text" class="form-control" id="nombreUsuario" value="<?php echo $nombreUsuario;?>" name="nombreUsuario" placeholder="Usuario" autocomplete="off">
+                <input type="password" class="form-control" id="contrasena" name="contrasena" value="<?php echo $contrasena;?>" autocomplete="off" placeholder="Contraseña">
+                <button type="submit" id="btnIniciar" name="btnIniciar" data-loading-text="Iniciando..." class="btn btn-default pull-right">Iniciar</button>
+            </form>
+            <a href="#">Recuperar contraseña</a>
+        </div>
+    </div>
+    <div class="col-sm-4"></div>
+</div>

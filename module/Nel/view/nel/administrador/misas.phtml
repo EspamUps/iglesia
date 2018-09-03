@@ -1,0 +1,58 @@
+<?php
+$optionSelectProvincias = $this->optionSelectProvincias;
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/misas/misas.php');
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            MISAS
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarMisa"> </div>
+                    <form method="post" action="<?php echo $this->basePath()?>/misas/ingresarmisa" id="formIngresarMisa">
+                        <div class="form-group col-lg-6">
+                            <label for="nombreProvincia">NOMBRE DE LA MISA</label>
+                            <div class="input-group margin">
+                                <input autofocus=""  type="text" id="descripcionMisa" name="descripcionMisa" class="form-control">
+                                <span class="input-group-btn">
+                                    <button style="margin-left: 10%;" name="btnGuardarMisa" id="btnGuardarMisa" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaMisas"> </div>
+                    <div id="contenedorTablaMisas"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<script type="text/javascript">  
+$(document).ready(function(){
+    cargandoMisas("#contenedorTablaMisas");
+   obtenerMisas(); 
+});
+
+
+</script>
+    

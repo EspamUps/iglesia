@@ -1,0 +1,54 @@
+<?php
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/sacerdotes/sacerdotes.php');
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/direccionpersona.php');
+?>
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Sacerdotes
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <section class="">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresoSacerdote"> </div>
+                    <form  onsubmit="return validarIngresoSacerdote(this)" id="formIngresoSacerdote" method="post" action="<?php echo $this->basePath();?>/sacerdote/ingresarsacerdote">
+                        <div class="form-group col-lg-6">
+                            <label for="identificacion">IDENTIFICACIÓN</label>
+                            <input onkeyup="filtrarSacerdotePorIdentificacion();" onkeydown="validarNumeros('identificacion');" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
+                        </div>
+
+
+                        <div class="form-group col-lg-6" id="contenedorDatosSacerdote">
+
+                        </div>
+                   
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row">
+                <div id="mensajeTablaSacerdotes">
+                    
+                </div>
+                <div  class="col-lg-12">
+                    <div id="contenedorTablaSacerdotes"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+    cargandoSacerdotes('#contenedorTablaSacerdotes');
+    obtenerSacerdotes();
+});
+
+</script>

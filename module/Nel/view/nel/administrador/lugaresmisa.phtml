@@ -1,0 +1,70 @@
+<?php
+$optionSelectProvincias = $this->optionSelectProvincias;
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/lugaresmisa/lugaresmisa.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Templos, capillas y otros
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarLugaresMisa"> </div>
+                    <form method="post" action="<?php echo $this->basePath()?>/lugaresmisa/ingresarlugaresmisa" id="formIngresarLugaresMisa">
+                        <div class="form-group col-lg-6">
+                            <label for="selectProvincias">PROVINCIA</label>
+                            <select onchange="filtrarConfigurarCantonProvinciaPorProvincia();" id="selectProvincias" name="selectProvincias" class="form-control"><?php echo $optionSelectProvincias;?></select>
+                            <label for="selectCantones">CANTÓN</label>
+                            <select onchange="filtrarConfigurarParroquiaCantonPorConfigurarCantonProvincia();" id="selectCantones" name="selectCantones" class="form-control">
+                                <option value="0">SELECCIONE UN CANTÓN</option>
+                            </select>
+                            <label for="selectParroquias">PARRÓQUIA</label>
+                            <select id="selectParroquias" name="selectParroquias" class="form-control">
+                                <option value="0">SELECCIONE UNA PARRÓQUIA</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="direccion">DIRECCIÓN</label>
+                            <input maxlength="200" autocomplete="off"  type="text" id="direccion" name="direccion" class="form-control">
+                            <label for="referencia">REFERENCIA</label>
+                            <input maxlength="200" autocomplete="off"  type="text" id="referencia" name="referencia" class="form-control">
+                            <label for="nombreLugar">NOMBRE DEL LUGAR</label>
+                            <input class="form-control" type="text" id="nombreLugar" name="nombreLugar">
+                        </div>
+                        <div class="form-group col-lg-12">
+                            <button data-loading-text="GUARDANDO..." class="btn btn-primary pull-right btn-flat" id="btnGuardarLugarMisa" name="btnGuardarLugarMisa"><i class="fa fa-save"></i>GUARDAR</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaLugaresMisa"> </div>
+                    <div id="contenedorTablaLugaresMisa"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script type="text/javascript">  
+$(document).ready(function(){
+    cargandoLugaresMisa("#contenedorTablaLugaresMisa");
+   obtenerLugaresMisa(); 
+});
+
+
+</script>
+    
