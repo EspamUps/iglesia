@@ -14,6 +14,7 @@ use Zend\View\Model\ViewModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
+use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
@@ -136,18 +137,25 @@ class AdministradorController extends AbstractActionController
         }else{
             
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-            $objProvincias = new Provincias($this->dbAdapter);
-            $objMetodos = new Metodos();
-            
-            $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
-            $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-            foreach ($listaProvincias as $valueProvincias) {
-                $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-                $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {                
+                $objProvincias = new Provincias($this->dbAdapter);
+                $objMetodos = new Metodos();
+
+                $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
+                $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
+                foreach ($listaProvincias as $valueProvincias) {
+                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                    $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+                }
+                $array = array(
+                    'optionSelectProvincias'=>$optionSelectProvincias
+                );
             }
-            $array = array(
-                'optionSelectProvincias'=>$optionSelectProvincias
-            );
         }
         return new ViewModel($array);
     }
