@@ -14,7 +14,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
-use Nel\Modelo\Entity\LugaresMisa;
+use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\TelefonoPersona;
 use Nel\Modelo\Entity\DireccionLugarMisa;
@@ -36,11 +36,17 @@ class MisasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 5);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objMisas = new Misas($this->dbAdapter);
                 $objMetodos = new Metodos();
                 ini_set('date.timezone','America/Bogota'); 
@@ -68,6 +74,8 @@ class MisasController extends AbstractActionController
                 $validar = TRUE;
                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
             }
+            
+                }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
@@ -80,32 +88,39 @@ class MisasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-                $objMetodos = new Metodos();
-               $objMisas = new Misas($this->dbAdapter);
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $descripcionMisa = trim(strtoupper($post['descripcionMisa']));
-                if(empty ($descripcionMisa) || strlen($descripcionMisa) > 200){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DE LA MISA MÁXIMO 200 CARACTERES</div>';
-                }else if(count( $objMisas->FiltrarMisaPorDescripcion($descripcionMisa)) > 0){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA MISA LLAMADA '.$descripcionMisa.'</div>';
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 5);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                 }else{
-                    ini_set('date.timezone','America/Bogota'); 
-                    $hoy = getdate();
-                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                    $resultado =  $objMisas->IngresarMisa($descripcionMisa, $fechaSubida, 1);
-                    if(count($resultado) == 0){
-                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA MISA POR FAVOR INTENTE MÁS TARDE</div>';
-                    }else{ 
-                        $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
-                        $validar = TRUE;
+                    $objMetodos = new Metodos();
+                   $objMisas = new Misas($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+                    $descripcionMisa = trim(strtoupper($post['descripcionMisa']));
+                    if(empty ($descripcionMisa) || strlen($descripcionMisa) > 200){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DE LA MISA MÁXIMO 200 CARACTERES</div>';
+                    }else if(count( $objMisas->FiltrarMisaPorDescripcion($descripcionMisa)) > 0){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA MISA LLAMADA '.$descripcionMisa.'</div>';
+                    }else{
+                        ini_set('date.timezone','America/Bogota'); 
+                        $hoy = getdate();
+                        $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                        $resultado =  $objMisas->IngresarMisa($descripcionMisa, $fechaSubida, 1);
+                        if(count($resultado) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA MISA POR FAVOR INTENTE MÁS TARDE</div>';
+                        }else{ 
+                            $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
+                            $validar = TRUE;
+                        }
                     }
                 }
                 

@@ -16,7 +16,7 @@ use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Cantones;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
-use Nel\Modelo\Entity\TipoUsuario;
+use Nel\Modelo\Entity\AsignarModulo;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -33,11 +33,17 @@ class ConfigurarCantonProvinciaController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
                 $objCantones = new Cantones($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -62,7 +68,7 @@ class ConfigurarCantonProvinciaController extends AbstractActionController
                     $validar = TRUE;
                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'optionCantones'=>$optionCantones));
                 }
-                
+            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));

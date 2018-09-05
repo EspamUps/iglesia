@@ -15,7 +15,7 @@ use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\LugaresMisa;
-use Nel\Modelo\Entity\Misas;
+use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\Sacerdotes;
 use Nel\Modelo\Entity\DireccionLugarMisa;
@@ -37,11 +37,17 @@ class ConfigurarMisaController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 6);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objMetodos = new Metodos();
                 $objConfigurarMisa = new ConfigurarMisa($this->dbAdapter);
 //                $objLugaresMisa = new LugaresMisa($this->dbAdapter);
@@ -132,7 +138,7 @@ class ConfigurarMisaController extends AbstractActionController
                         
                     }
 
-                    
+                 }
                  } 
             }
             
@@ -150,11 +156,17 @@ class ConfigurarMisaController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 6);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objMetodos = new Metodos();
                 $objLugaresMisa = new LugaresMisa($this->dbAdapter);
                 $objDireccionLugarMisa = new DireccionLugarMisa($this->dbAdapter);
@@ -209,7 +221,7 @@ class ConfigurarMisaController extends AbstractActionController
                             return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
                         }
                     }
-                }
+            }}
             }
             
         }
@@ -225,11 +237,17 @@ class ConfigurarMisaController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 6);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objMetodos = new Metodos();
                 $objPersona = new Persona($this->dbAdapter);
                 $objSacerdotes = new Sacerdotes($this->dbAdapter);
@@ -275,7 +293,7 @@ class ConfigurarMisaController extends AbstractActionController
                             return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla,'idSacerdoteEncriptado'=>$idSacerdoteEncriptado));
                         }
                     }
-                }
+            }}
                 
             }
         }

@@ -15,6 +15,7 @@ use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Provincias;
+use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\Cantones;
@@ -34,11 +35,17 @@ class CantonesController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objMetodos = new Metodos();
                 $listaProvincias = $objProvincias->ObtenerProvincias();
@@ -71,6 +78,8 @@ class CantonesController extends AbstractActionController
                 $mensaje = '';
                 $validar = TRUE;
                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formCantones'=>$formCantones));
+            
+                }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
@@ -86,11 +95,17 @@ class CantonesController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
                 $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -131,6 +146,7 @@ class CantonesController extends AbstractActionController
                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
                 }
             }
+            }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
@@ -145,11 +161,17 @@ class CantonesController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
                 $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -180,6 +202,7 @@ class CantonesController extends AbstractActionController
                     }
                 }
             }
+            }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
@@ -192,11 +215,17 @@ class CantonesController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objCantones = new Cantones($this->dbAdapter);
                 $objProvicias = new Provincias($this->dbAdapter);
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
@@ -251,6 +280,7 @@ class CantonesController extends AbstractActionController
                         }
                     }
                 }
+            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));

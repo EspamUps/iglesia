@@ -15,6 +15,7 @@ use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Provincias;
+use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\DireccionPersona;
@@ -36,11 +37,17 @@ class ParroquiasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objParroquias = new Parroquias($this->dbAdapter);
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
@@ -106,6 +113,7 @@ class ParroquiasController extends AbstractActionController
                         }
                     }
                 }
+                }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
@@ -122,11 +130,17 @@ class ParroquiasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
                 $objCantones = new Cantones($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -151,7 +165,7 @@ class ParroquiasController extends AbstractActionController
                     $validar = TRUE;
                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'optionCantones'=>$optionCantones));
                 }
-                
+            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
@@ -167,11 +181,17 @@ class ParroquiasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objMetodos = new Metodos();
                 $listaProvincias = $objProvincias->ObtenerProvincias();
@@ -212,6 +232,7 @@ class ParroquiasController extends AbstractActionController
                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formParroquias'=>$formParroquias));
             }
         }
+        }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
@@ -225,11 +246,17 @@ class ParroquiasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                 $objDireccionPersona = new DireccionPersona($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -270,6 +297,7 @@ class ParroquiasController extends AbstractActionController
                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
                 }
             }
+            }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
@@ -284,11 +312,17 @@ class ParroquiasController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
         }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
             $request=$this->getRequest();
             if(!$request->isPost()){
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
             }else{
-                $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
                 $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                 $objDireccionPersona = new DireccionPersona($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -318,6 +352,7 @@ class ParroquiasController extends AbstractActionController
                             return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
                         }
                     }
+                }
                 }
             }
         }
