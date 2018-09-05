@@ -36,31 +36,35 @@ class AdministradorController extends AbstractActionController
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
         }else{
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-            $objMisas = new Misas($this->dbAdapter);
-            $objPersonas = new Persona($this->dbAdapter);
-            $objLugaresMisa = new LugaresMisa($this->dbAdapter);
-            $objDireccionLugarMisa = new DireccionLugarMisa($this->dbAdapter);
-            $objMetodos = new Metodos();
-            $listaMisas = $objMisas->ObtenerMisas();
-            $optionSelectMisas = '<option value="0">SELECCIONE UNA MISA</option>';
-            foreach ($listaMisas as $valueMisas) {
-                $idMisaEncriptado = $objMetodos->encriptar($valueMisas['idMisa']);
-                $optionSelectMisas = $optionSelectMisas.'<option value="'.$idMisaEncriptado.'">'.$valueMisas['descripcionMisa'].'</option>';
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 6);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                $objMisas = new Misas($this->dbAdapter);
+                $objPersonas = new Persona($this->dbAdapter);
+                $objLugaresMisa = new LugaresMisa($this->dbAdapter);
+                $objDireccionLugarMisa = new DireccionLugarMisa($this->dbAdapter);
+                $objMetodos = new Metodos();
+                $listaMisas = $objMisas->ObtenerMisas();
+                $optionSelectMisas = '<option value="0">SELECCIONE UNA MISA</option>';
+                foreach ($listaMisas as $valueMisas) {
+                    $idMisaEncriptado = $objMetodos->encriptar($valueMisas['idMisa']);
+                    $optionSelectMisas = $optionSelectMisas.'<option value="'.$idMisaEncriptado.'">'.$valueMisas['descripcionMisa'].'</option>';
+                }
+                        
+                $listaLugaresMisa = $objLugaresMisa->ObtenerObtenerLugaresMisa();
+                $optionSelectLugaresMisa = '<option value="0">SELECCIONE UN LUGAR</option>';
+                foreach ($listaLugaresMisa as $valueLugarMisa) {
+                    $idLugarMisaEncriptado = $objMetodos->encriptar($valueLugarMisa['idLugarMisa']);
+                    $optionSelectLugaresMisa = $optionSelectLugaresMisa.'<option value="'.$idLugarMisaEncriptado.'">'.$valueLugarMisa['nombreLugar'].'</option>';
+                }
+                 $array = array(
+                    'optionSelectMisas'=>$optionSelectMisas,
+                     'optionSelectLugaresMisa'=>$optionSelectLugaresMisa
+                );
             }
-           
-            
-            
-            $listaLugaresMisa = $objLugaresMisa->ObtenerObtenerLugaresMisa();
-            $optionSelectLugaresMisa = '<option value="0">SELECCIONE UN LUGAR</option>';
-            foreach ($listaLugaresMisa as $valueLugarMisa) {
-                $idLugarMisaEncriptado = $objMetodos->encriptar($valueLugarMisa['idLugarMisa']);
-                $optionSelectLugaresMisa = $optionSelectLugaresMisa.'<option value="'.$idLugarMisaEncriptado.'">'.$valueLugarMisa['nombreLugar'].'</option>';
-            }
-             $array = array(
-                'optionSelectMisas'=>$optionSelectMisas,
-                 'optionSelectLugaresMisa'=>$optionSelectLugaresMisa
-            );
-            
         }
         return new ViewModel($array);
     }
@@ -72,6 +76,14 @@ class AdministradorController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
         }
+        else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 5);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+        }
         return new ViewModel($array);
     }
     
@@ -82,6 +94,14 @@ class AdministradorController extends AbstractActionController
         $array = array();
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }
+        else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 2);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
         }
         return new ViewModel($array);
     }
@@ -96,20 +116,26 @@ class AdministradorController extends AbstractActionController
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
         }else{
-            
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-            $objProvincias = new Provincias($this->dbAdapter);
-            $objMetodos = new Metodos();
-            
-            $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
-            $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-            foreach ($listaProvincias as $valueProvincias) {
-                $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-                $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 4);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {                
+                $objProvincias = new Provincias($this->dbAdapter);
+                $objMetodos = new Metodos();
+
+                $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
+                $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
+                foreach ($listaProvincias as $valueProvincias) {
+                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                    $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+                }
+                $array = array(
+                    'optionSelectProvincias'=>$optionSelectProvincias
+                );
             }
-            $array = array(
-                'optionSelectProvincias'=>$optionSelectProvincias
-            );
         }
         return new ViewModel($array);
     }
@@ -121,6 +147,14 @@ class AdministradorController extends AbstractActionController
         $array = array();
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }
+        else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
         }
         return new ViewModel($array);
     }
@@ -134,8 +168,7 @@ class AdministradorController extends AbstractActionController
         );
         if(!$sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-        }else{
-            
+        }else{            
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
