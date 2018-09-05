@@ -120,7 +120,10 @@ if($sesionUsuario->offsetExists('idUsuario')){
                             <img style="width: 90%;" src="<?php echo $this->basePath();?>/public/librerias/images/pagina/logoiglesia.png">
                         </div>
                     </div>
-                    <ul class="sidebar-menu">
+                    <?php
+                       echo  $sesionUsuario->offsetGet('menu_slide');
+                    ?>
+<!--                    <ul class="sidebar-menu">
                         <li class="header">OPCIONES</li>
                         <li>
                             <a href="<?php echo $this->basePath();?>/administrador/direcciones" ><i class="fa fa-asterisk"></i><span>DIRECCIONES</span></a>
@@ -153,7 +156,7 @@ if($sesionUsuario->offsetExists('idUsuario')){
                         <li>
                             <a  href="<?php echo $this->basePath();?>/inicio/salir" ><i class="fa fa-sign-out"></i><span>SALIR</span></a>
                         </li>
-                    </ul>
+                    </ul>-->
                 </section>
             </aside>
          

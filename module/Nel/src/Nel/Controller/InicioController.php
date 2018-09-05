@@ -21,6 +21,8 @@ use Nel\Modelo\Entity\TipoUsuario;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
+use Nel\Modelo\Entity\AsignarModulo;
+
 
 class InicioController extends AbstractActionController
 {
@@ -28,6 +30,7 @@ class InicioController extends AbstractActionController
     public function inicioAction()
     {
         $this->layout("layout/login");
+        //crear una sesion
         $sesionUsuario = new Container('sesionparroquia');
         if($sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
@@ -49,8 +52,9 @@ class InicioController extends AbstractActionController
                 $objPersona = new Persona($this->dbAdapter);
                 $objIglesia = new Iglesias($this->dbAdapter);
                 $objNombreIglesia = new NombreIglesia($this->dbAdapter); 
-                        
+                $objAsignarModulo = new AsignarModulo($this->dbAdapter);
                 $objMetodos = new Metodos();
+                
                 $post = array_merge_recursive(
                     $request->getPost()->toArray(),
                     $request->getFiles()->toArray()
@@ -73,24 +77,50 @@ class InicioController extends AbstractActionController
                         $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA CUENTA HA SIDO DESHABILITADA</div>';
                     }else{
                         $listaTipoUsuario = $objTipoUsuario->FiltrarTipoUsuario($listaUsuario[0]['idTipoUsuario']);
-                        if(count($listaTipoUsuario) != 1){
+                        if(count($listaTipoUsuario) == 0){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">ERROR INTERNO DEL SISTEMA, REVISAR LOS TIPOS DE USUARIO</div>';
                         }else{
-                            $sesionUsuario->offsetSet('idUsuario',$listaUsuario[0]['idUsuario']);
-                            $sesionUsuario->offsetSet('nombreUsuario', $listaUsuario[0]['nombreUsuario']);
-                            $sesionUsuario->offsetSet('contrasena', $listaUsuario[0]['contrasena']);
-                            $listaPersona = $objPersona->FiltrarPersona($listaUsuario[0]['idPersona']);
-                            $sesionUsuario->offsetSet('nombres', $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['primerApellido']);
-                            $sesionUsuario->offsetSet('idIglesia',$listaPersona[0]['idIglesia']);
-//                            $listaIglesia = $objIglesia->FiltrarIglesia($listaPersona[0]['idIglesia']);
-                            $nombreIglesia = 'SGP';
-                            $listaNombreIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($listaPersona[0]['idIglesia'], 1);
-                            if(count($listaNombreIglesia) == 1){
-                                $nombreIglesia = $listaNombreIglesia[0]['nombreIglesia'];
+                            $listaAsignarModulo = $objAsignarModulo->FiltrarModulosPorUsuario($listaUsuario[0]['idUsuario']);
+                            if(count($listaAsignarModulo)==0)
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA CUENTA NO TIENE MÓDULOS ASIGNADOS</div>';
+                            else{
+                                
+                                
+                                $menu_slide = "";
+                                $submenu_slide = "";
+                                foreach ($listaAsignarModulo as $valueAsignarM)
+                                {
+                                    $submenu_slide=$submenu_slide.'
+                                        <li>
+                                            <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
+                                        </li>';
+                                }
+                                if(!empty($submenu_slide))
+                                {
+                                    $menu_slide='<ul class="sidebar-menu">'.$submenu_slide.' <li>
+                                        <a  href="'.$this->getRequest()->getBaseUrl().'/inicio/salir" ><i class="fa fa-sign-out"></i><span>SALIR</span></a>
+                                    </li></ul>';
+                                }
+                                
+                                $sesionUsuario->offsetSet('menu_slide',$menu_slide);
+
+                                $sesionUsuario->offsetSet('idUsuario',$listaUsuario[0]['idUsuario']);
+                                $sesionUsuario->offsetSet('nombreUsuario', $listaUsuario[0]['nombreUsuario']);
+                                $sesionUsuario->offsetSet('contrasena', $listaUsuario[0]['contrasena']);
+                                $listaPersona = $objPersona->FiltrarPersona($listaUsuario[0]['idPersona']);
+                                $sesionUsuario->offsetSet('nombres', $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['primerApellido']);
+                                $sesionUsuario->offsetSet('idIglesia',$listaPersona[0]['idIglesia']);
+    //                            $listaIglesia = $objIglesia->FiltrarIglesia($listaPersona[0]['idIglesia']);
+                                $nombreIglesia = 'SGP';
+                                $listaNombreIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($listaPersona[0]['idIglesia'], 1);
+                                if(count($listaNombreIglesia) == 1){
+                                    $nombreIglesia = $listaNombreIglesia[0]['nombreIglesia'];
+                                }
+                                $sesionUsuario->offsetSet('nombreIglesia',$nombreIglesia);
+
+                                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+                        
                             }
-                            $sesionUsuario->offsetSet('nombreIglesia',$nombreIglesia);
-                            
-                            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
                         }
                     }
                     
