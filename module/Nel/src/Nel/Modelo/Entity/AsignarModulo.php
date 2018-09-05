@@ -23,6 +23,11 @@ class AsignarModulo extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarModulosPorUsuario('{$idUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+      public function FiltrarModuloPorIdentificadorYUsuario($idUsuario, $identificadorModulo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarModuloPorIdentificadorYUsuario('{$idUsuario}','{$identificadorModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    public function IngresarMisa($descripcionMisa,$fechaIngresoMisa,$estadoMisa){
 //        $resultado = $this->getAdapter()->query("CALL Sp_IngresarMisa('{$descripcionMisa}','{$fechaIngresoMisa}','{$estadoMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
