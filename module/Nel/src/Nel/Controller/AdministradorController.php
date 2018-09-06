@@ -104,6 +104,14 @@ class AdministradorController extends AbstractActionController
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 2);
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                 $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 2, 3);
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+            
         }
         return new ViewModel($array);
     }
@@ -157,7 +165,8 @@ class AdministradorController extends AbstractActionController
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
-        }
+            
+        }     
         return new ViewModel($array);
     }
     

@@ -236,7 +236,6 @@ function obtenerFormCantones(){
             }
         }
     }); 
-    
 }
 function cargandoCantones(contenedor){
     

@@ -13,6 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
+use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\AsignarModulo;
@@ -57,23 +58,34 @@ class CantonesController extends AbstractActionController
                 $selectProvincias = '<select onchange="cargandoCantones(\'#contenedorTablaCantones\');filtrarCantonesPorProvincia();" id="selectProvinciasCantones" name="selectProvinciasCantones" class="form-control">
                     '.$optionProvincias.'
                 </select>';
-                
-                $formCantones = '<div class="form-group col-lg-6">
-                        <label>PROVINCIAS</label>
-                        <div class=" margin">
-                            '.$selectProvincias.'
-                        </div>
-                   </div>
-                    <div class="form-group col-lg-6">
-                        <label for="nombreProvincia">NOMBRE DEL CANTÓN</label>
-                        <div class="input-group margin">
-                            <input autofocus  maxlength="100" type="text" id="nombreCanton" name="nombreCanton" class="form-control">
-                            <span class="input-group-btn">
-                                <button style="margin-left: 10%;" name="btnGuardarCanton" id="btnGuardarCanton" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
-                            </span>
-                        </div>
-                  </div>';
-                
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
+                $formCantones ="";
+        
+                if($validarprivilegio==true)
+                    {
+                    $formCantones = '<div class="form-group col-lg-6">
+                            <label>PROVINCIAS</label>
+                            <div class=" margin">
+                                '.$selectProvincias.'
+                            </div>
+                       </div>
+                        <div class="form-group col-lg-6">
+                            <label for="nombreProvincia">NOMBRE DEL CANTÓN</label>
+                            <div class="input-group margin">
+                                <input autofocus  maxlength="100" type="text" id="nombreCanton" name="nombreCanton" class="form-control">
+                                <span class="input-group-btn">
+                                    <button style="margin-left: 10%;" name="btnGuardarCanton" id="btnGuardarCanton" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
+                                </span>
+                            </div>
+                      </div>';
+                    }else{
+                        $formCantones = '<label>PROVINCIAS</label>
+                            <div class=" margin">
+                                '.$selectProvincias.'
+                            </div>'; 
+                        
+                    }
                            
                 $mensaje = '';
                 $validar = TRUE;

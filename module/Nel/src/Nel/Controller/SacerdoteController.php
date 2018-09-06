@@ -16,6 +16,7 @@ use Nel\Metodos\Metodos;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\Telefonos;
+use Nel\Modelo\Entity\AsignarModulo; 
 use Nel\Modelo\Entity\TelefonoPersona;
 use Nel\Modelo\Entity\DireccionPersona;
 use Nel\Modelo\Entity\Sacerdotes;
@@ -328,77 +329,78 @@ class SacerdoteController extends AbstractActionController
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 2);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-            else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objPersona = new Persona($this->dbAdapter);
-                $objSacerdotes = new Sacerdotes($this->dbAdapter);
-                $objTelefono = new Telefonos($this->dbAdapter);
-                $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
-                $objDireccionPersona = new DireccionPersona($this->dbAdapter);
-                $objMetodos = new Metodos();
-                ini_set('date.timezone','America/Bogota'); 
-                $listaSacerdotes = $objSacerdotes->ObtenerSacerdotes();
-                $array1 = array();
-                $i = 0;
-                $j = count($listaSacerdotes);
-                foreach ($listaSacerdotes as $value) {
-                    $listaPersona = $objPersona->FiltrarPersona($value['idPersona']);
-                    $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
-                    $numeroTelefono = '';
-                    if(count($listaTelefonoPersona) > 0){
-                        $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
-                        $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
+            else 
+                {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objPersona = new Persona($this->dbAdapter);
+                    $objSacerdotes = new Sacerdotes($this->dbAdapter);
+                    $objTelefono = new Telefonos($this->dbAdapter);
+                    $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
+                    $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+                    $objMetodos = new Metodos();
+                    ini_set('date.timezone','America/Bogota'); 
+                    $listaSacerdotes = $objSacerdotes->ObtenerSacerdotes();
+                    $array1 = array();
+                    $i = 0;
+                    $j = count($listaSacerdotes);
+                    foreach ($listaSacerdotes as $value) {
+                        $listaPersona = $objPersona->FiltrarPersona($value['idPersona']);
+                        $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
+                        $numeroTelefono = '';
+                        if(count($listaTelefonoPersona) > 0){
+                            $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
+                            $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
+                        }
+
+                        $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
+                        $provincia = '';
+                        $canton = '';
+                        $parroquia = '';
+                        $direccion = '';
+                        $referencia = '';
+                        if(count($listaDireccionPersona) > 0){
+                            $provincia = $listaDireccionPersona[0]['nombreProvincia'];
+                            $canton = $listaDireccionPersona[0]['nombreCanton'];
+                            $parroquia = $listaDireccionPersona[0]['nombreParroquia'];
+                            $direccion = $listaDireccionPersona[0]['direccionPersona'];
+                            $referencia = $listaDireccionPersona[0]['referenciaDireccionPersona'];
+                        }
+                        $identificacion = $listaPersona[0]['identificacion'];
+                        $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
+                        $apellidos = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'];
+                        $fechaRegistro = $objMetodos->obtenerFechaEnLetra($value['fechaIngresoSacerdote']);
+
+                        $fechaNacimiento2 = new \DateTime($listaPersona[0]['fechaNacimiento']);
+                        $fechaActual = new \DateTime(date("d-m-Y"));
+                        $diff = $fechaActual->diff($fechaNacimiento2);
+                        $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($listaPersona[0]['fechaNacimiento']);
+                         $botones = '';     
+                        $array1[$i] = array(
+                            '_j'=>$j,
+                            'identificacion'=>$identificacion,
+                            'nombres'=>$nombres,
+                            'apellidos'=>$apellidos,
+                            'fechaNacimiento'=>$fechaNacimiento,
+                            'edad'=>$diff->y,
+                            'numeroTelefono'=>$numeroTelefono,
+                            'provincia'=>$provincia,
+                            'canton'=>$canton,
+                            'parroquia'=>$parroquia,
+                            'direccion'=>$direccion,
+                            'referencia'=>$referencia,
+                            'fechaRegistro'=>$fechaRegistro,
+                            'opciones'=>$botones,
+                        );
+                        $j--;
+                        $i++;
                     }
-                        
-                    $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
-                    $provincia = '';
-                    $canton = '';
-                    $parroquia = '';
-                    $direccion = '';
-                    $referencia = '';
-                    if(count($listaDireccionPersona) > 0){
-                        $provincia = $listaDireccionPersona[0]['nombreProvincia'];
-                        $canton = $listaDireccionPersona[0]['nombreCanton'];
-                        $parroquia = $listaDireccionPersona[0]['nombreParroquia'];
-                        $direccion = $listaDireccionPersona[0]['direccionPersona'];
-                        $referencia = $listaDireccionPersona[0]['referenciaDireccionPersona'];
-                    }
-                    $identificacion = $listaPersona[0]['identificacion'];
-                    $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
-                    $apellidos = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'];
-                    $fechaRegistro = $objMetodos->obtenerFechaEnLetra($value['fechaIngresoSacerdote']);
-                        
-                    $fechaNacimiento2 = new \DateTime($listaPersona[0]['fechaNacimiento']);
-                    $fechaActual = new \DateTime(date("d-m-Y"));
-                    $diff = $fechaActual->diff($fechaNacimiento2);
-                    $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($listaPersona[0]['fechaNacimiento']);
-                     $botones = '';     
-                    $array1[$i] = array(
-                        '_j'=>$j,
-                        'identificacion'=>$identificacion,
-                        'nombres'=>$nombres,
-                        'apellidos'=>$apellidos,
-                        'fechaNacimiento'=>$fechaNacimiento,
-                        'edad'=>$diff->y,
-                        'numeroTelefono'=>$numeroTelefono,
-                        'provincia'=>$provincia,
-                        'canton'=>$canton,
-                        'parroquia'=>$parroquia,
-                        'direccion'=>$direccion,
-                        'referencia'=>$referencia,
-                        'fechaRegistro'=>$fechaRegistro,
-                        'opciones'=>$botones,
-                    );
-                    $j--;
-                    $i++;
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
                 }
-                $mensaje = '';
-                $validar = TRUE;
-                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
-            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));

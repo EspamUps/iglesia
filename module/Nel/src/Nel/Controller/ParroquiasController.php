@@ -13,6 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
+use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\AsignarModulo;
@@ -203,7 +204,12 @@ class ParroquiasController extends AbstractActionController
                 $selectProvincias = '<select onchange="filtrarSelectCantonesPorProvincia();" id="selectProvinciasParroquias" name="selectProvinciasParroquias" class="form-control">
                     '.$optionProvincias.'
                 </select>';
-                
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
+                $formCantones ="";
+        
+                if($validarprivilegio==true)
+                    {
                 $formParroquias = '<div class="form-group col-lg-4">
                         <label>PROVINCIAS</label>
                         <div class=" margin">
@@ -226,7 +232,24 @@ class ParroquiasController extends AbstractActionController
                                 <button style="margin-left: 10%;" name="btnGuardarParroquia" id="btnGuardarParroquia" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
                             </span>
                         </div>
-                  </div>';          
+                  </div>';  
+                    }
+                    else{
+                         $formParroquias = '<div class="form-group col-lg-6">
+                        <label>PROVINCIAS</label>
+                        <div class=" margin">
+                            '.$selectProvincias.'
+                        </div>
+                   </div>
+                   <div class="form-group col-lg-6">
+                        <label>CANTONES</label>
+                        <div class=" margin">
+                            <select onchange="cargandoParroquias(\'#contenedorTablaParroquias\');filtrarParroquiasPorCanton();" class="form-control" id="selectCantonesParroquias" name="selectCantonesParroquias">
+                                <option value="0">SELECCIONE UN CANTÓN</option>
+                            </select>
+                        </div>
+                   </div>';  
+                    }
                 $mensaje = '';
                 $validar = TRUE;
                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formParroquias'=>$formParroquias));

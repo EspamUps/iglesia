@@ -1,18 +1,21 @@
 <?php
+
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/provincias.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/cantones.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/parroquias.php');
-
  ?>
 
 <div class="content-wrapper" style="min-height: 1123px;">
     <br><br>
+  
     <section class="content-header">
         <h1>
             Direcciones
             <small>SWGP</small>
         </h1>
     </section>
+    
+      
     <section class="content">
         <div class="box-body nav-tabs-custom">
             <div class="row ">
@@ -26,24 +29,30 @@
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active"  id="tabProvincias">
+                         
                                 <div id="mensajeFormProvincias"> </div>
+                                
                                 <form class="col-lg-12" id="formIngresarProvincias" method="post" action="<?php echo $this->basePath();?>/provincias/ingresarprovincia">
 
                                 </form>
+                           
                                 <div class="col-lg-12" id="contenedorTablaProvincias">
                                     
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabCantones">
+                      
                                 <div id="mensajeFormCantones"> </div>
                                 <form id="formIngresarCantones" method="post" action="<?php echo $this->basePath();?>/cantones/ingresarcanton">
 
                                 </form>
+                          
                                 <div class="col-lg-12" id="contenedorTablaCantones">
                                     
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabParroquias">
+                              
                                 <div id="mensajeFormParroquias"> </div>
                                 <form id="formIngresarParroquias" method="post" action="<?php echo $this->basePath();?>/parroquias/ingresarparroquia">
 <!--                                    <div class="form-group col-lg-4">
@@ -64,6 +73,7 @@
                                     </div>-->
                                     
                                 </form>
+                             
                                 <div class="col-lg-12" id="contenedorTablaParroquias">
                                     
                                 </div>
@@ -74,6 +84,7 @@
             </div>
         </div>
     </section>
+       
 </div>
 <script type="text/javascript">
 

@@ -13,6 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
+use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
@@ -150,7 +151,12 @@ class ProvinciasController extends AbstractActionController
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
                 $objMetodos = new Metodos();
-                $formProvincias = '<div class="form-group col-lg-6">
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
+                $formProvincias ="";
+                if($validarprivilegio==true)
+                    {
+                    $formProvincias = '<div class="form-group col-lg-6">
                         <label for="nombreProvincia">NOMBRE DE LA PROVINCIA</label>
                         <div class="input-group margin">
                             <input autofocus  maxlength="100" type="text" id="nombreProvincia" name="nombreProvincia" class="form-control">
@@ -159,6 +165,9 @@ class ProvinciasController extends AbstractActionController
                             </span>
                         </div>
                   </div>';
+                    }
+                
+                
                 $listaProvincias = $objProvincias->ObtenerProvincias();
                 $array1 = array();
                 $i = 0;
