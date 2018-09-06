@@ -19,6 +19,7 @@ use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Telefonos;
 use Nel\Modelo\Entity\TelefonoPersona;
+use Nel\Modelo\Entity\HistorialPersona;
 use Nel\Modelo\Entity\DireccionPersona;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Zend\Session\Container;
@@ -299,7 +300,7 @@ class PersonaController extends AbstractActionController
                     $objPersona = new Persona($this->dbAdapter);
                    
                     $listaPersonas = $objPersona->ObtenerPersonas();
-                    $tabla = $this->CargarTablaPersonaAction($listaPersonas, 0, count($listaPersonas));
+                    $tabla = $this->CargarTablaPersonaAction($idUsuario,$this->dbAdapter,$listaPersonas, 0, count($listaPersonas));
                     
 
                     $mensaje = '';
@@ -312,11 +313,13 @@ class PersonaController extends AbstractActionController
     }
     
     
-    function CargarTablaPersonaAction($listaPersonas, $i, $j)
+    function CargarTablaPersonaAction($idUsuario,$adaptador,$listaPersonas, $i, $j)
     {
-        $objTelefono = new Telefonos($this->dbAdapter);
-        $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
-        $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+        $objTelefono = new Telefonos($adaptador);
+        $objTelefonoPersona = new TelefonoPersona($adaptador);
+        $objDireccionPersona = new DireccionPersona($adaptador);
+        $objMetodosControler = new MetodosControladores();
+        $objHistorialPersona = new HistorialPersona($adaptador);
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
         $array1 = array();
@@ -347,8 +350,13 @@ class PersonaController extends AbstractActionController
             if (count($listaDireccionPersona)>0)
             {
                 $botonDireccion = '<button data-target="#modalVerDireccionPersona" data-toggle="modal" id="btnFiltrarDireccion'.$i.'" title="VER DIRECCIÓN" onclick="FiltrarDireccionPorPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-home"></i></button>';
-
             }
+            $botonEliminarPersona = '';
+            if($objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1) == true){
+               if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0)
+                $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+            }
+            
             $identificacion = $value['identificacion'];
             $nombres = $value['primerNombre'].' '.$value['segundoNombre'];
             $apellidos = $value['primerApellido'].' '.$value['segundoApellido'];
@@ -357,7 +365,9 @@ class PersonaController extends AbstractActionController
             $fechaActual = new \DateTime(date("d-m-Y"));
             $diff = $fechaActual->diff($fechaNacimiento2);
             $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaNacimiento']);
-             $botones = '';     
+             $botones = $botonEliminarPersona;  
+             
+             
             $array1[$i] = array(
                 '_j'=>$j,
                 'identificacion'=>$identificacion,
