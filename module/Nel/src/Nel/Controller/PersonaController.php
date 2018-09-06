@@ -191,7 +191,91 @@ class PersonaController extends AbstractActionController
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
-    
+    public function  obtenerdireccionpersonaAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{               
+                    $objMetodos = new Metodos();
+                    $objPersona = new Persona($this->dbAdapter);
+                    $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+
+                    $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+
+                    $idPersonaEncriptado = $post['id'];
+                    $i = $post['i'];
+                    if($idPersonaEncriptado == NULL || $idPersonaEncriptado == "" ){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
+
+                    }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else{
+                        $idPersona = $objMetodos->desencriptar($idPersonaEncriptado); 
+                        $listaPersona = $objPersona->FiltrarPersona($idPersona);
+                        if(count($listaPersona) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE EN NUESTRA BASE DE DATOS</div>';
+                        }else{
+                            $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
+                            $tabla = '';
+                            if(count($listaDireccionPersona) > 0){
+                                $tabla = '<div class="table-responsive">
+                                    <table class="table">
+                                        <tr>
+                                            <th>PROVINCIA</th>
+                                            <td>'.$listaDireccionPersona[0]['nombreProvincia'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th>CANTÓN</th>
+                                            <td>'.$listaDireccionPersona[0]['nombreCanton'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th>PARRÓQUIA</th>
+                                            <td>'.$listaDireccionPersona[0]['nombreParroquia'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th>DIRECCIÓN</th>
+                                             <td>'.$listaDireccionPersona[0]['direccionPersona'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th>REFERENCIA</th>
+                                             <td>'.$listaDireccionPersona[0]['referenciaDireccionPersona'].'</td>
+                                        </tr>
+                                    </table>
+                                </div>';
+                            }
+                            $mensaje = '';
+                            $validar = TRUE;
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                        }
+                    }
+
+                }  
+            }
+        }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+
     public function obtenerpersonasAction()
     {
         $this->layout("layout/administrador");
@@ -213,71 +297,84 @@ class PersonaController extends AbstractActionController
                     $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                 }else{
                     $objPersona = new Persona($this->dbAdapter);
-                    $objTelefono = new Telefonos($this->dbAdapter);
-                    $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
-                    $objDireccionPersona = new DireccionPersona($this->dbAdapter);
-                    $objMetodos = new Metodos();
-                    ini_set('date.timezone','America/Bogota'); 
+                   
                     $listaPersonas = $objPersona->ObtenerPersonas();
-                    $array1 = array();
-                    $i = 0;
-                    $j = count($listaPersonas);
-                    foreach ($listaPersonas as $value) {
-                        $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($value['idPersona'], 1);
-                        $numeroTelefono = '';
-                        if(count($listaTelefonoPersona) > 0){
-                            $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
-                            $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
-                        }
-                        $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($value['idPersona'], 1);
-                        $provincia = '';
-                        $canton = '';
-                        $parroquia = '';
-                        $direccion = '';
-                        $referencia = '';
-                        if(count($listaDireccionPersona) > 0){
-                            $provincia = $listaDireccionPersona[0]['nombreProvincia'];
-                            $canton = $listaDireccionPersona[0]['nombreCanton'];
-                            $parroquia = $listaDireccionPersona[0]['nombreParroquia'];
-                            $direccion = $listaDireccionPersona[0]['direccionPersona'];
-                            $referencia = $listaDireccionPersona[0]['referenciaDireccionPersona'];
-                        }
-                        $identificacion = $value['identificacion'];
-                        $nombres = $value['primerNombre'].' '.$value['segundoNombre'];
-                        $apellidos = $value['primerApellido'].' '.$value['segundoApellido'];
-                        $fechaRegistro = $objMetodos->obtenerFechaEnLetra($value['fechaRegistro']);
-                        $fechaNacimiento2 = new \DateTime($value['fechaNacimiento']);
-                        $fechaActual = new \DateTime(date("d-m-Y"));
-                        $diff = $fechaActual->diff($fechaNacimiento2);
-                        $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaNacimiento']);
-                         $botones = '';     
-                        $array1[$i] = array(
-                            '_j'=>$j,
-                            'identificacion'=>$identificacion,
-                            'nombres'=>$nombres,
-                            'apellidos'=>$apellidos,
-                            'fechaNacimiento'=>$fechaNacimiento,
-                            'edad'=>$diff->y,
-                            'numeroTelefono'=>$numeroTelefono,
-                            'provincia'=>$provincia,
-                            'canton'=>$canton,
-                            'parroquia'=>$parroquia,
-                            'direccion'=>$direccion,
-                            'referencia'=>$referencia,
-                            'fechaRegistro'=>$fechaRegistro,
-                            'opciones'=>$botones,
-                        );
-                        $j--;
-                        $i++;
-                    }
+                    $tabla = $this->CargarTablaPersonaAction($listaPersonas, 0, count($listaPersonas));
+                    
 
                     $mensaje = '';
                     $validar = TRUE;
-                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
                 }                    
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    function CargarTablaPersonaAction($listaPersonas, $i, $j)
+    {
+        $objTelefono = new Telefonos($this->dbAdapter);
+        $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
+        $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+        $objMetodos = new Metodos();
+        ini_set('date.timezone','America/Bogota'); 
+        $array1 = array();
+//      $i = 0;
+//      $j = count($listaPersonas);
+        foreach ($listaPersonas as $value) {
+            $idPersonaEncriptado = $objMetodos->encriptar($value['idPersona']);
+            $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($value['idPersona'], 1);
+            $numeroTelefono = '';
+            if(count($listaTelefonoPersona) > 0){
+                $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
+                $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
+            }
+            $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($value['idPersona'], 1);
+//                        $provincia = '';
+//                        $canton = '';
+//                        $parroquia = '';
+//                        $direccion = '';
+//                        $referencia = '';
+//                        if(count($listaDireccionPersona) > 0){
+//                            $provincia = $listaDireccionPersona[0]['nombreProvincia'];
+//                            $canton = $listaDireccionPersona[0]['nombreCanton'];
+//                            $parroquia = $listaDireccionPersona[0]['nombreParroquia'];
+//                            $direccion = $listaDireccionPersona[0]['direccionPersona'];
+//                            $referencia = $listaDireccionPersona[0]['referenciaDireccionPersona'];
+//                        }
+            $botonDireccion ="";
+            if (count($listaDireccionPersona)>0)
+            {
+                $botonDireccion = '<button data-target="#modalVerDireccionPersona" data-toggle="modal" id="btnFiltrarDireccion'.$i.'" title="VER DIRECCIÓN" onclick="FiltrarDireccionPorPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-home"></i></button>';
+
+            }
+            $identificacion = $value['identificacion'];
+            $nombres = $value['primerNombre'].' '.$value['segundoNombre'];
+            $apellidos = $value['primerApellido'].' '.$value['segundoApellido'];
+            $fechaRegistro = $objMetodos->obtenerFechaEnLetra($value['fechaRegistro']);
+            $fechaNacimiento2 = new \DateTime($value['fechaNacimiento']);
+            $fechaActual = new \DateTime(date("d-m-Y"));
+            $diff = $fechaActual->diff($fechaNacimiento2);
+            $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaNacimiento']);
+             $botones = '';     
+            $array1[$i] = array(
+                '_j'=>$j,
+                'identificacion'=>$identificacion,
+                'nombres'=>$nombres,
+                'apellidos'=>$apellidos,
+                'fechaNacimiento'=>$fechaNacimiento,
+                'edad'=>$diff->y,
+                'numeroTelefono'=>$numeroTelefono,
+                'botonVerDireccion'=>$botonDireccion,
+                'fechaRegistro'=>$fechaRegistro,
+                'opciones'=>$botones,
+            );
+            $j--;
+            $i++;
+        }
+        
+        return $array1;
     }
 
 }
