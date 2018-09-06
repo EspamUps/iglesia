@@ -12,9 +12,11 @@ namespace Nel\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Nel\Metodos\Metodos;
+use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
+use Nel\Modelo\Entity\AsignarPrivilegio;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
@@ -175,7 +177,9 @@ class AdministradorController extends AbstractActionController
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
-            else {                
+            else {       
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 1, 3);
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objMetodos = new Metodos();
 
@@ -186,14 +190,14 @@ class AdministradorController extends AbstractActionController
                     $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
                 }
                 $array = array(
-                    'optionSelectProvincias'=>$optionSelectProvincias
+                    'optionSelectProvincias'=>$optionSelectProvincias,
+                    'validacionPrivilegio' =>  $validarprivilegio
                 );
             }
         }
         return new ViewModel($array);
     }
-    
-    
+      
     public function inicioAction()
     {
         $this->layout("layout/administrador");
