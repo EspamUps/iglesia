@@ -1,4 +1,5 @@
 <?php
+$validacionPrivilegio = $this->validacionPrivilegio;
 $optionSelectProvincias = $this->optionSelectProvincias;
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/lugaresmisa/lugaresmisa.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
@@ -11,6 +12,10 @@ $optionSelectProvincias = $this->optionSelectProvincias;
             <small>SWGP</small>
         </h1>
     </section>
+        <?php
+        if($validacionPrivilegio==true)
+        {
+        ?>
     <section class="content">
         <div class="box-body nav-tabs-custom">
             <div class="row ">
@@ -46,7 +51,7 @@ $optionSelectProvincias = $this->optionSelectProvincias;
         </div>
     </section>
     
-    
+       <?php } ?>
     <section class="content">
         <div class="box-body nav-tabs-custom">
             <div class="row ">

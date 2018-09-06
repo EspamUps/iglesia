@@ -44,6 +44,9 @@ class AdministradorController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
             else{
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 6, 3);
+                
                 $objMisas = new Misas($this->dbAdapter);
                 $objPersonas = new Persona($this->dbAdapter);
                 $objLugaresMisa = new LugaresMisa($this->dbAdapter);
@@ -64,7 +67,9 @@ class AdministradorController extends AbstractActionController
                 }
                  $array = array(
                     'optionSelectMisas'=>$optionSelectMisas,
-                     'optionSelectLugaresMisa'=>$optionSelectLugaresMisa
+                     'optionSelectLugaresMisa'=>$optionSelectLugaresMisa,
+                     'validacionPrivilegio' =>  $validarprivilegio
+
                 );
             }
         }
@@ -85,6 +90,14 @@ class AdministradorController extends AbstractActionController
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 5);
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                 $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 5, 3);
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+            
         }
         return new ViewModel($array);
     }
@@ -135,6 +148,8 @@ class AdministradorController extends AbstractActionController
             else {                
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objMetodos = new Metodos();
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 4, 3);
 
                 $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
                 $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
@@ -143,7 +158,8 @@ class AdministradorController extends AbstractActionController
                     $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
                 }
                 $array = array(
-                    'optionSelectProvincias'=>$optionSelectProvincias
+                    'optionSelectProvincias'=>$optionSelectProvincias,
+                    'validacionPrivilegio' =>  $validarprivilegio
                 );
             }
         }
