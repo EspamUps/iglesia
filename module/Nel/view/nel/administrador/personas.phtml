@@ -3,6 +3,7 @@
 //datos al respectivo controlador
 $optionSelectProvincias = $this->optionSelectProvincias;
 $validacionPrivilegio = $this->validacionPrivilegio;
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/obtenerdireccionesselectM.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/personas.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
 ?>
@@ -93,7 +94,30 @@ $(document).ready(function(){
 
 </script>
 
-
+ <div class="example-modal">
+        <div class="modal " id="modalModificarPersona">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">MODIFICAR</h4>
+              </div>
+              <div class="modal-body">
+                  <div id="mensajeModifcarPersona">
+                      
+                  </div>
+                  <form method="post" action="<?php echo $this->basePath();?>/persona/modificarpersona" id="contenedorModificarPersona">
+                      
+                  </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
  <div class="example-modal">
         <div class="modal" id="modalVerDireccionPersona">
           <div class="modal-dialog">

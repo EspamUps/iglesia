@@ -17,11 +17,14 @@ use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
+use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\Telefonos;
 use Nel\Modelo\Entity\TelefonoPersona;
 use Nel\Modelo\Entity\HistorialPersona;
 use Nel\Modelo\Entity\DireccionPersona;
+use Nel\Modelo\Entity\Parroquias;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
+use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -334,18 +337,7 @@ class PersonaController extends AbstractActionController
                 $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
             }
             $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($value['idPersona'], 1);
-//                        $provincia = '';
-//                        $canton = '';
-//                        $parroquia = '';
-//                        $direccion = '';
-//                        $referencia = '';
-//                        if(count($listaDireccionPersona) > 0){
-//                            $provincia = $listaDireccionPersona[0]['nombreProvincia'];
-//                            $canton = $listaDireccionPersona[0]['nombreCanton'];
-//                            $parroquia = $listaDireccionPersona[0]['nombreParroquia'];
-//                            $direccion = $listaDireccionPersona[0]['direccionPersona'];
-//                            $referencia = $listaDireccionPersona[0]['referenciaDireccionPersona'];
-//                        }
+
             $botonDireccion ="";
             if (count($listaDireccionPersona)>0)
             {
@@ -356,6 +348,8 @@ class PersonaController extends AbstractActionController
                if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0)
                 $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             }
+            if($objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 2) == true)
+                $botonModificar = '<button data-target="#modalModificarPersona" data-toggle="modal" id="btnModificarPersona'.$i.'" title="MODIFICAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarPersona(\''.$idPersonaEncriptado.'\','.$i.','.$j.')" class="btn btn-warning btn-sm btn-flat"><i class="fa fa-pencil"></i></button>';
             
             $identificacion = $value['identificacion'];
             $nombres = $value['primerNombre'].' '.$value['segundoNombre'];
@@ -365,7 +359,7 @@ class PersonaController extends AbstractActionController
             $fechaActual = new \DateTime(date("d-m-Y"));
             $diff = $fechaActual->diff($fechaNacimiento2);
             $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaNacimiento']);
-             $botones = $botonEliminarPersona;  
+             $botones = $botonEliminarPersona .' '.$botonModificar;  
              
              
             $array1[$i] = array(
@@ -385,6 +379,164 @@ class PersonaController extends AbstractActionController
         }
         
         return $array1;
+    }
+    
+    
+    public function obtenerformulariomodificarpersonaAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{               
+                    $objMetodos = new Metodos();
+                    $objPersona = new Persona($this->dbAdapter);
+                    $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+                    $objProvincias = new Provincias($this->dbAdapter);
+                    $objParroquias = new Parroquias($this->dbAdapter);
+                    $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
+                    $objTelefono = new Telefonos($this->dbAdapter);
+                    $objConfigurarCantonProvincia  = new ConfigurarCantonProvincia($this->dbAdapter);
+                    $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+
+                    $idPersonaEncriptado = $post['id'];
+                    $i = $post['i'];
+                    $j = $post['j'];
+                    if($idPersonaEncriptado == NULL || $idPersonaEncriptado == "" ){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
+
+                    }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else if(!is_numeric($j)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else{
+                        $idPersona = $objMetodos->desencriptar($idPersonaEncriptado); 
+                        $listaPersona = $objPersona->FiltrarPersona($idPersona);
+                        if(count($listaPersona) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE EN NUESTRA BASE DE DATOS</div>';
+                        }else{
+                            
+                            $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
+                            $tabla = '';
+//                            if(count($listaDireccionPersona) > 0){
+//                                
+//                            }
+                            $optionParroquias = '<option value="0">SELECCIONE UNA PARRÓQUIA</option>';
+                            $optionProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
+                            $optionCantones = '<option value="0">SELECCIONE UN CANTÓN</option>';
+                            foreach ($objProvincias->ObtenerProvincias() as $valueProvincias) {
+                                $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                                if($valueProvincias['idProvincia'] == $listaDireccionPersona[0]['idProvincia']){
+                                    $optionProvincias = $optionProvincias.'<option selected value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+                                    $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvincia($valueProvincias['idProvincia'], true);
+                                    foreach ($listaConfigurarCantonProvincia as $valueCanton) {
+                                        $idCantonEncriptado = $objMetodos->encriptar($valueCanton['idCanton']);
+                                        if($valueCanton['idCanton'] == $listaDireccionPersona[0]['idCanton']){
+                                            $optionCantones = $optionCantones.'<option selected value="'.$idCantonEncriptado.'">'.$valueCanton['nombreCanton'].'</option>';
+                                        
+                                            
+                                            $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaCanton($valueProvincias['idProvincia'],$valueCanton['idCanton'], true);
+                                            foreach ($listaConfigurarCantonProvincia as $valueConfigurarCantonProvincia) {
+                                                $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvincia($valueConfigurarCantonProvincia['idConfigurarCantonProvincia']);
+                                                foreach ($listaConfigurarParroquiaCanton as $valueConfigurarParroquiaCanton) {
+                                                    $listaParroquia = $objParroquias->FiltrarParroquia($valueConfigurarParroquiaCanton['idParroquia']);
+                                                    $idConfigurarParroquiaCantonEncriptado = $objMetodos->encriptar($valueConfigurarParroquiaCanton['idConfigurarParroquiaCanton']);
+                                                    if($valueConfigurarParroquiaCanton['idParroquia'] == $listaDireccionPersona[0]['idParroquia'])
+                                                        $optionParroquias = $optionParroquias.'<option selected value="'.$idConfigurarParroquiaCantonEncriptado.'">'.$listaParroquia[0]['nombreParroquia'].'</option>';
+                                                    else
+                                                        $optionParroquias = $optionParroquias.'<option value="'.$idConfigurarParroquiaCantonEncriptado.'">'.$listaParroquia[0]['nombreParroquia'].'</option>';
+                                                }
+                                            }  
+                                            
+                                        }else
+                                            $optionCantones = $optionCantones.'<option value="'.$idCantonEncriptado.'">'.$valueCanton['nombreCanton'].'</option>';
+                                    }
+                                }else
+                                    $optionProvincias = $optionProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+                                
+                                
+                                
+                                
+                            }
+                            
+                            
+                            $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
+                            $numeroTelefono = '';
+                            if(count($listaTelefonoPersona) > 0){
+                                $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
+                                $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
+                            }
+                            
+                            $tabla = '<div class="form-group col-lg-6">
+                                <label for="identificacionM">IDENTIFICACIÓN</label>
+                                <input value="'.$listaPersona[0]['identificacion'].'" onkeydown="validarNumeros(\'identificacionM\')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionM" name="identificacionM" class="form-control">
+                                <label for="primerNombreM">PRIMER NOMBRE</label>
+                                <input value="'.$listaPersona[0]['primerNombre'].'" maxlength="50" autocomplete="off" type="text" id="primerNombreM" name="primerNombreM" class="form-control">
+                                <label for="segundoNombreM">SEGUNDO NOMBRE</label>
+                                <input value="'.$listaPersona[0]['segundoNombre'].'" maxlength="50" autocomplete="off" type="text" id="segundoNombreM" name="segundoNombreM" class="form-control">
+                                <label for="primerApellidoM">PRIMER APELLIDO</label>
+                                <input value="'.$listaPersona[0]['primerApellido'].'" maxlength="50" autocomplete="off" type="text" id="primerApellidoM" name="primerApellidoM" class="form-control">
+                                <label for="segundoApellidoM">SEGUNDO APELLIDO</label>
+                                <input value="'.$listaPersona[0]['segundoApellido'].'" maxlength="50" autocomplete="off" type="text" id="segundoApellidoM" name="segundoApellidoM" class="form-control">
+                                <label for="fechaNacimientoM">FECHA DE NACIMIENTO</label>
+                                <input value="'.$listaPersona[0]['fechaNacimiento'].'" type="date" id="fechaNacimientoM" name="fechaNacimientoM" class="form-control">
+                            </div>
+
+
+                            <div class="form-group col-lg-6">
+                                <label for="telefonoM">TELÉFONO</label>
+                                <input value="'.$numeroTelefono.'" onkeydown="validarNumeros(\'telefono\')" maxlength="20" autocomplete="off" type="text" id="telefonoM" name="telefonoM" class="form-control">
+                                <label for="selectProvinciasM">PROVINCIA</label>
+                                <select onchange="filtrarConfigurarCantonProvinciaPorProvinciaM();" id="selectProvinciasM" name="selectProvinciasM" class="form-control">'.$optionProvincias.'</select>
+                                <label for="selectCantonesM">CANTÓN</label>
+                                <select onchange="filtrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaM();" id="selectCantonesM" name="selectCantonesM" class="form-control">
+                                    '.$optionCantones.'
+                                </select>
+                                <label for="selectParroquiasM">PARRÓQUIA</label>
+                                <select id="selectParroquiasM" name="selectParroquiasM" class="form-control">
+                                    '.$optionParroquias.'
+                                </select>
+                                <label for="direccionM">DIRECCIÓN</label>
+                                <input value="'.$listaDireccionPersona[0]['direccionPersona'].'" maxlength="200" autocomplete="off" type="text" id="direccionM" name="direccionM" class="form-control">
+                                <label for="referenciaM">REFERENCIA</label>
+                                <input value="'.$listaDireccionPersona[0]['referenciaDireccionPersona'].'" maxlength="200" autocomplete="off" type="text" id="referenciaM" name="referenciaM" class="form-control">
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <button data-loading-text="GUARDANDO..." id="btnGuardarPersonaM" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                            </div>';
+                            
+                            
+                            
+                            
+                            $mensaje = '';
+                            $validar = TRUE;
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                        }
+                    }
+
+                }  
+            }
+        }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
 
 }
