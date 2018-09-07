@@ -73,6 +73,7 @@ return array(
             'Nel\Controller\Sacerdote' => 'Nel\Controller\SacerdoteController',
             'Nel\Controller\Misas' => 'Nel\Controller\MisasController',
             'Nel\Controller\ConfigurarMisa' => 'Nel\Controller\ConfigurarMisaController',
+            'Nel\Controller\DireccionPersona' => 'Nel\Controller\DireccionPersonaController',
             
         ),
     ),

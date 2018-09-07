@@ -194,6 +194,7 @@ function FiltrarDireccionPorPersona(id, i){
         uploadProgress: function(event,position,total,percentComplete){
         },
         success: function(data){  
+            console.log(data)
             if(data.validar == true){
                 $("#contenedorDireccionPersona").html(data.tabla);
                
@@ -240,6 +241,7 @@ function obtenerFormularioModificarPersona(id, i,j){
         uploadProgress: function(event,position,total,percentComplete){
         },
         success: function(data){  
+            
             if(data.validar == true){
                 $("#contenedorModificarPersona").html(data.tabla);
                

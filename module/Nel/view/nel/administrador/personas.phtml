@@ -6,7 +6,9 @@ $validacionPrivilegio = $this->validacionPrivilegio;
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/obtenerdireccionesselectM.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/personas.php');
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
-?>
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/personas/direccionpersona.php');
+
+ ?>
 
 <div class="content-wrapper" style="min-height: 1123px;">
     <br><br>
@@ -96,7 +98,7 @@ $(document).ready(function(){
 
  <div class="example-modal">
         <div class="modal " id="modalModificarPersona">
-          <div class="modal-dialog modal-lg">
+          <div class="modal-dialog modal-md">
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -131,9 +133,9 @@ $(document).ready(function(){
                   <div id="mensajeDireccionPersona">
                       
                   </div>
-                  <div id="contenedorDireccionPersona">
+                  <form action="<?php echo $this->basePath(); ?>/direccionpersona/modificardireccion" method="post" id="contenedorDireccionPersona">
                       
-                  </div>
+                  </form>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>

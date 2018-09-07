@@ -137,15 +137,10 @@ class PersonaController extends AbstractActionController
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PERSONA POR FAVOR INTENTE MÁS TARDE</div>';
                                 }else{
                                     $idPersona = $resultado[0]['idPersona'];
-                                    $arrayDireccionPersona = array(
-                                        'idPersona' => $idPersona,
-                                        'idConfigurarParroquiaCanton' => $idConfigurarParroquiaCanton,
-                                        'direccionPersona' => $direccion,
-                                        'referenciaDireccionPersona' => $referencia,
-                                        'fechaIngresoDireccionPersona' => $fechaSubida,
-                                        'estadoDireccionPersona' => 1
-                                    );
-                                    if(count($objDireccionPersona->IngresarDireccionPersona($arrayDireccionPersona)) == 0){
+                                    
+                                if(count($objDireccionPersona->IngresarDireccionPersona(
+                                        $idPersona, $idConfigurarParroquiaCanton,$direccion,$referencia, $fechaSubida, 1
+                                        )) == 0){
                                         $objPersona->EliminarPersona($idPersona);
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PERSONA POR FAVOR INTENTE MÁS TARDE</div>';
                                     }else{
@@ -218,7 +213,9 @@ class PersonaController extends AbstractActionController
                     $objMetodos = new Metodos();
                     $objPersona = new Persona($this->dbAdapter);
                     $objDireccionPersona = new DireccionPersona($this->dbAdapter);
-
+                    $objProvincias = new Provincias($this->dbAdapter);
+                    $objParroquias = new Parroquias($this->dbAdapter);
+                    $objConfigurarCantonProvincia  = new ConfigurarCantonProvincia($this->dbAdapter);
                     $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                     $post = array_merge_recursive(
                         $request->getPost()->toArray(),
@@ -241,35 +238,105 @@ class PersonaController extends AbstractActionController
                         }else{
                             $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
                             $tabla = '';
-                            if(count($listaDireccionPersona) > 0){
-                                $tabla = '<div class="table-responsive">
-                                    <table class="table">
-                                        <tr>
-                                            <th>PROVINCIA</th>
-                                            <td>'.$listaDireccionPersona[0]['nombreProvincia'].'</td>
-                                        </tr>
-                                        <tr>
-                                            <th>CANTÓN</th>
-                                            <td>'.$listaDireccionPersona[0]['nombreCanton'].'</td>
-                                        </tr>
-                                        <tr>
-                                            <th>PARRÓQUIA</th>
-                                            <td>'.$listaDireccionPersona[0]['nombreParroquia'].'</td>
-                                        </tr>
-                                        <tr>
-                                            <th>DIRECCIÓN</th>
-                                             <td>'.$listaDireccionPersona[0]['direccionPersona'].'</td>
-                                        </tr>
-                                        <tr>
-                                            <th>REFERENCIA</th>
-                                             <td>'.$listaDireccionPersona[0]['referenciaDireccionPersona'].'</td>
-                                        </tr>
-                                    </table>
-                                </div>';
-                            }
-                            $mensaje = '';
-                            $validar = TRUE;
-                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                            if(count($listaDireccionPersona) > 0)
+                            {
+                                $objMetodosC = new MetodosControladores();
+                                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 1, 2);
+                                
+                                if ($validarprivilegio==false)
+                                {
+                                     $tabla = '<div class="table-responsive">
+                                        <table class="table">
+                                            <tr>
+                                                <th>PROVINCIA</th>
+                                                <td>'.$listaDireccionPersona[0]['nombreProvincia'].'</td>
+                                            </tr>
+                                            <tr>
+                                                <th>CANTÓN</th>
+                                                <td>'.$listaDireccionPersona[0]['nombreCanton'].'</td>
+                                            </tr>
+                                            <tr>
+                                                <th>PARRÓQUIA</th>
+                                                <td>'.$listaDireccionPersona[0]['nombreParroquia'].'</td>
+                                            </tr>
+                                            <tr>
+                                                <th>DIRECCIÓN</th>
+                                                 <td>'.$listaDireccionPersona[0]['direccionPersona'].'</td>
+                                            </tr>
+                                            <tr>
+                                                <th>REFERENCIA</th>
+                                                 <td>'.$listaDireccionPersona[0]['referenciaDireccionPersona'].'</td>
+                                            </tr>
+                                        </table>
+                                    </div>';
+                                } 
+                                else {                                 
+
+                                    $optionParroquias = '<option value="0">SELECCIONE UNA PARRÓQUIA</option>';
+                                    $optionProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
+                                    $optionCantones = '<option value="0">SELECCIONE UN CANTÓN</option>';
+                                    foreach ($objProvincias->ObtenerProvincias() as $valueProvincias) {
+                                        $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                                        if($valueProvincias['idProvincia'] == $listaDireccionPersona[0]['idProvincia']){
+                                            $optionProvincias = $optionProvincias.'<option selected value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+                                            $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvincia($valueProvincias['idProvincia'], true);
+                                            foreach ($listaConfigurarCantonProvincia as $valueCanton) {
+                                                $idCantonEncriptado = $objMetodos->encriptar($valueCanton['idCanton']);
+                                                if($valueCanton['idCanton'] == $listaDireccionPersona[0]['idCanton']){
+                                                    $optionCantones = $optionCantones.'<option selected value="'.$idCantonEncriptado.'">'.$valueCanton['nombreCanton'].'</option>';
+
+
+                                                    $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaCanton($valueProvincias['idProvincia'],$valueCanton['idCanton'], true);
+                                                    foreach ($listaConfigurarCantonProvincia as $valueConfigurarCantonProvincia) {
+                                                        $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvincia($valueConfigurarCantonProvincia['idConfigurarCantonProvincia']);
+                                                        foreach ($listaConfigurarParroquiaCanton as $valueConfigurarParroquiaCanton) {
+                                                            $listaParroquia = $objParroquias->FiltrarParroquia($valueConfigurarParroquiaCanton['idParroquia']);
+                                                            $idConfigurarParroquiaCantonEncriptado = $objMetodos->encriptar($valueConfigurarParroquiaCanton['idConfigurarParroquiaCanton']);
+                                                            if($valueConfigurarParroquiaCanton['idParroquia'] == $listaDireccionPersona[0]['idParroquia'])
+                                                                $optionParroquias = $optionParroquias.'<option selected value="'.$idConfigurarParroquiaCantonEncriptado.'">'.$listaParroquia[0]['nombreParroquia'].'</option>';
+                                                            else
+                                                                $optionParroquias = $optionParroquias.'<option value="'.$idConfigurarParroquiaCantonEncriptado.'">'.$listaParroquia[0]['nombreParroquia'].'</option>';
+                                                        }
+                                                    }  
+
+                                                }else
+                                                    $optionCantones = $optionCantones.'<option value="'.$idCantonEncriptado.'">'.$valueCanton['nombreCanton'].'</option>';
+                                            }
+                                        }else
+                                            $optionProvincias = $optionProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+
+                                        }   
+                                        $idDireccionEncriptado = $objMetodos->encriptar($listaDireccionPersona[0]['idDireccionPersona']);
+                                        $tabla = '<div class="form-group col-lg-12">
+                                            
+                                            <input value="'.$i.'" type="hidden" id="numeroFila" name="numeroFila">
+                                            <input value="'.$idDireccionEncriptado.'" type="hidden" id="direccionPersonaEncriptado" name="direccionPersonaEncriptado">
+                                            <label for="selectProvinciasM">PROVINCIA</label>
+                                            <select onchange="filtrarConfigurarCantonProvinciaPorProvinciaM();" id="selectProvinciasM" name="selectProvinciasM" class="form-control">'.$optionProvincias.'</select>
+                                            <label for="selectCantonesM">CANTÓN</label>
+                                            <select onchange="filtrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaM();" id="selectCantonesM" name="selectCantonesM" class="form-control">
+                                                '.$optionCantones.'
+                                            </select>
+                                            <label for="selectParroquiasM">PARRÓQUIA</label>
+                                            <select id="selectParroquiasM" name="selectParroquiasM" class="form-control">
+                                                '.$optionParroquias.'
+                                            </select>
+                                            <label for="direccionM">DIRECCIÓN</label>
+                                            <input value="'.$listaDireccionPersona[0]['direccionPersona'].'" maxlength="200" autocomplete="off" type="text" id="direccionM" name="direccionM" class="form-control">
+                                            <label for="referenciaM">REFERENCIA</label>
+                                            <input value="'.$listaDireccionPersona[0]['referenciaDireccionPersona'].'" maxlength="200" autocomplete="off" type="text" id="referenciaM" name="referenciaM" class="form-control">
+                                        </div>
+                                        <div class="form-group col-lg-12">
+                                            <button data-loading-text="GUARDANDO..." id="btnModificarDireccion" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                                        </div>';
+                                    }
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('val'=>$validarprivilegio,'mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+
+        //                               
+                                }
+                            
                         }
                     }
 
@@ -348,6 +415,7 @@ class PersonaController extends AbstractActionController
                if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0)
                 $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             }
+            $botonModificar ='';
             if($objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 2) == true)
                 $botonModificar = '<button data-target="#modalModificarPersona" data-toggle="modal" id="btnModificarPersona'.$i.'" title="MODIFICAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarPersona(\''.$idPersonaEncriptado.'\','.$i.','.$j.')" class="btn btn-warning btn-sm btn-flat"><i class="fa fa-pencil"></i></button>';
             
@@ -439,43 +507,7 @@ class PersonaController extends AbstractActionController
 //                            if(count($listaDireccionPersona) > 0){
 //                                
 //                            }
-                            $optionParroquias = '<option value="0">SELECCIONE UNA PARRÓQUIA</option>';
-                            $optionProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-                            $optionCantones = '<option value="0">SELECCIONE UN CANTÓN</option>';
-                            foreach ($objProvincias->ObtenerProvincias() as $valueProvincias) {
-                                $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-                                if($valueProvincias['idProvincia'] == $listaDireccionPersona[0]['idProvincia']){
-                                    $optionProvincias = $optionProvincias.'<option selected value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
-                                    $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvincia($valueProvincias['idProvincia'], true);
-                                    foreach ($listaConfigurarCantonProvincia as $valueCanton) {
-                                        $idCantonEncriptado = $objMetodos->encriptar($valueCanton['idCanton']);
-                                        if($valueCanton['idCanton'] == $listaDireccionPersona[0]['idCanton']){
-                                            $optionCantones = $optionCantones.'<option selected value="'.$idCantonEncriptado.'">'.$valueCanton['nombreCanton'].'</option>';
-                                        
-                                            
-                                            $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaCanton($valueProvincias['idProvincia'],$valueCanton['idCanton'], true);
-                                            foreach ($listaConfigurarCantonProvincia as $valueConfigurarCantonProvincia) {
-                                                $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvincia($valueConfigurarCantonProvincia['idConfigurarCantonProvincia']);
-                                                foreach ($listaConfigurarParroquiaCanton as $valueConfigurarParroquiaCanton) {
-                                                    $listaParroquia = $objParroquias->FiltrarParroquia($valueConfigurarParroquiaCanton['idParroquia']);
-                                                    $idConfigurarParroquiaCantonEncriptado = $objMetodos->encriptar($valueConfigurarParroquiaCanton['idConfigurarParroquiaCanton']);
-                                                    if($valueConfigurarParroquiaCanton['idParroquia'] == $listaDireccionPersona[0]['idParroquia'])
-                                                        $optionParroquias = $optionParroquias.'<option selected value="'.$idConfigurarParroquiaCantonEncriptado.'">'.$listaParroquia[0]['nombreParroquia'].'</option>';
-                                                    else
-                                                        $optionParroquias = $optionParroquias.'<option value="'.$idConfigurarParroquiaCantonEncriptado.'">'.$listaParroquia[0]['nombreParroquia'].'</option>';
-                                                }
-                                            }  
-                                            
-                                        }else
-                                            $optionCantones = $optionCantones.'<option value="'.$idCantonEncriptado.'">'.$valueCanton['nombreCanton'].'</option>';
-                                    }
-                                }else
-                                    $optionProvincias = $optionProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
-                                
-                                
-                                
-                                
-                            }
+                          
                             
                             
                             $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
@@ -485,7 +517,7 @@ class PersonaController extends AbstractActionController
                                 $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
                             }
                             
-                            $tabla = '<div class="form-group col-lg-6">
+                            $tabla = '<div class="form-group col-lg-12">
                                 <label for="identificacionM">IDENTIFICACIÓN</label>
                                 <input value="'.$listaPersona[0]['identificacion'].'" onkeydown="validarNumeros(\'identificacionM\')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionM" name="identificacionM" class="form-control">
                                 <label for="primerNombreM">PRIMER NOMBRE</label>
@@ -498,27 +530,10 @@ class PersonaController extends AbstractActionController
                                 <input value="'.$listaPersona[0]['segundoApellido'].'" maxlength="50" autocomplete="off" type="text" id="segundoApellidoM" name="segundoApellidoM" class="form-control">
                                 <label for="fechaNacimientoM">FECHA DE NACIMIENTO</label>
                                 <input value="'.$listaPersona[0]['fechaNacimiento'].'" type="date" id="fechaNacimientoM" name="fechaNacimientoM" class="form-control">
-                            </div>
-
-
-                            <div class="form-group col-lg-6">
+                          
                                 <label for="telefonoM">TELÉFONO</label>
                                 <input value="'.$numeroTelefono.'" onkeydown="validarNumeros(\'telefono\')" maxlength="20" autocomplete="off" type="text" id="telefonoM" name="telefonoM" class="form-control">
-                                <label for="selectProvinciasM">PROVINCIA</label>
-                                <select onchange="filtrarConfigurarCantonProvinciaPorProvinciaM();" id="selectProvinciasM" name="selectProvinciasM" class="form-control">'.$optionProvincias.'</select>
-                                <label for="selectCantonesM">CANTÓN</label>
-                                <select onchange="filtrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaM();" id="selectCantonesM" name="selectCantonesM" class="form-control">
-                                    '.$optionCantones.'
-                                </select>
-                                <label for="selectParroquiasM">PARRÓQUIA</label>
-                                <select id="selectParroquiasM" name="selectParroquiasM" class="form-control">
-                                    '.$optionParroquias.'
-                                </select>
-                                <label for="direccionM">DIRECCIÓN</label>
-                                <input value="'.$listaDireccionPersona[0]['direccionPersona'].'" maxlength="200" autocomplete="off" type="text" id="direccionM" name="direccionM" class="form-control">
-                                <label for="referenciaM">REFERENCIA</label>
-                                <input value="'.$listaDireccionPersona[0]['referenciaDireccionPersona'].'" maxlength="200" autocomplete="off" type="text" id="referenciaM" name="referenciaM" class="form-control">
-                            </div>
+                                </div>
                             <div class="form-group col-lg-12">
                                 <button data-loading-text="GUARDANDO..." id="btnGuardarPersonaM" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>
                             </div>';

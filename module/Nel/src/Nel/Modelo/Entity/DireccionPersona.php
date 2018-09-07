@@ -18,16 +18,23 @@ class DireccionPersona extends TableGateway
         return parent::__construct('direccionpersona', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
-//    public function ObtenerPersonasPorIglesia($idIglesia){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerPersonasPorIglesia('{$idIglesia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    
+    public function FiltrarDireccionPersona($idDireccionPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarDireccionPersona('{$idDireccionPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    
     public function FiltrarDireccionPersonaPorPersonaEstado($idPersona,$estado){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarDireccionPersonaPorPersonaEstado('{$idPersona}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function ModificarDireccionPersonaEstado($idDireccionPersona,$estadoDireccionPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarDireccionPersonaEstado('{$idDireccionPersona}','{$estadoDireccionPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    
     public function FiltrarDireccionPersonaPorConfigurarParroquiaCantonLimite1($idConfigurarParroquiaCanton){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarDireccionPersonaPorConfigurarPCLimite1('{$idConfigurarParroquiaCanton}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -39,17 +46,13 @@ class DireccionPersona extends TableGateway
 //        return $resultado;
 //    }
     
-    public function IngresarDireccionPersona($array)
-    {
-        $idPersona = $array['idPersona'];
-        $idConfigurarParroquiaCanton = $array['idConfigurarParroquiaCanton'];
-        $direccionPersona = $array['direccionPersona'];
-        $referenciaDireccionPersona = $array['referenciaDireccionPersona'];
-        $fechaIngresoDireccionPersona = $array['fechaIngresoDireccionPersona'];
-        $estadoDireccionPersona = $array['estadoDireccionPersona'];
-        $resultado =  $this->getAdapter()->query("CALL Sp_IngresarDireccionPersona('{$idPersona}','{$idConfigurarParroquiaCanton}','{$direccionPersona}','{$referenciaDireccionPersona}','{$fechaIngresoDireccionPersona}','{$estadoDireccionPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+    public function IngresarDireccionPersona(
+        $idPersona,$idConfigurarParroquiaCanton,$direccionPersona,$referenciaDireccionPersona,
+        $fechaIngresoDireccionPersona,$estadoDireccionPersona)
+        {
+            $resultado =  $this->getAdapter()->query("CALL Sp_IngresarDireccionPersona('{$idPersona}','{$idConfigurarParroquiaCanton}','{$direccionPersona}','{$referenciaDireccionPersona}','{$fechaIngresoDireccionPersona}','{$estadoDireccionPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+            return $resultado;
+        }
     
 //    public function obtenerPersonas(){
 ////        $sql="CALL Sp_ObtenerPersonas()";

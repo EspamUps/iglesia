@@ -66,6 +66,7 @@ function filtrarConfigurarCantonProvinciaPorProvinciaM(){
             beforeSend: function(){
                 $("#mensajeDireccionPersona").html('');
                 $("#selectCantonesM").html('<option value="0">CARGANDO...</option>');
+                $("#selectParroquiasM").html('<option value="0">SELECCIONE UNA PARRÓQUIA</option>');
             },
             uploadProgress: function(event,position,total,percentComplete){
             },
