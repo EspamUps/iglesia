@@ -225,10 +225,13 @@ class PersonaController extends AbstractActionController
 
                     $idPersonaEncriptado = $post['id'];
                     $i = $post['i'];
+                    $j = $post['j'];
                     if($idPersonaEncriptado == NULL || $idPersonaEncriptado == "" ){
                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
 
                     }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else if(!is_numeric($j)){
                         $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
                     }else{
                         $idPersona = $objMetodos->desencriptar($idPersonaEncriptado); 
@@ -308,7 +311,7 @@ class PersonaController extends AbstractActionController
                                         }   
                                         $idDireccionEncriptado = $objMetodos->encriptar($listaDireccionPersona[0]['idDireccionPersona']);
                                         $tabla = '<div class="form-group col-lg-12">
-                                            
+                                            <input value="'.$j.'" type="hidden" id="numeroFila2" name="numeroFila2">
                                             <input value="'.$i.'" type="hidden" id="numeroFila" name="numeroFila">
                                             <input value="'.$idDireccionEncriptado.'" type="hidden" id="direccionPersonaEncriptado" name="direccionPersonaEncriptado">
                                             <label for="selectProvinciasM">PROVINCIA</label>
@@ -408,7 +411,7 @@ class PersonaController extends AbstractActionController
             $botonDireccion ="";
             if (count($listaDireccionPersona)>0)
             {
-                $botonDireccion = '<button data-target="#modalVerDireccionPersona" data-toggle="modal" id="btnFiltrarDireccion'.$i.'" title="VER DIRECCIÓN" onclick="FiltrarDireccionPorPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-home"></i></button>';
+                $botonDireccion = '<button data-target="#modalVerDireccionPersona" data-toggle="modal" id="btnFiltrarDireccion'.$i.'" title="VER DIRECCIÓN" onclick="FiltrarDireccionPorPersona(\''.$idPersonaEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-home"></i></button>';
             }
             $botonEliminarPersona = '';
             if($objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1) == true){
@@ -465,7 +468,9 @@ class PersonaController extends AbstractActionController
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-            else {
+            else{
+                $objMetodosControlador =  new MetodosControladores();
+                
                 $request=$this->getRequest();
                 if(!$request->isPost()){
                     $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
@@ -502,41 +507,30 @@ class PersonaController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE EN NUESTRA BASE DE DATOS</div>';
                         }else{
                             
-                            $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
                             $tabla = '';
-//                            if(count($listaDireccionPersona) > 0){
-//                                
-//                            }
+//                            if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1));
+                            
                           
-                            
-                            
-                            $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
-                            $numeroTelefono = '';
-                            if(count($listaTelefonoPersona) > 0){
-                                $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
-                                $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
-                            }
-                            
+                             
                             $tabla = '<div class="form-group col-lg-12">
-                                <label for="identificacionM">IDENTIFICACIÓN</label>
-                                <input value="'.$listaPersona[0]['identificacion'].'" onkeydown="validarNumeros(\'identificacionM\')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionM" name="identificacionM" class="form-control">
-                                <label for="primerNombreM">PRIMER NOMBRE</label>
-                                <input value="'.$listaPersona[0]['primerNombre'].'" maxlength="50" autocomplete="off" type="text" id="primerNombreM" name="primerNombreM" class="form-control">
-                                <label for="segundoNombreM">SEGUNDO NOMBRE</label>
-                                <input value="'.$listaPersona[0]['segundoNombre'].'" maxlength="50" autocomplete="off" type="text" id="segundoNombreM" name="segundoNombreM" class="form-control">
-                                <label for="primerApellidoM">PRIMER APELLIDO</label>
-                                <input value="'.$listaPersona[0]['primerApellido'].'" maxlength="50" autocomplete="off" type="text" id="primerApellidoM" name="primerApellidoM" class="form-control">
-                                <label for="segundoApellidoM">SEGUNDO APELLIDO</label>
-                                <input value="'.$listaPersona[0]['segundoApellido'].'" maxlength="50" autocomplete="off" type="text" id="segundoApellidoM" name="segundoApellidoM" class="form-control">
-                                <label for="fechaNacimientoM">FECHA DE NACIMIENTO</label>
-                                <input value="'.$listaPersona[0]['fechaNacimiento'].'" type="date" id="fechaNacimientoM" name="fechaNacimientoM" class="form-control">
-                          
-                                <label for="telefonoM">TELÉFONO</label>
-                                <input value="'.$numeroTelefono.'" onkeydown="validarNumeros(\'telefono\')" maxlength="20" autocomplete="off" type="text" id="telefonoM" name="telefonoM" class="form-control">
+                                    <input type="hidden" value="'.$idPersonaEncriptado.'" name="idPersonaEncriptadoM" id="idPersonaEncriptadoM">
+                                    <label for="identificacionM">IDENTIFICACIÓN</label>
+                                    <input value="'.$listaPersona[0]['identificacion'].'" onkeydown="validarNumeros(\'identificacionM\')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionM" name="identificacionM" class="form-control">
+                                    <label for="primerNombreM">PRIMER NOMBRE</label>
+                                    <input value="'.$listaPersona[0]['primerNombre'].'" maxlength="50" autocomplete="off" type="text" id="primerNombreM" name="primerNombreM" class="form-control">
+                                    <label for="segundoNombreM">SEGUNDO NOMBRE</label>
+                                    <input value="'.$listaPersona[0]['segundoNombre'].'" maxlength="50" autocomplete="off" type="text" id="segundoNombreM" name="segundoNombreM" class="form-control">
+                                    <label for="primerApellidoM">PRIMER APELLIDO</label>
+                                    <input value="'.$listaPersona[0]['primerApellido'].'" maxlength="50" autocomplete="off" type="text" id="primerApellidoM" name="primerApellidoM" class="form-control">
+                                    <label for="segundoApellidoM">SEGUNDO APELLIDO</label>
+                                    <input value="'.$listaPersona[0]['segundoApellido'].'" maxlength="50" autocomplete="off" type="text" id="segundoApellidoM" name="segundoApellidoM" class="form-control">
+                                    <label for="fechaNacimientoM">FECHA DE NACIMIENTO</label>
+                                    <input value="'.$listaPersona[0]['fechaNacimiento'].'" type="date" id="fechaNacimientoM" name="fechaNacimientoM" class="form-control">
+
                                 </div>
-                            <div class="form-group col-lg-12">
-                                <button data-loading-text="GUARDANDO..." id="btnGuardarPersonaM" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>
-                            </div>';
+                                <div class="form-group col-lg-12">
+                                    <button data-loading-text="GUARDANDO..." id="btnGuardarPersonaM" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                                </div>';
                             
                             
                             

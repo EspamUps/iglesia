@@ -1,17 +1,13 @@
 <script>
     
-//function validarIngresoPersona(f){
-//    var _validar = false;
-//    var _identificacion = $("#identificacion").val();
-//    if(_identificacion.length == 0){
-//        if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTA PERSONA SIN LA IDENTIFICACIÓN?")){
-//            _validar = true;
-//        }
-//    }else{
-//        _validar = true;
-//    }
-//    return _validar;
-//}
+function validarModificarDireccion(f){
+    var _validar = false;
+    if(confirm("¿ESTÁ SEGURO DE MODIFICAR LA DIRECCIÓN?")){
+        _validar = true;
+    }
+   
+    return _validar;
+}
 //    
 //function limpiarFormIngresarPersona()
 //{
@@ -32,9 +28,9 @@ $(function(){
 
         },
         success: function(data){
-            console.log(data)
+            console.log(data.tabla)
             if(data.validar==true){
-                FiltrarDireccionPorPersona(data.idpersona, data.i);
+                FiltrarDireccionPorPersona(data.idpersona, data.i,data.j);
             }
             $("#btnModificarDireccion").button('reset');
             $("#mensajeDireccionPersona").html(data.mensaje);

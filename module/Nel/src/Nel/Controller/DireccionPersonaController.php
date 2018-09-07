@@ -17,7 +17,7 @@ use Nel\Metodos\MetodosControladores;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\DireccionPersona;
-use Nel\Modelo\Entity\DireccionLugarMisa;
+use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 
 use Zend\Session\Container;
@@ -54,6 +54,7 @@ class DireccionPersonaController extends AbstractActionController
                     }else{
                         $objMetodos = new Metodos();
                         $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+                        $objPersona = new Persona($this->dbAdapter);
 //                       $objMisas = new Misas($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
@@ -62,6 +63,7 @@ class DireccionPersonaController extends AbstractActionController
                         $idConfigurarParroquiaCantonEncriptado = $post['selectParroquiasM'];
                         $idDireccionPersonaEncriptado = $post['direccionPersonaEncriptado'];
                         $i = $post['numeroFila'];
+                        $j = $post['numeroFila2'];
                         $direccion = trim(strtoupper($post['direccionM']));
                         $referencia = trim(strtoupper($post['referenciaM']));
                         if($idConfigurarParroquiaCantonEncriptado == NULL || $idConfigurarParroquiaCantonEncriptado == "" || $idConfigurarParroquiaCantonEncriptado == "0"){
@@ -73,6 +75,8 @@ class DireccionPersonaController extends AbstractActionController
                         }else if(empty ($referencia) || strlen($referencia) > 200){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA REFERENCIA MÁXIMO 200 CARACTERES</div>';
                         }else if(!is_numeric($i)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                        }else if(!is_numeric($j)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
                         }else{
                             $idDireccionPersona = $objMetodos->desencriptar($idDireccionPersonaEncriptado);
@@ -101,10 +105,10 @@ class DireccionPersonaController extends AbstractActionController
                                     if(count( $objDireccionPersona->IngresarDireccionPersona( $idPersona, $idConfigurarParroquiaCanton,$direccion,$referencia, $fechaSubida, 1)) == 0){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ</div>';
                                         $objDireccionPersona->ModificarDireccionPersonaEstado($idDireccionPersona, 1);
-                                    }else{
+                                    }else{                                        
                                         $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
                                         $validar = TRUE;
-                                      return new JsonModel(array('idpersona'=>$idPersonaEncriptado,'i'=>$i,'mensaje'=>$mensaje,'validar'=>$validar));
+                                        return new JsonModel(array('idpersona'=>$idPersonaEncriptado,'i'=>$i,'j'=>$j,'mensaje'=>$mensaje,'validar'=>$validar));
                                     }       
                                 }                           
                             }          

@@ -180,13 +180,13 @@ function obtenerPersonas(){
 }
 
 
-function FiltrarDireccionPorPersona(id, i){
+function FiltrarDireccionPorPersona(id, i, j){
     var url = $("#rutaBase").text();
     $.ajax({
         url : url+'/persona/obtenerdireccionpersona',
         type: 'post',
         dataType: 'JSON',
-        data: {id:id, i:i},
+        data: {id:id, i:i,j:j},
         beforeSend: function(){
             $("#mensajeDireccionPersona").html('');
             cargandoPersonas("#contenedorDireccionPersona")
@@ -194,7 +194,7 @@ function FiltrarDireccionPorPersona(id, i){
         uploadProgress: function(event,position,total,percentComplete){
         },
         success: function(data){  
-            console.log(data)
+//            console.log(data)
             if(data.validar == true){
                 $("#contenedorDireccionPersona").html(data.tabla);
                

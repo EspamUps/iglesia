@@ -133,7 +133,7 @@ $(document).ready(function(){
                   <div id="mensajeDireccionPersona">
                       
                   </div>
-                  <form action="<?php echo $this->basePath(); ?>/direccionpersona/modificardireccion" method="post" id="contenedorDireccionPersona">
+                  <form onsubmit="return validarModificarDireccion(this)" action="<?php echo $this->basePath(); ?>/direccionpersona/modificardireccion" method="post" id="contenedorDireccionPersona">
                       
                   </form>
               </div>

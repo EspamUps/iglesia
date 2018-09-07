@@ -30,7 +30,7 @@ class InicioController extends AbstractActionController
     public function inicioAction()
     {
         $this->layout("layout/login");
-        //crear una sesion
+        //crear una sesi
         $sesionUsuario = new Container('sesionparroquia');
         if($sesionUsuario->offsetExists('idUsuario')){
             $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
