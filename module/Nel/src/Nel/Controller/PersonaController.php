@@ -510,12 +510,19 @@ class PersonaController extends AbstractActionController
                             $tabla = '';
 //                            if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1));
                             
-                          
+                            $inputIdentificacion = '<input  value="0" type="hidden" id="identificacionM" name="identificacionM" class="form-control">';
+                            if($listaPersona[0]['identificacion'] == ""){
+                                $inputIdentificacion = '<label for="identificacionM">IDENTIFICACIÓN</label>
+                                    <input onkeydown="validarNumeros(\'identificacionM\')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionM" name="identificacionM" class="form-control">';
+                                                           
+                            }
+                            
                              
                             $tabla = '<div class="form-group col-lg-12">
+                                    <input type="hidden" value="'.$i.'" id="im" name="im">
+                                    <input type="hidden" value="'.$j.'" id="jm" name="jm">
                                     <input type="hidden" value="'.$idPersonaEncriptado.'" name="idPersonaEncriptadoM" id="idPersonaEncriptadoM">
-                                    <label for="identificacionM">IDENTIFICACIÓN</label>
-                                    <input value="'.$listaPersona[0]['identificacion'].'" onkeydown="validarNumeros(\'identificacionM\')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionM" name="identificacionM" class="form-control">
+                                    '.$inputIdentificacion.'
                                     <label for="primerNombreM">PRIMER NOMBRE</label>
                                     <input value="'.$listaPersona[0]['primerNombre'].'" maxlength="50" autocomplete="off" type="text" id="primerNombreM" name="primerNombreM" class="form-control">
                                     <label for="segundoNombreM">SEGUNDO NOMBRE</label>
@@ -542,6 +549,109 @@ class PersonaController extends AbstractActionController
                     }
 
                 }  
+            }
+        }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    public function modificarpersonaAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objHistorialPersona = new HistorialPersona($this->dbAdapter);
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 1, 2);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS PARA MODIFICAR EN ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objPersona = new Persona($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idPersonaEncriptadoM = $post['idPersonaEncriptadoM'];
+                        $im = $post['im'];
+                        $jm = $post['jm'];
+                        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+                        $identificacion = trim($post['identificacionM']);
+                        $primerNombre = trim(strtoupper($post['primerNombreM']));
+                        $segundoNombre = trim(strtoupper($post['segundoNombreM']));
+                        $primerApellido = trim(strtoupper($post['primerApellidoM']));
+                        $segundoApellido = trim(strtoupper($post['segundoApellidoM']));                     
+                        $fechaNacimiento = $post['fechaNacimientoM'];
+                        $validarIngresoCedula = FALSE;
+                        if($identificacion != '0' && !empty($identificacion)){
+                            $validarIngresoCedula = TRUE;
+                        }
+                        if($validarIngresoCedula == true && $objMetodos->validarIdentificacion($identificacion) == FALSE){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA IDENTIFICACIÓN INGRESADA NO ES CORRECTA</div>';
+                        }else if($validarIngresoCedula == true && count($objPersona->FiltrarPersonaPorIdentificacion($identificacion)) > 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA PERSONA CON LA IDENTIFICACIÓN '.$identificacion.'</div>';
+                        }else if($idIglesia == NULL || $idIglesia == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA IGLESIA</div>';
+                        }else if(empty ($primerNombre) || strlen($primerNombre) > 50){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL PRIMER NOMBRE MÁXIMO 50 CARACTERES</div>';
+                        }else if(empty ($segundoNombre) || strlen($segundoNombre) > 50){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL SEGUNDO NOMBRE MÁXIMO 50 CARACTERES</div>';
+                        }else if(empty ($primerApellido) || strlen($primerApellido) > 50){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE PRIMER APELLIDO MÁXIMO 50 CARACTERES</div>';
+                        }else if(empty ($segundoApellido) || strlen($segundoApellido) > 50){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL SEGUNDO APELLIDO MÁXIMO 50 CARACTERES</div>';
+                        }else if(empty ($fechaNacimiento)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA DE NACIMIENTO</div>';
+                        }else{   
+                            
+                            $idPersona= $objMetodos->desencriptar($idPersonaEncriptadoM);
+                            $listaPersona = $objPersona->FiltrarPersona($idPersona);
+                            if(count($listaPersona)>0)
+                            {
+                                if($validarIngresoCedula == FALSE)
+                                    $identificacion = $listaPersona[0]['identificacion'];
+                                ini_set('date.timezone','America/Bogota'); 
+                                $hoy = getdate();
+                                $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+     
+                                $estado = $listaPersona[0]['estadoPersona'];
+                                $fechaRegistro = $listaPersona[0]['fechaRegistro'];
+                                $resultado =  $objPersona->ModificarPersona($idPersona, $idIglesia, $identificacion, $primerNombre, $segundoNombre, $primerApellido, $segundoApellido, $fechaNacimiento, $fechaSubida, $estado);
+                                if(count($resultado) == 0){                                    
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PERSONA POR FAVOR INTENTE MÁS TARDE</div>';
+                                }else{
+                                     $resultado2 =  $objHistorialPersona->IngresarHistorialPersona(
+                                             $idUsuario, $idPersona, $idIglesia, 
+                                     $listaPersona[0]['identificacion'],$listaPersona[0]['primerNombre'], $listaPersona[0]['segundoNombre'], $listaPersona[0]['primerApellido'], $listaPersona[0]['segundoApellido'], $listaPersona[0]['fechaNacimiento'], $fechaRegistro, $estado);
+                                     
+                                     $tablaPersona ="";
+                                     $tablaPersona = $this->CargarTablaPersonaAction($idUsuario, $this->dbAdapter,$resultado, $im, $jm);
+                                     
+                                     $mensaje = '<div class="alert alert-success text-center" role="alert">MODIFICADO CORRECTAMENTE</div>';
+                                     $validar = TRUE;
+                                     
+                                    return new JsonModel(array('tabla'=>$tablaPersona,'idPersona'=>$idPersonaEncriptadoM,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar));
+                                }
+                            }
+
+                        }
+                    }   
+                }
             }
         }
         

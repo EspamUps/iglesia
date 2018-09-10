@@ -23,5 +23,12 @@ class HistorialPersona extends TableGateway
         return $resultado;
     }
  
-   
+   public function IngresarHistorialPersona(
+        $idUsuario, $idPersona, $idIglesia, $identificacion, $primerNombre, $segundoNombre,$primerApellido, 
+        $segundoApellido, $fechaNacimiento, $fechaRegistro,$estadoPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarHistorialPersona('{$idUsuario}','{$idPersona}', '{$idIglesia}', '{$identificacion}',
+                '{$primerNombre}', '{$segundoNombre}','{$primerApellido}', '{$segundoApellido}', '{$fechaNacimiento}', '{$fechaRegistro}','{$estadoPersona}')", 
+                Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 }

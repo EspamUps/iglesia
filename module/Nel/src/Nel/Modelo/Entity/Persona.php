@@ -28,6 +28,14 @@ class Persona extends TableGateway
         return $resultado;
     }
     
+public function ModificarPersona(
+        $idPersona, $idIglesia, $identificacion, $primerNombre, $segundoNombre,$primerApellido, 
+        $segundoApellido, $fechaNacimiento, $fechaRegistro,$estadoPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarPersona( '{$idPersona}', '{$idIglesia}', '{$identificacion}',
+                '{$primerNombre}', '{$segundoNombre}','{$primerApellido}', '{$segundoApellido}', '{$fechaNacimiento}', '{$fechaRegistro}','{$estadoPersona}')", 
+                Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
     public function FiltrarPersona($idPersona){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
