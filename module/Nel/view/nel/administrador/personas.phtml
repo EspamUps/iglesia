@@ -96,6 +96,39 @@ $(document).ready(function(){
 });
 
 </script>
+ <div class="example-modal">
+        <div class="modal " id="modalModificarTelefono">
+          <div class="modal-dialog modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">MODIFICAR TELÉFONO</h4>
+              </div>
+              <div class="modal-body">
+                  <div id="mensajeModifcarTelefono">
+                      
+                  </div>
+                  <form method="post" action="<?php echo $this->basePath();?>/persona/modificartelefono" id="formModificarTelefono">
+                      <div class="form-group">
+                          <input type="hidden" id="numeroFilaT" name="numeroFilaT">
+                          <input type="hidden" id="numeroFila2T" name="numeroFila2T">
+                          <input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado">
+                          <label for="nuevoTelefono">TELÉFONO</label>
+                          <input class="form-control" type="text" onkeydown="validarNumeros('nuevoTelefono')" name="nuevoTelefono" id="nuevoTelefono">
+                          <br><button id="btnModificarTelefono" data-loading-text="GUARDANDO..." type="submit" class="btn btn-primary btn-flat pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
 
  <div class="example-modal">
         <div class="modal " id="modalModificarPersona">

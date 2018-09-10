@@ -29,17 +29,22 @@ class TelefonoPersona extends TableGateway
 //        return $resultado;
 //    }
 //    
-    public function FiltrarTelefonoPersonaPorPersonaEstado($idPersona,$estado){
+    public function ModificarTelefonoPersona($idTelefonoPersona,$estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarTelefonoPersona('{$idTelefonoPersona}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+     public function FiltrarTelefonoPersonaPorPersonaEstado($idPersona,$estado){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTelefonoPersonaPorPersonaEstado('{$idPersona}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    public function FiltrarTelefonoPersonaPorNumeroPersonaEstado($numeroTelefono,$idPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTelefonoPorNumero('{$numeroTelefono}','{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
-    public function IngresarTelefonoPersona($array)
+    
+    public function IngresarTelefonoPersona($idPersona,$idTelefono,$fechaRegistro,$estadoTelefonoPersona)
     {
-        $idPersona = $array['idPersona'];
-        $idTelefono = $array['idTelefono'];
-        $fechaRegistro = $array['fechaRegistro'];
-        $estadoTelefonoPersona = $array['estadoTelefonoPersona'];
         $resultado =  $this->getAdapter()->query("CALL Sp_IngresarTelefonoPersona('{$idPersona}','{$idTelefono}','{$fechaRegistro}','{$estadoTelefonoPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }

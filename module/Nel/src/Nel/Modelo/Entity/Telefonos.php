@@ -38,10 +38,8 @@ class Telefonos extends TableGateway
 //        return $resultado;
 //    }
     
-    public function IngresarTelefono($array)
+    public function IngresarTelefono($numeroTelefono,$estadoTelefono)
     {
-        $numeroTelefono = $array['numeroTelefono'];
-        $estadoTelefono = $array['estadoTelefono'];
         $resultado =  $this->getAdapter()->query("CALL Sp_IngresarTelefono('{$numeroTelefono}','{$estadoTelefono}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }

@@ -32,6 +32,105 @@ use Zend\Db\Adapter\Adapter;
 class PersonaController extends AbstractActionController
 {
     public $dbAdapter;
+    public function modificartelefonoAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 1);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 1, 2);
+                if ($validarprivilegio==false)
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objPersona = new Persona($this->dbAdapter);
+                        $objTelefono = new Telefonos($this->dbAdapter);
+                        $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+
+                        $idPersonaEncriptado = $post['idPersonaEncriptado'];
+                        $telefono = trim($post['nuevoTelefono']);
+                        $numeroFila = $post['numeroFilaT'];
+                        $numeroFila2 = $post['numeroFila2T'];
+                     
+                        if($idPersonaEncriptado == NULL || $idPersonaEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
+                        }else if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else  if(!is_numeric($numeroFila2)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else if(!is_numeric($telefono) || strlen($telefono) > 20){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL TELÉFONO SÓLO NUMEROS</div>';
+                        }else{
+                            $idPersona = $objMetodos->desencriptar($idPersonaEncriptado);
+                            $listaPersona = $objPersona->FiltrarPersona($idPersona);
+                            if(count($listaPersona) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE</div>';
+                            }else{
+                                $listaTelefonoActual = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($idPersona, true);
+                                
+                                
+                                $listaTelefonoAnterior = $objTelefonoPersona->FiltrarTelefonoPersonaPorNumeroPersonaEstado($telefono, $idPersona);
+                                if(count($listaTelefonoAnterior) > 0){
+                                    if($listaTelefonoAnterior[0]['estadoTelefonoPersona'] == true)
+                                    {
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">POR FAVOR MODIFIQUE EL TELÉFONO</div>';
+                                    }else{
+                                        $resultado = $objTelefonoPersona->ModificarTelefonoPersona($listaTelefonoActual[0]['idTelefonoPersona'], 0);
+                                        $resultado = $objTelefonoPersona->ModificarTelefonoPersona($listaTelefonoAnterior[0]['idTelefonoPersona'], true);
+                                    }
+                                }else{
+                                    ini_set('date.timezone','America/Bogota'); 
+                                    $hoy = getdate();
+                                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                                    $resultadoTelefono = $objTelefono->IngresarTelefono($telefono, 1);
+                                    $idTelefono = $resultadoTelefono[0]['idTelefono'];
+                                    $objTelefonoPersona->ModificarTelefonoPersona($listaTelefonoActual[0]['idTelefonoPersona'], 0);
+                                    $objTelefonoPersona->IngresarTelefonoPersona($idPersona, $idTelefono, $fechaSubida, 1);
+                                    
+                                     
+                                    
+                                    
+                                    
+                                   
+                               }
+                               $tablaPersona = $this->CargarTablaPersonaAction($idUsuario, $this->dbAdapter,$listaPersona, $numeroFila, $numeroFila2);
+                               $mensaje = '<div class="alert alert-success text-center" role="alert">MODIFICADO CORRECTAMENTE</div>';
+                               $validar = TRUE;
+                               return new JsonModel(array('tabla'=>$tablaPersona,'numeroFila'=>$numeroFila,'numeroFila2'=>$numeroFila2,'idPersona'=>$idPersonaEncriptado,'mensaje'=>$mensaje,'validar'=>$validar));
+                               
+                            }
+                 
+                        }   
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }        
+            
+            
+            
+            
+            
      public function eliminarpersonaAction()
     {
         $this->layout("layout/administrador");
@@ -213,11 +312,7 @@ class PersonaController extends AbstractActionController
                                         if(count($listaTelefono) > 0){
                                             $idTelefono = $listaTelefono[0]['numeroTelefono'];
                                         }else{
-                                            $arrayTelefono = array(
-                                              'numeroTelefono'=>$numeroTelefono,
-                                                'estadoTelefono'=>1
-                                            );
-                                            $resultadoTelefono = $objTelefono->IngresarTelefono($arrayTelefono);
+                                            $resultadoTelefono = $objTelefono->IngresarTelefono($numeroTelefono,1);
                                             if(count($resultadoTelefono) > 0){
                                                 $idTelefono = $resultadoTelefono[0]['idTelefono'];
                                             }
@@ -226,13 +321,8 @@ class PersonaController extends AbstractActionController
                                             $objPersona->EliminarPersona($idPersona);
                                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PERSONA POR FAVOR INTENTE MÁS TARDE</div>';
                                         }else{
-                                            $arrayTelefonoPersona = array(
-                                                'idPersona'=>$idPersona,
-                                                'idTelefono'=>$idTelefono,
-                                                'fechaRegistro'=>$fechaSubida,
-                                                'estadoTelefonoPersona'=>1
-                                            );
-                                            $resultadoTelefonoPersona = $objTelefonoPersona->IngresarTelefonoPersona($arrayTelefonoPersona);
+                                           
+                                            $resultadoTelefonoPersona = $objTelefonoPersona->IngresarTelefonoPersona($idPersona,$idTelefono,$fechaSubida,1);
                                             if(count($resultadoTelefonoPersona) == 0){
                                                 $objPersona->EliminarPersona($idPersona);
                                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PERSONA POR FAVOR INTENTE MÁS TARDE</div>';
@@ -499,6 +589,7 @@ class PersonaController extends AbstractActionController
              
             $array1[$i] = array(
                 '_j'=>$j,
+                '_idPersonaEncriptado'=>$idPersonaEncriptado,
                 'identificacion'=>$identificacion,
                 'nombres'=>$nombres,
                 'apellidos'=>$apellidos,

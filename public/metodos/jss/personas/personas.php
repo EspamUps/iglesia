@@ -1,4 +1,55 @@
 <script>
+$(function(){
+    $("#formModificarTelefono").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeModifcarTelefono").html('');
+            $("#btnModificarTelefono").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){
+            if(data.validar==true){
+//                console.log(data.tabla)
+                var table = $('#tablaPersonas').DataTable();
+                table.row(data.numeroFila).data(data.tabla[data.numeroFila]).draw();
+                setTimeout(function() {$("#mensajeModifcarTelefono").html('');},1500);
+            }
+            $("#btnModificarTelefono").button('reset');
+            $("#mensajeModifcarTelefono").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnModificarTelefono").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeModifcarTelefono").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
+    
+    
+function obtenerTelefonoModal(ID,ID2,_idPersonaEncriptado){
+    var telefono = $("#telefonoPersona"+ID).text();
+    $("#nuevoTelefono").val(telefono);
+    $("#numeroFilaT").val(ID);
+    $("#numeroFila2T").val(ID2);
+    $("#idPersonaEncriptado").val(_idPersonaEncriptado);
+}
+    
 function EliminarPersona(vari, ID){
     if (confirm('¿DESEAS ELIMINAR A '+$("#nombrePersona"+ID).text()+'?')) {
         var url = $("#rutaBase").text();
@@ -207,6 +258,14 @@ function obtenerPersonas(){
                            'targets': 2,
                            'createdCell':  function (td, cellData, rowData, row, col) {
                                 $(td).attr('id','nombrePersona'+row); 
+                           },
+                           'targets': 6,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('id','telefonoPersona'+row); 
+                                $(td).attr('onclick','obtenerTelefonoModal('+row+','+rowData._j+',\''+rowData._idPersonaEncriptado+'\')'); 
+                                $(td).attr('data-target','#modalModificarTelefono'); 
+                                $(td).attr('data-toggle','modal'); 
+                                
                            },
                         }
                      ],
