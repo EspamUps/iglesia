@@ -43,53 +43,52 @@ class CantonesController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objProvincias = new Provincias($this->dbAdapter);
-                $objMetodos = new Metodos();
-                $listaProvincias = $objProvincias->ObtenerProvincias();
-                $optionProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-                foreach ($listaProvincias as $valueProvincias) {
-                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-                    $optionProvincias = $optionProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
-                }  
-                $selectProvincias = '<select onchange="cargandoCantones(\'#contenedorTablaCantones\');filtrarCantonesPorProvincia();" id="selectProvinciasCantones" name="selectProvinciasCantones" class="form-control">
-                    '.$optionProvincias.'
-                </select>';
-                $objMetodosC = new MetodosControladores();
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
-                $formCantones ="";
-        
-                if($validarprivilegio==true)
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objProvincias = new Provincias($this->dbAdapter);
+                    $objMetodos = new Metodos();
+                    $listaProvincias = $objProvincias->ObtenerProvincias();
+                    $optionProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
+                    foreach ($listaProvincias as $valueProvincias) {
+                        $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                        $optionProvincias = $optionProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+                    }  
+                    $selectProvincias = '<select onchange="cargandoCantones(\'#contenedorTablaCantones\');filtrarCantonesPorProvincia();" id="selectProvinciasCantones" name="selectProvinciasCantones" class="form-control">
+                        '.$optionProvincias.'
+                    </select>';
+                    $objMetodosC = new MetodosControladores();
+                    $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
+                    $formCantones ="";
+
+                    if($validarprivilegio==true)
                     {
-                    $formCantones = '<div class="form-group col-lg-6">
-                            <label>PROVINCIAS</label>
-                            <div class=" margin">
-                                '.$selectProvincias.'
-                            </div>
-                       </div>
-                        <div class="form-group col-lg-6">
-                            <label for="nombreProvincia">NOMBRE DEL CANTÓN</label>
-                            <div class="input-group margin">
-                                <input autofocus  maxlength="100" type="text" id="nombreCanton" name="nombreCanton" class="form-control">
-                                <span class="input-group-btn">
-                                    <button style="margin-left: 10%;" name="btnGuardarCanton" id="btnGuardarCanton" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
-                                </span>
-                            </div>
-                      </div>';
+                        $formCantones = '<div class="form-group col-lg-6">
+                                <label>PROVINCIAS</label>
+                                <div class=" margin">
+                                    '.$selectProvincias.'
+                                </div>
+                           </div>
+                            <div class="form-group col-lg-6">
+                                <label for="nombreProvincia">NOMBRE DEL CANTÓN</label>
+                                <div class="input-group margin">
+                                    <input autofocus  maxlength="100" type="text" id="nombreCanton" name="nombreCanton" class="form-control">
+                                    <span class="input-group-btn">
+                                        <button style="margin-left: 10%;" name="btnGuardarCanton" id="btnGuardarCanton" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
+                                    </span>
+                                </div>
+                          </div>';
                     }else{
                         $formCantones = '<label>PROVINCIAS</label>
                             <div class=" margin">
                                 '.$selectProvincias.'
                             </div>'; 
-                        
+
                     }
-                           
-                $mensaje = '';
-                $validar = TRUE;
-                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formCantones'=>$formCantones));
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formCantones'=>$formCantones));
             
                 }
             }
@@ -114,50 +113,53 @@ class CantonesController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
-                $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
-                $objMetodos = new Metodos();
-                
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                
-                $idProvinciaEncriptado = $post['id'];
-                if(empty($idProvinciaEncriptado) || $idProvinciaEncriptado == NULL){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PROVINCIA</div>';
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                 }else{
-                    
-                    $idProvincia = $objMetodos->desencriptar($idProvinciaEncriptado);
-                    $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvincia($idProvincia, true);
-                    $array1 = array();
-                    $i = 0;
-                    $j = count($listaConfigurarCantonProvincia);
-                    foreach ($listaConfigurarCantonProvincia as $valueConfigurarCantonProvincia) {
-                        
-                        $idConfigurarCantonProvinciaEncriptado = $objMetodos->encriptar($valueConfigurarCantonProvincia['idConfigurarCantonProvincia']);
-                        $botonEliminarCanton = '';
-                        if(count($objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaLimite1($valueConfigurarCantonProvincia['idConfigurarCantonProvincia'])) == 0){
-                            $botonEliminarCanton = '<button id="btnEliminarCanton'.$i.'" title="ELIMINAR '.$valueConfigurarCantonProvincia['nombreCanton'].'" onclick="eliminarCanton(\''.$idConfigurarCantonProvinciaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
-                        }
-                        $botones = $botonEliminarCanton;
-                        $array1[$i] = array(
-                            '_j'=>$j,
-                            'nombreCanton'=>$valueConfigurarCantonProvincia['nombreCanton'],
-                            'botones'=>$botones
-                        );
-                        $j--;
-                        $i++;
-                    }  
-                    $mensaje = '';
-                    $validar = TRUE;
-                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
+                    $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
+                    $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
+                    $objMetodos = new Metodos();
+
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+                    $idProvinciaEncriptado = $post['id'];
+                    if(empty($idProvinciaEncriptado) || $idProvinciaEncriptado == NULL){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PROVINCIA</div>';
+                    }else{
+                        $objMetodosC = new MetodosControladores();
+                        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+
+                        $idProvincia = $objMetodos->desencriptar($idProvinciaEncriptado);
+                        $listaConfigurarCantonProvincia = $objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvincia($idProvincia, true);
+                        $array1 = array();
+                        $i = 0;
+                        $j = count($listaConfigurarCantonProvincia);
+                        foreach ($listaConfigurarCantonProvincia as $valueConfigurarCantonProvincia) {
+
+                            $idConfigurarCantonProvinciaEncriptado = $objMetodos->encriptar($valueConfigurarCantonProvincia['idConfigurarCantonProvincia']);
+                            $botonEliminarCanton = '';
+                            if($validarprivilegioEliminar == TRUE){
+                                if(count($objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaLimite1($valueConfigurarCantonProvincia['idConfigurarCantonProvincia'])) == 0)
+                                    $botonEliminarCanton = '<button id="btnEliminarCanton'.$i.'" title="ELIMINAR '.$valueConfigurarCantonProvincia['nombreCanton'].'" onclick="eliminarCanton(\''.$idConfigurarCantonProvinciaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                            }
+                            $botones = $botonEliminarCanton;
+                            $array1[$i] = array(
+                                '_j'=>$j,
+                                'nombreCanton'=>$valueConfigurarCantonProvincia['nombreCanton'],
+                                'botones'=>$botones
+                            );
+                            $j--;
+                            $i++;
+                        }  
+                        $mensaje = '';
+                        $validar = TRUE;
+                        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
+                    }
                 }
-            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
@@ -180,40 +182,46 @@ class CantonesController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
-                $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
-                $objMetodos = new Metodos();
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $idConfigurarCantonProvinciaEncriptado = $post['id'];
-                $numeroFila = $post['numeroFila'];
-                if(empty($idConfigurarCantonProvinciaEncriptado) || $idConfigurarCantonProvinciaEncriptado == null){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CANTÓN</div>';
-                }else  if(!is_numeric($numeroFila)){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FILA</div>';
-                }else{
-                    
-                    $idConfigurarCantonProvincia = $objMetodos->desencriptar($idConfigurarCantonProvinciaEncriptado);
-                    if(count($objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaLimite1($idConfigurarCantonProvincia)) > 0){
-                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUEDE ELIMINAR EL CANTÓN PORQUE TIENE PARROQUIAS ASIGNADAS</div>';
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{
-                        $resultado =  $objConfigurarCantonProvincia->EliminarConfigurarCantonProvincia($idConfigurarCantonProvincia);
-                        if(count($resultado) > 0){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ EL CANTÓN POR FAVOR INTENTE MÁS TARDE</div>';
+                        $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
+                        $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
+                        $objMetodos = new Metodos();
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idConfigurarCantonProvinciaEncriptado = $post['id'];
+                        $numeroFila = $post['numeroFila'];
+                        if(empty($idConfigurarCantonProvinciaEncriptado) || $idConfigurarCantonProvinciaEncriptado == null){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CANTÓN</div>';
+                        }else  if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FILA</div>';
                         }else{
-                            $mensaje = '';
-                            $validar = TRUE;
-                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
+
+                            $idConfigurarCantonProvincia = $objMetodos->desencriptar($idConfigurarCantonProvinciaEncriptado);
+                            if(count($objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaLimite1($idConfigurarCantonProvincia)) > 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUEDE ELIMINAR EL CANTÓN PORQUE TIENE PARROQUIAS ASIGNADAS</div>';
+                            }else{
+                                $resultado =  $objConfigurarCantonProvincia->EliminarConfigurarCantonProvincia($idConfigurarCantonProvincia);
+                                if(count($resultado) > 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ EL CANTÓN POR FAVOR INTENTE MÁS TARDE</div>';
+                                }else{
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
+                                }
+                            }
                         }
                     }
                 }
-            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));

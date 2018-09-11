@@ -41,40 +41,46 @@ class ProvinciasController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objProvincia = new Provincias($this->dbAdapter);
-                $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
-                $objMetodos = new Metodos();
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $idProvinciaEncriptado = $post['id'];
-                $numeroFila = $post['numeroFila'];
-                if(empty($idProvinciaEncriptado) || $idProvinciaEncriptado == null){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PROVINCIA</div>';
-                }else  if(!is_numeric($numeroFila)){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FILA</div>';
-                }else{
-                    
-                    $idProvincia = $objMetodos->desencriptar($idProvinciaEncriptado);
-                    if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaLimite1($idProvincia)) > 0){
-                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUEDE ELIMINAR LA PROVINCIA PORQUE TIENE CANTONES ASIGNADOS</div>';
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{
-                        $resultado =  $objProvincia->EliminarProvincia($idProvincia);
-                        if(count($resultado) > 0){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ LA PROVINCIA POR FAVOR INTENTE MÁS TARDE</div>';
+                        $objProvincia = new Provincias($this->dbAdapter);
+                        $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
+                        $objMetodos = new Metodos();
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idProvinciaEncriptado = $post['id'];
+                        $numeroFila = $post['numeroFila'];
+                        if(empty($idProvinciaEncriptado) || $idProvinciaEncriptado == null){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PROVINCIA</div>';
+                        }else  if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FILA</div>';
                         }else{
-                            $mensaje = '';
-                            $validar = TRUE;
-                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
+
+                            $idProvincia = $objMetodos->desencriptar($idProvinciaEncriptado);
+                            if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaLimite1($idProvincia)) > 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUEDE ELIMINAR LA PROVINCIA PORQUE TIENE CANTONES ASIGNADOS</div>';
+                            }else{
+                                $resultado =  $objProvincia->EliminarProvincia($idProvincia);
+                                if(count($resultado) > 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ LA PROVINCIA POR FAVOR INTENTE MÁS TARDE</div>';
+                                }else{
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
+                                }
+                            }
                         }
                     }
                 }
-            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
@@ -96,33 +102,39 @@ class ProvinciasController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objProvincia = new Provincias($this->dbAdapter);
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $nombreProvincia = trim(strtoupper($post['nombreProvincia']));
-                if(empty($nombreProvincia) || strlen($nombreProvincia) > 100){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DE LA PROVINCIA MÁXIMO 100 CARACTERES</div>';
-                }else if(count($objProvincia->FiltrarProvinciaPorNombreProvincia($nombreProvincia)) > 0){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA PROVINCIA LLAMADA '.$nombreProvincia.'</div>';
-                }else{
-                    ini_set('date.timezone','America/Bogota'); 
-                    $hoy = getdate();
-                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                    $resultado =  $objProvincia->IngresarProvincia($nombreProvincia,$fechaSubida,1);
-                    if(count($resultado) == 0){
-                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PROVINCIA POR FAVOR INTENTE MÁS TARDE</div>';
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 3);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{
-                        $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADA CORRECTAMENTE</div>';
-                        $validar = TRUE;
+                        $objProvincia = new Provincias($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $nombreProvincia = trim(strtoupper($post['nombreProvincia']));
+                        if(empty($nombreProvincia) || strlen($nombreProvincia) > 100){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DE LA PROVINCIA MÁXIMO 100 CARACTERES</div>';
+                        }else if(count($objProvincia->FiltrarProvinciaPorNombreProvincia($nombreProvincia)) > 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA PROVINCIA LLAMADA '.$nombreProvincia.'</div>';
+                        }else{
+                            ini_set('date.timezone','America/Bogota'); 
+                            $hoy = getdate();
+                            $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                            $resultado =  $objProvincia->IngresarProvincia($nombreProvincia,$fechaSubida,1);
+                            if(count($resultado) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PROVINCIA POR FAVOR INTENTE MÁS TARDE</div>';
+                            }else{
+                                $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADA CORRECTAMENTE</div>';
+                                $validar = TRUE;
+                            }
+                        }
                     }
                 }
-            }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
@@ -155,7 +167,7 @@ class ProvinciasController extends AbstractActionController
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
                 $formProvincias ="";
                 if($validarprivilegio==true)
-                    {
+                {
                     $formProvincias = '<div class="form-group col-lg-6">
                         <label for="nombreProvincia">NOMBRE DE LA PROVINCIA</label>
                         <div class="input-group margin">
@@ -165,8 +177,9 @@ class ProvinciasController extends AbstractActionController
                             </span>
                         </div>
                   </div>';
-                    }
-                
+                }
+                $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+               
                 
                 $listaProvincias = $objProvincias->ObtenerProvincias();
                 $array1 = array();
@@ -174,17 +187,19 @@ class ProvinciasController extends AbstractActionController
                 $j = count($listaProvincias);
                 foreach ($listaProvincias as $valueProvincias) {
                     $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                    $botonEliminarProvincia = '';
                     $validarBoton = false;
-                    if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaLimite1($valueProvincias['idProvincia'])) > 0)
-                    {
-                        $validarBoton = true;
+                    if($validarprivilegioEliminar == TRUE){
+                        if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaLimite1($valueProvincias['idProvincia'])) == 0)
+                            $botonEliminarProvincia = '<button id="btnEliminarProvincia'.$i.'" title="ELIMINAR '.$valueProvincias['nombreProvincia'].'" onclick="eliminarProvincia(\''.$idProvinciaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                     }
+                    $botones = $botonEliminarProvincia;
                     $array1[$i] = array(
                         '_j'=>$j,
                         'idProvinciaEncriptado'=>$idProvinciaEncriptado,
                         'nombreProvincia'=>$valueProvincias['nombreProvincia'],
                         'validarBoton'=>$validarBoton,
-                        'botones'=>''
+                        'botones'=>$botones
                     );
                     $j--;
                     $i++;

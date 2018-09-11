@@ -254,6 +254,7 @@ function obtenerFormParroquias(){
         dataType: 'JSON',
         beforeSend: function(){
             
+            
         },
         uploadProgress: function(event,position,total,percentComplete){
         },

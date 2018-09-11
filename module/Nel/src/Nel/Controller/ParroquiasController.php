@@ -45,75 +45,81 @@ class ParroquiasController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objParroquias = new Parroquias($this->dbAdapter);
-                $objProvincias = new Provincias($this->dbAdapter);
-                $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
-                $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
-                $objMetodos = new Metodos();
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $idProvinciaEncriptado = $post['selectProvinciasParroquias'];
-                $idConfigurarCantonProvinciaEncriptado = $post['selectCantonesParroquias'];
-                $nombreParroquia = trim(strtoupper($post['nombreParroquia']));
-                if(empty($idProvinciaEncriptado) || $idProvinciaEncriptado == NULL || $idProvinciaEncriptado=="0"){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UNA PROVÍNCIA</div>';
-                }else if(empty($idConfigurarCantonProvinciaEncriptado) || $idConfigurarCantonProvinciaEncriptado == NULL || $idConfigurarCantonProvinciaEncriptado=="0"){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UN CANTÓN</div>';
-                }else if(empty($nombreParroquia) || strlen($nombreParroquia) > 100){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DE LA PARRÓQUIA MÁXIMO 100 CARACTERES</div>';
-                }else {
-                    $idProvincia = $objMetodos->desencriptar($idProvinciaEncriptado);
-                    if(count($objProvincias->FiltrarProvincia($idProvincia)) == 0){
-                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE LA PROVINCIA SELECCIONADA</div>';
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 3);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{
-                        $idConfigurarCantonProvincia = $objMetodos->desencriptar($idConfigurarCantonProvinciaEncriptado);
-                        if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvincia($idConfigurarCantonProvincia)) == 0){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE EL CANTÓN SELECCIONADA</div>';
-                        }else{
-                        
-                        
-                            $listaParroquias = $objParroquias->FiltrarParroquiaPorNombreParroquia($nombreParroquia);
-                            $idParroquia = 0;
-                            $validarParroquiaExiste = TRUE;
-                            if(count($listaParroquias) > 0){
-                                $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaParroquia($idConfigurarCantonProvincia, $listaParroquias[0]['idParroquia']);
-                                if(count($listaConfigurarParroquiaCanton) == 0){
-                                    $validarParroquiaExiste = FALSE;
-                                    $idParroquia = $listaParroquias[0]['idParroquia'];
-                                }
+                        $objParroquias = new Parroquias($this->dbAdapter);
+                        $objProvincias = new Provincias($this->dbAdapter);
+                        $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
+                        $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
+                        $objMetodos = new Metodos();
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idProvinciaEncriptado = $post['selectProvinciasParroquias'];
+                        $idConfigurarCantonProvinciaEncriptado = $post['selectCantonesParroquias'];
+                        $nombreParroquia = trim(strtoupper($post['nombreParroquia']));
+                        if(empty($idProvinciaEncriptado) || $idProvinciaEncriptado == NULL || $idProvinciaEncriptado=="0"){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UNA PROVÍNCIA</div>';
+                        }else if(empty($idConfigurarCantonProvinciaEncriptado) || $idConfigurarCantonProvinciaEncriptado == NULL || $idConfigurarCantonProvinciaEncriptado=="0"){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UN CANTÓN</div>';
+                        }else if(empty($nombreParroquia) || strlen($nombreParroquia) > 100){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DE LA PARRÓQUIA MÁXIMO 100 CARACTERES</div>';
+                        }else {
+                            $idProvincia = $objMetodos->desencriptar($idProvinciaEncriptado);
+                            if(count($objProvincias->FiltrarProvincia($idProvincia)) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE LA PROVINCIA SELECCIONADA</div>';
                             }else{
-                                ini_set('date.timezone','America/Bogota'); 
-                                $hoy = getdate();
-                                $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                                $resultadoParroquia = $objParroquias->IngresarParroquia($nombreParroquia, $fechaSubida, 1);
-                                if(count($resultadoParroquia) > 0){
-                                    $idParroquia = $resultadoParroquia[0]['idParroquia'];
-                                }
-                            }
-                            if($idParroquia == 0){
-                                if($validarParroquiaExiste == TRUE){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA PARRÓQUIA LLAMADA '.$nombreParroquia.'</div>';
+                                $idConfigurarCantonProvincia = $objMetodos->desencriptar($idConfigurarCantonProvinciaEncriptado);
+                                if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvincia($idConfigurarCantonProvincia)) == 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE EL CANTÓN SELECCIONADA</div>';
                                 }else{
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PARRÓQUIA POR FAVOR INTENTE MÁS TARDE</div>';
-                                }
-                            }else{
-                                $resultado = $objConfigurarParroquiaCanton->IngresarConfigurarParroquiaCanton($idConfigurarCantonProvincia, $idParroquia, 1);
-                                if(count($resultado) == 0){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PARRÓQUIA POR FAVOR INTENTE MÁS TARDE</div>';
-                                }else{
-                                    $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADA CORRECTAMENTE</div>';
-                                    $validar = TRUE;
+
+
+                                    $listaParroquias = $objParroquias->FiltrarParroquiaPorNombreParroquia($nombreParroquia);
+                                    $idParroquia = 0;
+                                    $validarParroquiaExiste = TRUE;
+                                    if(count($listaParroquias) > 0){
+                                        $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvinciaParroquia($idConfigurarCantonProvincia, $listaParroquias[0]['idParroquia']);
+                                        if(count($listaConfigurarParroquiaCanton) == 0){
+                                            $validarParroquiaExiste = FALSE;
+                                            $idParroquia = $listaParroquias[0]['idParroquia'];
+                                        }
+                                    }else{
+                                        ini_set('date.timezone','America/Bogota'); 
+                                        $hoy = getdate();
+                                        $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                                        $resultadoParroquia = $objParroquias->IngresarParroquia($nombreParroquia, $fechaSubida, 1);
+                                        if(count($resultadoParroquia) > 0){
+                                            $idParroquia = $resultadoParroquia[0]['idParroquia'];
+                                        }
+                                    }
+                                    if($idParroquia == 0){
+                                        if($validarParroquiaExiste == TRUE){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA PARRÓQUIA LLAMADA '.$nombreParroquia.'</div>';
+                                        }else{
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PARRÓQUIA POR FAVOR INTENTE MÁS TARDE</div>';
+                                        }
+                                    }else{
+                                        $resultado = $objConfigurarParroquiaCanton->IngresarConfigurarParroquiaCanton($idConfigurarCantonProvincia, $idParroquia, 1);
+                                        if(count($resultado) == 0){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ LA PARRÓQUIA POR FAVOR INTENTE MÁS TARDE</div>';
+                                        }else{
+                                            $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADA CORRECTAMENTE</div>';
+                                            $validar = TRUE;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                }
                 }
             }
         }
@@ -293,7 +299,9 @@ class ParroquiasController extends AbstractActionController
                 if(empty($idConfigurarCantonProvinciaEncriptado) || $idConfigurarCantonProvinciaEncriptado == NULL){
                     $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CANTÓN</div>';
                 }else{
-                    
+                    $objMetodosC = new MetodosControladores();
+                    $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+               
                     $idConfigurarCantonProvincia = $objMetodos->desencriptar($idConfigurarCantonProvinciaEncriptado);
                     $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCantonPorConfigurarCantonProvincia($idConfigurarCantonProvincia);
                     $array1 = array();
@@ -303,8 +311,9 @@ class ParroquiasController extends AbstractActionController
                         
                         $idConfigurarParroquiaCantonEncriptado = $objMetodos->encriptar($valueConfigurarParroquiaCanton['idConfigurarParroquiaCanton']);
                         $botonEliminarParroquia = '';
-                        if(count($objDireccionPersona->FiltrarDireccionPersonaPorConfigurarParroquiaCantonLimite1($valueConfigurarParroquiaCanton['idConfigurarParroquiaCanton'])) == 0){
-                            $botonEliminarParroquia = '<button id="btnEliminarParroquia'.$i.'" title="ELIMINAR '.$valueConfigurarParroquiaCanton['nombreParroquia'].'" onclick="eliminarParroquia(\''.$idConfigurarParroquiaCantonEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                        if($validarprivilegioEliminar == true){
+                            if(count($objDireccionPersona->FiltrarDireccionPersonaPorConfigurarParroquiaCantonLimite1($valueConfigurarParroquiaCanton['idConfigurarParroquiaCanton'])) == 0)
+                                $botonEliminarParroquia = '<button id="btnEliminarParroquia'.$i.'" title="ELIMINAR '.$valueConfigurarParroquiaCanton['nombreParroquia'].'" onclick="eliminarParroquia(\''.$idConfigurarParroquiaCantonEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                         }
                         $botones = $botonEliminarParroquia;
                         $array1[$i] = array(
@@ -342,40 +351,46 @@ class ParroquiasController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
-                $objDireccionPersona = new DireccionPersona($this->dbAdapter);
-                $objMetodos = new Metodos();
-                $post = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $idConfigurarParroquiaCantonEncriptado = $post['id'];
-                $numeroFila = $post['numeroFila'];
-                if(empty($idConfigurarParroquiaCantonEncriptado) || $idConfigurarParroquiaCantonEncriptado == null){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CANTÓN</div>';
-                }else  if(!is_numeric($numeroFila)){
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FILA</div>';
-                }else{
-                    
-                    $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
-                    if(count($objDireccionPersona->FiltrarDireccionPersonaPorConfigurarParroquiaCantonLimite1($idConfigurarParroquiaCanton)) > 0){
-                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUEDE ELIMINAR LA PARRÓQUIA PORQUE ALGUNAS PERSONAS TIENEN ESTA DIRECCIÓN ASIGNADA</div>';
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{
-                        
-                        $resultado = $objConfigurarParroquiaCanton->EliminarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
-                        if(count($resultado) > 0){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ LA PARRÓQUIA POR FAVOR INTENTE MÁS TARDE</div>';
+                        $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
+                        $objDireccionPersona = new DireccionPersona($this->dbAdapter);
+                        $objMetodos = new Metodos();
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idConfigurarParroquiaCantonEncriptado = $post['id'];
+                        $numeroFila = $post['numeroFila'];
+                        if(empty($idConfigurarParroquiaCantonEncriptado) || $idConfigurarParroquiaCantonEncriptado == null){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CANTÓN</div>';
+                        }else  if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FILA</div>';
                         }else{
-                            $mensaje = '';
-                            $validar = TRUE;
-                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
+
+                            $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
+                            if(count($objDireccionPersona->FiltrarDireccionPersonaPorConfigurarParroquiaCantonLimite1($idConfigurarParroquiaCanton)) > 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUEDE ELIMINAR LA PARRÓQUIA PORQUE ALGUNAS PERSONAS TIENEN ESTA DIRECCIÓN ASIGNADA</div>';
+                            }else{
+
+                                $resultado = $objConfigurarParroquiaCanton->EliminarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
+                                if(count($resultado) > 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ LA PARRÓQUIA POR FAVOR INTENTE MÁS TARDE</div>';
+                                }else{
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'numeroFila'=>$numeroFila));
+                                }
+                            }
                         }
                     }
-                }
                 }
             }
         }

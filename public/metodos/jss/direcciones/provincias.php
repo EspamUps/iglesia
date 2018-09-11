@@ -137,16 +137,16 @@ function obtenerProvincias(){
                         $(row).attr('id', 'filaTablaProvincias' + dataIndex);
                     },
                     'columnDefs': [
-                        {
-                           'targets': 2,
-                           'createdCell':  function (td, cellData, rowData, row, col) {
-                               if(rowData.validarBoton ==false){
-                                    $(td).html('<button id="btnEliminarProvincia'+row+'" title="ELIMINAR '+rowData.nombreProvincia+'" onclick="eliminarProvincia(\''+rowData.idProvinciaEncriptado+'\','+row+')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>'); 
-                               }else{
-                                    $(td).html(''); 
-                               }
-                           },
-                        },
+//                        {
+//                           'targets': 2,
+//                           'createdCell':  function (td, cellData, rowData, row, col) {
+//                               if(rowData.validarBoton ==false){
+//                                    $(td).html('<button id="btnEliminarProvincia'+row+'" title="ELIMINAR '+rowData.nombreProvincia+'" onclick="eliminarProvincia(\''+rowData.idProvinciaEncriptado+'\','+row+')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>'); 
+//                               }else{
+//                                    $(td).html(''); 
+//                               }
+//                           },
+//                        },
                         {
                            'targets': 1,
                            'createdCell':  function (td, cellData, rowData, row, col) {
