@@ -52,7 +52,7 @@ class LugaresMisa extends TableGateway
 //
 //    
     public function EliminarLugarMisa($idLugarMisa){
-        $resultado = $this->getAdapter()->query("CALL Sp_EliminarLugarMisa('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        $resultado = $this->getAdapter()->query("CALL Sp_EliminarLugaresMisa('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

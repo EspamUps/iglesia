@@ -163,7 +163,7 @@ class ProvinciasController extends AbstractActionController
                 $objProvincias = new Provincias($this->dbAdapter);
                 $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
                 $objMetodos = new Metodos();
-                $objMetodosC = new MetodosControladores();
+                
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
                 $formProvincias ="";
                 if($validarprivilegio==true)
@@ -178,6 +178,7 @@ class ProvinciasController extends AbstractActionController
                         </div>
                   </div>';
                 }
+                $objMetodosC = new MetodosControladores();
                 $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
                
                 

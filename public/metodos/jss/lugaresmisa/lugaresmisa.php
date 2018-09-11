@@ -1,4 +1,54 @@
 <script type="text/javascript">
+    function eliminarLugar(vari, ID){
+    if (confirm('¿DESEAS ELIMINAR A '+$("#nombreLugarMisa"+ID).text()+'?')) {
+        var url = $("#rutaBase").text();
+        $.ajax({
+            url : url+'/lugaresmisa/eliminarlugarmisa',
+            type: 'post',
+            dataType: 'JSON',
+            data: { id: vari, numeroFila: ID },
+            beforeSend: function () {
+                $("#btnEliminarLugar" + ID).html('<i class="fa fa-spinner"></i>');
+                $("#mensajeTablaLugaresMisa").html('');
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+            },
+            success: function (data) {
+                if (data.validar == true) {
+                    $("#filaTablaLugaresMisa"+data.numeroFila).remove();
+                    if (data.numeroFila == 0) {
+                        seleccionarFila(data.numeroFila + 1);
+                    } else {
+                        seleccionarFila(data.numeroFila - 1);
+                    }
+                } else {
+                    $("#btnEliminarLugar" + ID).html('<i class="fa fa-times"></i>');
+                }
+                $("#mensajeTablaLugaresMisa").html(data.mensaje);
+            },
+            complete: function () {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#btnEliminarLugar" + ID).html('<i class="fa fa-times"></i>');
+                if (xhr.status === 0) {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                } else if (xhr.status == 404) {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                } else if (xhr.status == 500) {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                } else if (errorThrown === 'parsererror') {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                } else if (errorThrown === 'timeout') {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                } else if (errorThrown === 'abort') {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                } else {
+                    $("#mensajeTablaLugaresMisa").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        });
+    }
+}
 function seleccionarFila(ID)
 {
     var menues2 = $("#tablaLugaresMisa tbody tr td");
@@ -37,6 +87,14 @@ function obtenerLugaresMisa(){
                         $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
                         $(row).attr('id', 'filaTablaLugaresMisa' + dataIndex);
                     },
+                    'columnDefs': [
+                        {
+                           'targets': 1,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('id','nombreLugarMisa'+row); 
+                           },
+                        }
+                     ],
                     columns: [
                         {
                             title: '#',
