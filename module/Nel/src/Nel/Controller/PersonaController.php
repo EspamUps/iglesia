@@ -552,6 +552,8 @@ class PersonaController extends AbstractActionController
         $array1 = array();
 //      $i = 0;
 //      $j = count($listaPersonas);
+        $validarPrivilegioEliminar = $objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1);
+        $validarPrivilegioModificar = $objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 2);
         foreach ($listaPersonas as $value) {
             $idPersonaEncriptado = $objMetodos->encriptar($value['idPersona']);
             $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($value['idPersona'], 1);
@@ -568,12 +570,12 @@ class PersonaController extends AbstractActionController
                 $botonDireccion = '<button data-target="#modalVerDireccionPersona" data-toggle="modal" id="btnFiltrarDireccion'.$i.'" title="VER DIRECCIÓN" onclick="FiltrarDireccionPorPersona(\''.$idPersonaEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-home"></i></button>';
             }
             $botonEliminarPersona = '';
-            if($objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1) == true){
+            if($validarPrivilegioEliminar == true){
                if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0)
                 $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             }
             $botonModificar ='';
-            if($objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 2) == true)
+            if($validarPrivilegioModificar == true)
                 $botonModificar = '<button data-target="#modalModificarPersona" data-toggle="modal" id="btnModificarPersona'.$i.'" title="MODIFICAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarPersona(\''.$idPersonaEncriptado.'\','.$i.','.$j.')" class="btn btn-warning btn-sm btn-flat"><i class="fa fa-pencil"></i></button>';
             
             $identificacion = $value['identificacion'];

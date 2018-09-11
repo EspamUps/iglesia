@@ -22,7 +22,10 @@ class Sacerdotes extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerSacerdotes()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-    
+    public function FiltrarSacerdote($idSacerdote){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarSacerdote('{$idSacerdote}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
     public function FiltrarSacerdotePorPersona($idPersona){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarSacerdotePorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
@@ -33,7 +36,10 @@ class Sacerdotes extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarSacerdote('{$idPersona}','{$fechaIngresoSacerdote}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-    
+    public function EliminarSacerdote($idSacerdote){
+        $resultado = $this->getAdapter()->query("CALL Sp_EliminarSacerdote('{$idSacerdote}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function FiltrarPersonaPorIdentificacion($identificacion){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

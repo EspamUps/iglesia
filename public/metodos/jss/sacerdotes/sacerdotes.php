@@ -1,4 +1,56 @@
-<script>
+<script type="text/javascript">
+function EliminarSacerdote(vari, ID){
+    if (confirm('¿DESEAS ELIMINAR A '+$("#nombreSacerdote"+ID).text()+'?')) {
+        var url = $("#rutaBase").text();
+        $.ajax({
+            url : url+'/sacerdote/eliminarsacerdote',
+            type: 'post',
+            dataType: 'JSON',
+            data: { id: vari, numeroFila: ID },
+            beforeSend: function () {
+                $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-spinner"></i>');
+                $("#mensajeTablaSacerdotes").html('');
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+            },
+            success: function (data) {
+                if (data.validar == true) {
+                    $("#filaTablaSacerdotes"+data.numeroFila).remove();
+                    if (data.numeroFila == 0) {
+                        seleccionarFila(data.numeroFila + 1);
+                    } else {
+                        seleccionarFila(data.numeroFila - 1);
+                    }
+                } else {
+                    $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-times"></i>');
+                }
+                $("#mensajeTablaSacerdotes").html(data.mensaje);
+            },
+            complete: function () {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-times"></i>');
+                if (xhr.status === 0) {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                } else if (xhr.status == 404) {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                } else if (xhr.status == 500) {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                } else if (errorThrown === 'parsererror') {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                } else if (errorThrown === 'timeout') {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                } else if (errorThrown === 'abort') {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                } else {
+                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        });
+    }
+}
+    
+    
 function validarIngresoSacerdote(f){
     var _validar = false;
     if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTE SACERDOTE?")){
@@ -152,6 +204,14 @@ function obtenerSacerdotes(){
                         $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
                         $(row).attr('id', 'filaTablaSacerdotes' + dataIndex);
                     },
+                    'columnDefs': [
+                        {
+                           'targets': 2,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('id','nombreSacerdote'+row); 
+                           },
+                        }
+                     ],
                     columns: [
                         {
                             title: '#',
