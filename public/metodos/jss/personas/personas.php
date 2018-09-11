@@ -259,6 +259,8 @@ function obtenerPersonas(){
                            'createdCell':  function (td, cellData, rowData, row, col) {
                                 $(td).attr('id','nombrePersona'+row); 
                            },
+                        },
+                        {
                            'targets': 6,
                            'createdCell':  function (td, cellData, rowData, row, col) {
                                 $(td).attr('id','telefonoPersona'+row); 
@@ -266,7 +268,7 @@ function obtenerPersonas(){
                                 $(td).attr('data-target','#modalModificarTelefono'); 
                                 $(td).attr('data-toggle','modal'); 
                                 
-                           },
+                           }
                         }
                      ],
                     columns: [

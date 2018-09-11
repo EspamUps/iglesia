@@ -235,4 +235,39 @@ class AdministradorController extends AbstractActionController
         }
         return new ViewModel($array);
     }
+    
+    public function usuariosAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {       
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 7, 3);
+//                $objProvincias = new Provincias($this->dbAdapter);
+//                $objMetodos = new Metodos();
+//
+//                $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
+//                $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
+//                foreach ($listaProvincias as $valueProvincias) {
+//                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+//                    $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
+//                }
+                $array = array(
+//                    'optionSelectProvincias'=>$optionSelectProvincias,
+                    'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+        }
+        return new ViewModel($array);
+    }
 }

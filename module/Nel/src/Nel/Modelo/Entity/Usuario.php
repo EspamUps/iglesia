@@ -22,4 +22,9 @@ class Usuario extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_LoginUsuario('{$nombreUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+     public function ObtenerUsuarios(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerUsuarios()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 }

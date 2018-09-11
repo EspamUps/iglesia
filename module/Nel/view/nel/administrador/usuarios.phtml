@@ -1,0 +1,41 @@
+<?php
+//estas librerias php son llamadas ya que contienen los metodos ajax para obtener y envias
+//datos al respectivo controlador
+$validacionPrivilegio = $this->validacionPrivilegio;
+include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuarios/usuarios.php');
+ 
+ ?>
+
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Usuarios
+            <small>SWGP</small>
+        </h1>
+    </section>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row">
+                <div id="mensajeTablaUsuarios">
+                    
+                </div>
+                <div  class="col-lg-12">
+                    <div id="contenedorTablaUsuarios"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+    cargandoUsuarios('#contenedorTablaUsuarios');
+    obtenerUsuarios();
+});
+
+</script>
