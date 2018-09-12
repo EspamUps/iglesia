@@ -1,4 +1,55 @@
 <script type="text/javascript">
+    function eliminarMisa(vari, ID){
+    if (confirm('¿DESEAS ELIMINAR '+$("#nombreMisa"+ID).text()+'?')) {
+        var url = $("#rutaBase").text();
+        $.ajax({
+            url : url+'/misas/eliminarmisa',
+            type: 'post',
+            dataType: 'JSON',
+            data: { id: vari, numeroFila: ID },
+            beforeSend: function () {
+                $("#btnEliminarMisa" + ID).html('<i class="fa fa-spinner"></i>');
+                $("#mensajeTablaMisas").html('');
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+            },
+            success: function (data) {
+                if (data.validar == true) {
+                    $("#filaTablaMisas"+data.numeroFila).remove();
+                    if (data.numeroFila == 0) {
+                        seleccionarFila(data.numeroFila + 1);
+                    } else {
+                        seleccionarFila(data.numeroFila - 1);
+                    }
+                } else {
+                    $("#btnEliminarMisa" + ID).html('<i class="fa fa-times"></i>');
+                }
+                $("#mensajeTablaMisas").html(data.mensaje);
+            },
+            complete: function () {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#btnEliminarMisa" + ID).html('<i class="fa fa-times"></i>');
+                if (xhr.status === 0) {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                } else if (xhr.status == 404) {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                } else if (xhr.status == 500) {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                } else if (errorThrown === 'parsererror') {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                } else if (errorThrown === 'timeout') {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                } else if (errorThrown === 'abort') {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                } else {
+                    $("#mensajeTablaMisas").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        });
+    }
+}
+    
 function seleccionarFila(ID)
 {
     var menues2 = $("#tablaMisas tbody tr td");
@@ -37,6 +88,14 @@ function obtenerMisas(){
                         $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
                         $(row).attr('id', 'filaTablaMisas' + dataIndex);
                     },
+                    'columnDefs': [
+                        {
+                           'targets': 1,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('id','nombreMisa'+row); 
+                           },
+                        }
+                     ],
                     columns: [
                         {
                             title: '#',

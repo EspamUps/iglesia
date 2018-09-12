@@ -31,6 +31,16 @@ class Misas extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMisaPorDescripcion('{$descripcionMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function FiltrarMisa($idMisa){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMisa('{$idMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function EliminarMisa($idMisa){
+        $resultado = $this->getAdapter()->query("CALL Sp_EliminarMisa('{$idMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    
 //    

@@ -18,6 +18,11 @@ class ConfigurarMisa extends TableGateway
         return parent::__construct('configurarmisa', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
+    public function FiltrarConfigurarMisaPorMisaLimite1($idMisa){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfiMisaPorMisaLimit1('{$idMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function FiltrarConfigurarMisaPorLugarLimite1($idLugarMisa){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarMisaPorLugarLimit1('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
