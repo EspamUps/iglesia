@@ -156,59 +156,59 @@ class ProvinciasController extends AbstractActionController
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-            $request=$this->getRequest();
-            if(!$request->isPost()){
-                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-            }else{
-                $objProvincias = new Provincias($this->dbAdapter);
-                $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
-                $objMetodos = new Metodos();
-                
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
-                $formProvincias ="";
-                if($validarprivilegio==true)
-                {
-                    $formProvincias = '<div class="form-group col-lg-6">
-                        <label for="nombreProvincia">NOMBRE DE LA PROVINCIA</label>
-                        <div class="input-group margin">
-                            <input autofocus  maxlength="100" type="text" id="nombreProvincia" name="nombreProvincia" class="form-control">
-                            <span class="input-group-btn">
-                                <button style="margin-left: 10%;" name="btnGuardarProvincia" id="btnGuardarProvincia" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
-                            </span>
-                        </div>
-                  </div>';
-                }
-                $objMetodosC = new MetodosControladores();
-                $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
-               
-                
-                $listaProvincias = $objProvincias->ObtenerProvincias();
-                $array1 = array();
-                $i = 0;
-                $j = count($listaProvincias);
-                foreach ($listaProvincias as $valueProvincias) {
-                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-                    $botonEliminarProvincia = '';
-                    $validarBoton = false;
-                    if($validarprivilegioEliminar == TRUE){
-                        if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaLimite1($valueProvincias['idProvincia'])) == 0)
-                            $botonEliminarProvincia = '<button id="btnEliminarProvincia'.$i.'" title="ELIMINAR '.$valueProvincias['nombreProvincia'].'" onclick="eliminarProvincia(\''.$idProvinciaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objProvincias = new Provincias($this->dbAdapter);
+                    $objConfigurarCantonProvincia = new ConfigurarCantonProvincia($this->dbAdapter);
+                    $objMetodos = new Metodos();
+                    $objMetodosC = new MetodosControladores();
+                    $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario,3 , 3);
+                    $formProvincias ="";
+                    if($validarprivilegio==true)
+                    {
+                        $formProvincias = '<div class="form-group col-lg-6">
+                            <label for="nombreProvincia">NOMBRE DE LA PROVINCIA</label>
+                            <div class="input-group margin">
+                                <input autofocus  maxlength="100" type="text" id="nombreProvincia" name="nombreProvincia" class="form-control">
+                                <span class="input-group-btn">
+                                    <button style="margin-left: 10%;" name="btnGuardarProvincia" id="btnGuardarProvincia" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
+                                </span>
+                            </div>
+                      </div>';
                     }
-                    $botones = $botonEliminarProvincia;
-                    $array1[$i] = array(
-                        '_j'=>$j,
-                        'idProvinciaEncriptado'=>$idProvinciaEncriptado,
-                        'nombreProvincia'=>$valueProvincias['nombreProvincia'],
-                        'validarBoton'=>$validarBoton,
-                        'botones'=>$botones
-                    );
-                    $j--;
-                    $i++;
-                }             
-                $mensaje = '';
-                $validar = TRUE;
-                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formProvincias'=>$formProvincias,'tabla'=>$array1));
-            }
+                    
+                    $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 3, 1);
+
+
+                    $listaProvincias = $objProvincias->ObtenerProvincias();
+                    $array1 = array();
+                    $i = 0;
+                    $j = count($listaProvincias);
+                    foreach ($listaProvincias as $valueProvincias) {
+                        $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
+                        $botonEliminarProvincia = '';
+                        $validarBoton = false;
+                        if($validarprivilegioEliminar == TRUE){
+                            if(count($objConfigurarCantonProvincia->FiltrarConfigurarCantonProvinciaPorProvinciaLimite1($valueProvincias['idProvincia'])) == 0)
+                                $botonEliminarProvincia = '<button id="btnEliminarProvincia'.$i.'" title="ELIMINAR '.$valueProvincias['nombreProvincia'].'" onclick="eliminarProvincia(\''.$idProvinciaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                        }
+                        $botones = $botonEliminarProvincia;
+                        $array1[$i] = array(
+                            '_j'=>$j,
+                            'idProvinciaEncriptado'=>$idProvinciaEncriptado,
+                            'nombreProvincia'=>$valueProvincias['nombreProvincia'],
+                            'validarBoton'=>$validarBoton,
+                            'botones'=>$botones
+                        );
+                        $j--;
+                        $i++;
+                    }             
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'formProvincias'=>$formProvincias,'tabla'=>$array1));
+                }
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
