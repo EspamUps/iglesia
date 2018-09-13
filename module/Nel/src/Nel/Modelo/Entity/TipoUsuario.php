@@ -23,5 +23,11 @@ class TipoUsuario extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTipoUsuario('{$idTipoUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    
+    public function ObtenerTiposUsuario(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerTiposUsuario()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
    
 }

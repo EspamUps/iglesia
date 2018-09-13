@@ -23,6 +23,31 @@ class Usuario extends TableGateway
         return $resultado;
     }
     
+        public function IngresarUsuario($idPersona, $nombreUsuario, $contraseña, $idTipoUsuario, $fechaRegistroUsuario){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarUsuario('{$idPersona}','{$nombreUsuario}','{$contraseña}','{$idTipoUsuario}','{$fechaRegistroUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+        public function ModificarIdUsuarioEnAsignarModulo($idUsuarioAnterior, $idUsuarioNuevo){       
+        $resultado =$this->getAdapter()->query("CALL Sp_ModificarIdUsuarioEnAsignarModulo('{$idUsuarioAnterior}','{$idUsuarioNuevo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarUsuario($idUsuario){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarUsuario('{$idUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function ModificarUsuario($idUsuario, $contraseña){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarUsuario('{$idUsuario}','{$contraseña}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function ModificarEstadoUsuario($idUsuario, $estadoUsuario){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoUsuario('{$idUsuario}','{$estadoUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
      public function ObtenerUsuarios(){
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerUsuarios()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

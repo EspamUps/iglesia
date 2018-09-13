@@ -168,96 +168,90 @@ function obtenerUsuarios(){
 }
 
 
-function FiltrarDireccionPorPersona(id, i, j){
+function obtenerFormularioModificarUsuario(id, i,j){
     var url = $("#rutaBase").text();
     $.ajax({
-        url : url+'/persona/obtenerdireccionpersona',
+        url : url+'/usuario/obtenerformulariomodificarusuario',
         type: 'post',
         dataType: 'JSON',
         data: {id:id, i:i,j:j},
         beforeSend: function(){
-            $("#mensajeDireccionPersona").html('');
-            cargandoPersonas("#contenedorDireccionPersona")
-        },
-        uploadProgress: function(event,position,total,percentComplete){
-        },
-        success: function(data){  
-//            console.log(data)
-            if(data.validar == true){
-                $("#contenedorDireccionPersona").html(data.tabla);
-               
-            }else{
-                $("#contenedorDireccionPersona").html('');
-            }
-            $("#mensajeDireccionPersona").html(data.mensaje);
-        },
-        complete: function(){
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            $("#contenedorDireccionPersona").html('');
-            if(xhr.status === 0){
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-            }else if(xhr.status == 404){
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-            }else if(xhr.status == 500){
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-            }else if(errorThrown === 'parsererror'){
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-            }else if(errorThrown === 'timeout'){
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-            }else if(errorThrown === 'abort'){
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-            }else{
-                $("#mensajeDireccionPersona").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-            }
-        }
-    }); 
-}
-
-
-function obtenerFormularioModificarPersona(id, i,j){
-    var url = $("#rutaBase").text();
-    $.ajax({
-        url : url+'/persona/obtenerformulariomodificarpersona',
-        type: 'post',
-        dataType: 'JSON',
-        data: {id:id, i:i,j:j},
-        beforeSend: function(){
-            $("#mensajeModifcarPersona").html('');
-            cargandoPersonas("#contenedorModificarPersona")
+            $("#mensajeModificarUsuario").html('');
+            cargandoUsuarios("#contenedorModificarUsuario")
         },
         uploadProgress: function(event,position,total,percentComplete){
         },
         success: function(data){  
             
             if(data.validar == true){
-                $("#contenedorModificarPersona").html(data.tabla);
+                $("#contenedorModificarUsuario").html(data.tabla);
                
             }else{
-                $("#contenedorModificarPersona").html('');
+                $("#contenedorModificarUsuario").html('');
             }
-            $("#mensajeModifcarPersona").html(data.mensaje);
+            $("#mensajeModificarUsuario").html(data.mensaje);
         },
         complete: function(){
         },
         error: function(xhr, textStatus, errorThrown) {
-            $("#contenedorModificarPersona").html('');
+            $("#contenedorModificarUsuario").html('');
             if(xhr.status === 0){
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
             }else if(xhr.status == 404){
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
             }else if(xhr.status == 500){
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
             }else if(errorThrown === 'parsererror'){
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
             }else if(errorThrown === 'timeout'){
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
             }else if(errorThrown === 'abort'){
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
             }else{
-                $("#mensajeModifcarPersona").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
             }
         }
     }); 
 }
+
+$(function(){
+    $("#contenedorModificarUsuario").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeModificarUsuario").html('');
+            $("#btnGuardarUsuarioM").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){
+            if(data.validar==true){
+                var table = $('#tablaUsuarios').DataTable();
+                table.row(data.im).data(data.tabla[data.im]).draw();
+                obtenerFormularioModificarUsuario(data.idUsuario, data.im, data.jm);
+            }
+            $("#btnGuardarUsuarioM").button('reset');
+            $("#mensajeModificarUsuario").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnGuardarUsuarioM").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeModificarUsuario").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
 </script>
