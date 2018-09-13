@@ -18,6 +18,11 @@ class ConfigurarMisa extends TableGateway
         return parent::__construct('configurarmisa', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
+    public function ObtenerConfigurarMisa(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerConfigurarMisa()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function FiltrarConfigurarMisaPorMisaLimite1($idMisa){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfiMisaPorMisaLimit1('{$idMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -43,6 +48,16 @@ class ConfigurarMisa extends TableGateway
     
     public function IngresarConfigurarMisa($idMisa,$idSacerdote,$idLugarMisa,$descripcionMisa,$fechaMisa,$horaInicio,$horaFin,$fechaRegistro,$valorMisa,$estado){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarConfigurarMisa('{$idMisa}','{$idSacerdote}','{$idLugarMisa}','{$descripcionMisa}','{$fechaMisa}','{$horaInicio}','{$horaFin}','{$fechaRegistro}','{$valorMisa}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function EliminarConfigurarMisa($idConfigurarMisa){
+        $resultado = $this->getAdapter()->query("CALL Sp_EliminarConfigurarMisa('{$idConfigurarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarConfigurarMisa($idConfigurarMisa){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarMisa('{$idConfigurarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

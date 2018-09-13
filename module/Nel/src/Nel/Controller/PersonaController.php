@@ -550,8 +550,6 @@ class PersonaController extends AbstractActionController
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
         $array1 = array();
-//      $i = 0;
-//      $j = count($listaPersonas);
         $validarPrivilegioEliminar = $objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 1);
         $validarPrivilegioModificar = $objMetodosControler->ValidarPrivilegioAction($adaptador, $idUsuario, 1, 2);
         foreach ($listaPersonas as $value) {
