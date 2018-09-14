@@ -38,6 +38,11 @@ class Usuario extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarUnUsuarioPorPersona($idPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarUnUsuarioPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function ModificarUsuario($idUsuario, $contraseña){
         $resultado = $this->getAdapter()->query("CALL Sp_ModificarUsuario('{$idUsuario}','{$contraseña}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

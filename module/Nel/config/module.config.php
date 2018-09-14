@@ -75,6 +75,8 @@ return array(
             'Nel\Controller\ConfigurarMisa' => 'Nel\Controller\ConfigurarMisaController',
             'Nel\Controller\DireccionPersona' => 'Nel\Controller\DireccionPersonaController',
             'Nel\Controller\Usuario' => 'Nel\Controller\UsuarioController',
+            'Nel\Controller\GestionarModulosPrivilegios' => 'Nel\Controller\GestionarModulosPrivilegiosController',
+
             
         ),
     ),

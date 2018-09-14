@@ -16,6 +16,7 @@ use Nel\Metodos\Metodos;
 use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
+use Nel\Modelo\Entity\Usuario;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\Telefonos;
@@ -158,6 +159,7 @@ class PersonaController extends AbstractActionController
                     }else{               
                         $objMetodos = new Metodos();
                         $objPersona = new Persona($this->dbAdapter);
+                        $objUsuario = new Usuario($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -175,6 +177,10 @@ class PersonaController extends AbstractActionController
                             $listaPersona = $objPersona->FiltrarPersona($idPersona);
                             if(count($listaPersona) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE</div>';
+                            }else if (count($objUsuario->FiltrarUnUsuarioPorPersona($idPersona))>0)
+                            {
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA TIENE UN USUARIO ASIGNADO, NO PUEDE SER ELIMINADA</div>';
+
                             }else{
                                 $resultado = $objPersona->EliminarPersona($idPersona);
                                 if(count($resultado) > 0){
@@ -542,6 +548,7 @@ class PersonaController extends AbstractActionController
     
     function CargarTablaPersonaAction($idUsuario,$adaptador,$listaPersonas, $i, $j)
     {
+        $objUsuario = new Usuario($adaptador);
         $objTelefono = new Telefonos($adaptador);
         $objTelefonoPersona = new TelefonoPersona($adaptador);
         $objDireccionPersona = new DireccionPersona($adaptador);
@@ -569,7 +576,7 @@ class PersonaController extends AbstractActionController
             }
             $botonEliminarPersona = '';
             if($validarPrivilegioEliminar == true){
-               if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0)
+               if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0 && count($objUsuario->FiltrarUnUsuarioPorPersona($value['idPersona']))==0)
                 $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             }
             $botonModificar ='';

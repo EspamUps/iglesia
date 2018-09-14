@@ -85,7 +85,7 @@ class UsuarioController extends AbstractActionController
             if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 7, 2) == true)
                 $botonModificarUsuario = '<button data-target="#modalModificarUsuario" data-toggle="modal" id="btnModificarUsuario'.$i.'" title="MODIFICAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-warning btn-sm btn-flat"><i class="fa fa-pencil"></i></button>';
             
-            $botonGestionModulos = '<button data-target="#modalGestionModulos" data-toggle="modal" id="btnGestionModulos'.$i.'" title="ASIGNAR MODULOS A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionModulos(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-cog"></i></button>';
+            $botonGestionModulos = '<button data-target="#modalAdministrarModulos" data-toggle="modal" id="btnAdministrarModulos'.$i.'" title="ADMINISTRAR MODULOS A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionModulos(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-cog"></i></button>';
             $botonGestionPrivilegios = '<button data-target="#modalGestionPrivilegios" data-toggle="modal" id="btnGestionPrivilegios'.$i.'" title="ASIGNAR PRIVILEGIOS A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionPrivilegios(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-default btn-sm btn-flat"><i class="fa fa-cogs"></i></button>';
 
             
@@ -118,7 +118,7 @@ class UsuarioController extends AbstractActionController
     }
     
     
-     public function obtenerformulariomodificarestadousuarioAction()
+    public function obtenerformulariomodificarestadousuarioAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -215,7 +215,7 @@ class UsuarioController extends AbstractActionController
     }
     
     
-     public function obtenerformulariomodificarusuarioAction()
+    public function obtenerformulariomodificarusuarioAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';

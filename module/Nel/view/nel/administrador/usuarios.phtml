@@ -3,7 +3,8 @@
 //datos al respectivo controlador
 $validacionPrivilegio = $this->validacionPrivilegio;
 include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuarios/usuarios.php');
- 
+include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuarios/modulosprivilegios.php');
+
  ?>
 
 
@@ -83,6 +84,33 @@ $(document).ready(function(){
                   <form method="post" action="<?php echo $this->basePath();?>/usuario/modificarestadousuario" id="contenedorModificarEstadoUsuario">
                       
                   </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+ <div class="example-modal">
+        <div class="modal " id="modalAdministrarModulos">
+          <div class="modal-dialog modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">ADMINISTRAR MÓDULOS</h4>
+              </div>
+              <div class="modal-body">
+                  <div id="mensajeAdministrarModulos">
+                      
+                  </div>
+                  <form method="post" action="<?php echo $this->basePath();?>/gestionarmodulosprivilegios/administrarmodulos" id="contenedorAdministrarModulos">
+                      
+                  </form>
+                  <div id="contenedorTablaModulos" > </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>

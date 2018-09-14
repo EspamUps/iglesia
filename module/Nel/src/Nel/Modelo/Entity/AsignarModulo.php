@@ -24,40 +24,15 @@ class AsignarModulo extends TableGateway
         return $resultado;
     }
     
-      public function FiltrarModuloPorIdentificadorYUsuario($idUsuario, $identificadorModulo){
+    public function FiltrarModuloPorIdentificadorYUsuario($idUsuario, $identificadorModulo){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarModuloPorIdentificadorYUsuario('{$idUsuario}','{$identificadorModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    public function IngresarMisa($descripcionMisa,$fechaIngresoMisa,$estadoMisa){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarMisa('{$descripcionMisa}','{$fechaIngresoMisa}','{$estadoMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    public function FiltrarMisaPorDescripcion($descripcionMisa){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMisaPorDescripcion('{$descripcionMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    
-//    
-//    public function FiltrarPersona($idPersona){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function FiltrarPersonaPorIdentificacion($identificacion){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//
-//    
-//    public function EliminarLugarMisa($idLugarMisa){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarLugarMisa('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-    
-    
-   
+
+    public function FiltrarAsignarModuloPorUsuarioYModulo($idUsuario, $idModulo, $estadoAsingarModulo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarModuloPorUsuarioYModulo('{$idUsuario}','{$idModulo}','{$estadoAsingarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 
