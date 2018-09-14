@@ -81,6 +81,7 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                 $idModuloEncriptado = $objMetodos->encriptar($valueModulos['idModulo']);
                                 if(count($listaAsignarModulos)==0){
                                     $optionModulos = $optionModulos.'<option value="'.$idModuloEncriptado.'">'.$valueModulos['nombreModulo'].'</option>';
+                                    
                                 }else{
                                     $idAsignarModuloEncriptado = $objMetodos->encriptar($listaAsignarModulos[0]['idAsignarModulo']);
                                     $botonEliminarModulo = '<button id="btnEliminarAsignarModulo'.$i.'" title="ELIMINAR MÓDULO '.$valueModulos['nombreModulo'].'" onclick="EliminarModulo(\''.$idUsuarioEncriptado.'\','.$i.','.$j.',\''.$idAsignarModuloEncriptado.'\')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
@@ -93,10 +94,14 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                 }     
                             }
                            
-                           $selectModulo = '<div class="col-lg-9"><input type="hidden" id="usuarioEncriptadoMO" name ="usuarioEncriptadoMO" value="'.$idUsuarioEncriptado.'">
+                           $selectModulo = '<div class="col-lg-9">
+                                   <input type="hidden" id="usuarioEncriptadoMO" name ="usuarioEncriptadoMO" value="'.$idUsuarioEncriptado.'">
+                                       <input type="hidden" value="'.$i.'" id="imm" name="imm">
+                                    <input type="hidden" value="'.$j.'" id="jmm" name="jmm">
                                         <select class="form-control" id="selectModulos" name="selectModulos">
                                         '.$optionModulos.'
-                                    </select> <br><br></div><div class="col-lg-3"><button type="submit" data-loading-text="GUARDANDO..." class="btn btn-primary btn-sm btn-flat" id="btnGuardarAsignarModulos" ><i class="fa fa-save"></i>GUARDAR</button></div>';
+                                    </select> 
+                                    <br><br></div><div class="col-lg-3"><button type="submit" data-loading-text="GUARDANDO..." class="btn btn-primary btn-sm btn-flat" id="btnGuardarAsignarModulos" ><i class="fa fa-save"></i>GUARDAR</button></div>';
                             
                             $tabla = '';
                             if(!empty($cuerpoTabla)){
@@ -192,6 +197,74 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                             }
                  
                         }   
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function administrarmodulosAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 7, 2);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS PARA MODIFICAR EN ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos(); 
+                        $objModulo = new  Modulos($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idUsuarioEncriptadoMO = $post['usuarioEncriptadoMO'];
+                        $imm = $post['imm'];
+                        $jmm = $post['jmm'];
+                        $idselectModulosEncriptado = $post['selectModulos'];
+                               
+                            $idModulo = $objMetodos->desencriptar($idselectModulosEncriptado);
+                            $listaModulo = $objModulo->FiltrarModulo($idModulo);
+                            if(count($listaModulo)==0)
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL MÓDULO REGISTRADO EN LA BASE DE DATOS DEL SISTEMA</div>';
+                            else{
+                                $idUsuarioM= $objMetodos->desencriptar($idUsuarioEncriptadoMO);
+                                $listaAsignarModulos = $objAsignarModulo->FiltrarAsignarModuloPorUsuarioYModulo($idUsuarioM, $idModulo, 0);
+                                if(count($listaAsignarModulos)>0)
+                                    $objAsignarModulo->ModificarEstadoEnAsginarModulo ($listaAsignarModulos[0]['idAsignarModulo'], $listaAsignarModulos[0]['estadoAsignarModulo'], 1);
+                                else
+                                {
+                                    ini_set('date.timezone','America/Bogota'); 
+                                    $hoy = getdate();
+                                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+
+                                    $resultado = $objAsignarModulo->IngresarAsignarModulo($idUsuarioM, $idModulo, $fechaSubida, 1);
+                                   
+                                    $mensaje = '<div class="alert alert-success text-center" role="alert">MODULO ASIGNADO CORRECTAMENTE</div>';
+                                    $validar = TRUE;
+
+                                    return new JsonModel(array('idUsuarioEncriptado'=>$idUsuarioEncriptadoMO,'jmm'=>$jmm,'imm'=>$imm,'mensaje'=>$mensaje,'validar'=>$validar));
+
+                                }             
+                            }
                     }
                 }
             }

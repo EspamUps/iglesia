@@ -43,6 +43,11 @@ class AsignarModulo extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoEnAsginarModulo('{$idAsignarModulo}','{$estadoAsignarModuloActual}','{$estadoAsignarModuloNuevo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function IngresarAsignarModulo($idUsuario, $idModulo, $fechaAsignacion, $estadoAsingarModulo){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarAsignarModulo('{$idUsuario}','{$idModulo}','{$fechaAsignacion}','{$estadoAsingarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 }
