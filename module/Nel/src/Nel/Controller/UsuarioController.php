@@ -14,8 +14,6 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\MetodosControladores;
-use Nel\Metodos\Correo;
-use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Usuario;
 use Nel\Modelo\Entity\TipoUsuario;
@@ -71,11 +69,17 @@ class UsuarioController extends AbstractActionController
         foreach ($listaUsuarios as $value) {
             $idUsuarioEncriptado = $objMetodos->encriptar($value['idUsuario']);
             
-            $botonEliminarUsuario = '';
+            $botonModificarEstadoUsuario = '';
             $botonModificarUsuario ='';
             
             if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 7, 1) == true){
-                $botonEliminarUsuario = '<button id="btnDeshabilitarUsuario'.$i.'" title="DESHABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="DeshabilitarUsuario(\''.$idUsuarioEncriptado.'\','.$i.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                if($idUsuario != $value['idUsuario'])
+                {
+                    if($value['estadoUsuario']==0)
+                    $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="HABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                    else
+                    $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="DESHABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                }
             }
             
             if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 7, 2) == true)
@@ -91,7 +95,7 @@ class UsuarioController extends AbstractActionController
             $usuario = $value['nombreUsuario'];
             $tipoUsuario = $value['descripcionTipoUsuario'];
             
-            $botones = $botonEliminarUsuario .' '.$botonModificarUsuario;  
+            $botones = $botonModificarEstadoUsuario .' '.$botonModificarUsuario;  
             $botones2 = $botonGestionModulos.' '.$botonGestionPrivilegios;  
 
              
@@ -111,6 +115,103 @@ class UsuarioController extends AbstractActionController
         }
         
         return $array1;
+    }
+    
+    
+     public function obtenerformulariomodificarestadousuarioAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else{
+                $objMetodosControlador =  new MetodosControladores();
+                
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{               
+                    $objMetodos = new Metodos();
+                    $objUsuario = new Usuario($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+                    $idUsuarioEncriptado = $post['id'];
+                    $i = $post['i'];
+                    $j = $post['j'];
+                    if($idUsuarioEncriptado == NULL || $idUsuarioEncriptado == "" ){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
+
+                    }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else if(!is_numeric($j)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else{
+                        $idUsuario = $objMetodos->desencriptar($idUsuarioEncriptado); 
+                        $listaUsuarios = $objUsuario->FiltrarUsuario($idUsuario);
+                        if(count($listaUsuarios) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL USUARIO SELECCIONADO NO EXISTE EN NUESTRA BASE DE DATOS</div>';
+                        }else{
+                            
+                            
+                            $tabla = '';
+                            if($listaUsuarios[0]['ultimoModificado']==1 && $listaUsuarios[0]['estadoUsuario']==1){
+                            $tabla = '<div class="form-group col-lg-12">
+                                    <input type="hidden" value="'.$i.'" id="ime" name="ime">
+                                    <input type="hidden" value="'.$j.'" id="jme" name="jme">
+                                    <input type="hidden" value="'.$idUsuarioEncriptado.'" name="idUsuarioEncriptadoME" id="idUsuarioEncriptadoME">
+                                    <h4>Usted está a punto de deshabilitar al usuario: '.$listaUsuarios[0]['nombreUsuario'].' </h4>
+                                    <label>Esto significa que '.$listaUsuarios[0]['nombreUsuario'].' ya no tendrá acceso al sistema y todos</label>
+                                    <label>sus permisos y privilegios automáticamente serán desactivados.</label>
+                                      
+
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <button data-loading-text="DESHABILITANDO..." id="btnModificarEstadoUsuario" type="submit" class="btn btn-danger pull-right"><i class="fa fa-ban"></i> DESHABILITAR USUARIO</button>
+                                 </div>
+                                ';
+                            }else{                            
+                            
+                                $tabla = '<div class="form-group col-lg-12">
+                                    <input type="hidden" value="'.$i.'" id="ime" name="ime">
+                                    <input type="hidden" value="'.$j.'" id="jme" name="jme">
+                                    <input type="hidden" value="'.$idUsuarioEncriptado.'" name="idUsuarioEncriptadoME" id="idUsuarioEncriptadoME">
+                                    <h4>Usted está a punto de habilitar al usuario: '.$listaUsuarios[0]['nombreUsuario'].' </h4>
+                                    <label>Esto significa que '.$listaUsuarios[0]['nombreUsuario'].' volverá a tener acceso al sistema</label>
+                                    <label>con los permisos y privilegios que tenía anteriormente.</label>
+                                      
+
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <button data-loading-text="HABILITANDO..." id="btnModificarEstadoUsuario" type="submit" class="btn btn-success pull-right"><i class="fa fa-check"></i> HABILITAR USUARIO</button>
+                                 </div>
+                                ';
+                            }
+                            
+                            
+                            
+                            $mensaje = '';
+                            $validar = TRUE;
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                        }
+                    }
+
+                }  
+            }
+        }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
     
@@ -176,7 +277,7 @@ class UsuarioController extends AbstractActionController
                             $tabla = '<div class="form-group col-lg-12">
                                     <input type="hidden" value="'.$i.'" id="im" name="im">
                                     <input type="hidden" value="'.$j.'" id="jm" name="jm">
-                                    <input type="hidden" value="'.$idUsuarioEncriptado.'" name="$idUsuarioEncriptadoM" id="$idUsuarioEncriptadoM">
+                                    <input type="hidden" value="'.$idUsuarioEncriptado.'" name="idUsuarioEncriptadoM" id="idUsuarioEncriptadoM">
                                     <label for="usuario">USUARIO</label>
                                     <input value="'.$listaUsuarios[0]['nombreUsuario'].'" maxlength="20" autocomplete="off" type="text" id="usuarioM" name="usuarioM" class="form-control">
                                     <label for="contraseña">CONTRASEÑA</label>
@@ -238,7 +339,7 @@ class UsuarioController extends AbstractActionController
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
                         );
-                        $idUsuarioEncriptadoM = $post['$idUsuarioEncriptadoM'];
+                        $idUsuarioEncriptadoM = $post['idUsuarioEncriptadoM'];
                         $im = $post['im'];
                         $jm = $post['jm'];
                         $idIglesia = $sesionUsuario->offsetGet('idIglesia');
@@ -265,7 +366,7 @@ class UsuarioController extends AbstractActionController
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NINGÚN CAMPO HA SIDO MODIFICADO</div>';
                                     else
                                     {
-                                       $resultado = $objUsuario->ModificarUsuario($idUsuarioM, $contraseña);
+                                       $resultado = $objUsuario->ModificarUsuario($idUsuarioM, $contraseña, 1);
                                        if(count($resultado) == 0)                                    
                                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ AL USUARIO, POR FAVOR INTENTE MÁS TARDE</div>';
                                         else{ 
@@ -277,7 +378,7 @@ class UsuarioController extends AbstractActionController
                                         }  
                                     }
                                  }else{
-                                        $resultado = $objUsuario->ModificarEstadoUsuario($idUsuarioM, 0);
+                                        $resultado = $objUsuario->ModificarEstadoUsuario($idUsuarioM, 0, 0);
                                         if(count($resultado) == 0){                                    
                                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO DEL USUARIO, POR FAVOR INTENTE MÁS TARDE</div>';
                                         }else{   
@@ -323,5 +424,83 @@ class UsuarioController extends AbstractActionController
     }
 
     
+    public function modificarestadousuarioAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 7, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS PARA MODIFICAR EN ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objUsuario = new Usuario($this->dbAdapter);                        
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idUsuarioEncriptadoM = $post['idUsuarioEncriptadoME'];
+                        $im = $post['ime'];
+                        $jm = $post['jme'];
+
+                        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+                        
+                        
+                        if($idIglesia == NULL || $idIglesia == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA IGLESIA</div>';
+                        }else{   
+                            
+                            $idUsuarioM= $objMetodos->desencriptar($idUsuarioEncriptadoM);
+                            $listaUsuario = $objUsuario->FiltrarUsuario($idUsuarioM);
+                            if(count($listaUsuario)>0)
+                            {
+                                if($idUsuario == $idUsuarioM)
+                                {
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">UD. NO PUEDE AUTO-DESHABILITARSE. CONTÁCTESE CON EL ADMINISTRADOR.</div>';
+                                }
+                                else{
+                                    $estadoUsuario = 0;
+                                    if($listaUsuario[0]['estadoUsuario']==0)
+                                    $estadoUsuario=1;
+                                    
+                                    $resultado = $objUsuario->ModificarEstadoUsuario($idUsuarioM, $estadoUsuario, $listaUsuario[0]['ultimoModificado']);    
+                                    if(count($resultado) == 0){                                    
+                                       $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ, POR FAVOR INTENTE MÁS TARDE</div>';
+                                    }else{
+                                        $tablaUsuario = $this->CargarTablaUsuarioAction($idUsuario, $this->dbAdapter,$resultado, $im, $jm);
+
+                                        $mensaje = '<div class="alert alert-success text-center" role="alert">USUARIO MODIFICADO CORRECTAMENTE</div>';
+                                        $validar = TRUE;
+
+                                        return new JsonModel(array( 'tabla'=>$tablaUsuario,'idUsuario'=>$idUsuarioEncriptadoM,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar));
+                                    }
+                                    
+                                }
+                                    
+                            }
+                        }
+                    }   
+                }
+            }
+        }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
 
 }

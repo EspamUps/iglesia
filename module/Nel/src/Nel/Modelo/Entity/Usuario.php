@@ -43,13 +43,18 @@ class Usuario extends TableGateway
         return $resultado;
     }
     
-    public function ModificarEstadoUsuario($idUsuario, $estadoUsuario){
-        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoUsuario('{$idUsuario}','{$estadoUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function ModificarEstadoUsuario($idUsuario, $estadoUsuario, $ultimoModificado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoUsuario('{$idUsuario}','{$estadoUsuario}','{$ultimoModificado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     
      public function ObtenerUsuarios(){
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerUsuarios()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+     public function ModificarEstadoEnAsginarModulo($idUsuario, $estadoUsuarioActual, $estadoUsuarioNuevo){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoEnAsginarModulo('{$idUsuario}','{$estadoUsuarioActual}','{$estadoUsuarioNuevo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
 }
