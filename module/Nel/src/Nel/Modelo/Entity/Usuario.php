@@ -58,8 +58,5 @@ class Usuario extends TableGateway
         return $resultado;
     }
     
-     public function ModificarEstadoEnAsginarModulo($idUsuario, $estadoUsuarioActual, $estadoUsuarioNuevo){
-        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoEnAsginarModulo('{$idUsuario}','{$estadoUsuarioActual}','{$estadoUsuarioNuevo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+    
 }

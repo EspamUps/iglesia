@@ -132,7 +132,7 @@ class PersonaController extends AbstractActionController
             
             
             
-     public function eliminarpersonaAction()
+    public function eliminarpersonaAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';

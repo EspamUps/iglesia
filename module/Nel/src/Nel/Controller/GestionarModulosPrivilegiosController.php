@@ -82,7 +82,8 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                 if(count($listaAsignarModulos)==0){
                                     $optionModulos = $optionModulos.'<option value="'.$idModuloEncriptado.'">'.$valueModulos['nombreModulo'].'</option>';
                                 }else{
-                                    $botonEliminarModulo = '<button id="btnEliminarModulo'.$i.'" title="ELIMINAR MÓDULO '.$valueModulos['nombreModulo'].'" onclick="EliminarModulo(\''.$listaAsignarModulos[0]['idAsignarModulo'].'\')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                    $idAsignarModuloEncriptado = $objMetodos->encriptar($listaAsignarModulos[0]['idAsignarModulo']);
+                                    $botonEliminarModulo = '<button id="btnEliminarAsignarModulo'.$i.'" title="ELIMINAR MÓDULO '.$valueModulos['nombreModulo'].'" onclick="EliminarModulo(\''.$idUsuarioEncriptado.'\','.$i.','.$j.',\''.$idAsignarModuloEncriptado.'\')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             
                                     $cuerpoTabla =$cuerpoTabla. '<tr>
                                             <td>'.$valueModulos['nombreModulo'].'</td>
@@ -127,6 +128,74 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
             }
         }
         
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function eliminarmoduloAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 7, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objUsuario = new Usuario($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        
+                        $idUsuarioEncriptado = $post['usuario'];
+                        $idAsignarModuloEncriptado = $post['idAsignarModulo'];
+                        $fila = $post['fila'];
+                        $fila2 = $post['fila2'];
+                        
+                        if($idAsignarModuloEncriptado == NULL || $idAsignarModuloEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL MÓDULO</div>';
+                        }else if(!is_numeric($fila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else if(!is_numeric($fila2)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else{
+                            $idAsignarModulo = $objMetodos->desencriptar($idAsignarModuloEncriptado);
+                            $listaAsignarModulo = $objAsignarModulo->FiltrarAsignarModulo($idAsignarModulo);
+                            if(count($listaAsignarModulo) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL MÓDULO NO EXISTE</div>';
+                            }else{
+                                $resultado = $objAsignarModulo->ModificarEstadoEnAsginarModulo($idAsignarModulo, $listaAsignarModulo[0]['estadoAsignarModulo'], 0);
+                                if(count($resultado) < 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE DESHABILITÓ EL MÓDULO</div>';
+                                }else{
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('idUsuarioEncriptado'=>$idUsuarioEncriptado, 'fila2'=>$fila2, 'fila'=>$fila,'mensaje'=>$mensaje,'validar'=>$validar));
+                                }
+                            }
+                 
+                        }   
+                    }
+                }
+            }
+        }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
       

@@ -24,6 +24,11 @@ class AsignarModulo extends TableGateway
         return $resultado;
     }
     
+        public function FiltrarAsignarModulo($idAsignarModulo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarModulo('{$idAsignarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function FiltrarModuloPorIdentificadorYUsuario($idUsuario, $identificadorModulo){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarModuloPorIdentificadorYUsuario('{$idUsuario}','{$identificadorModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -33,7 +38,11 @@ class AsignarModulo extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarModuloPorUsuarioYModulo('{$idUsuario}','{$idModulo}','{$estadoAsingarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-
+    
+     public function ModificarEstadoEnAsginarModulo($idAsignarModulo, $estadoAsignarModuloActual, $estadoAsignarModuloNuevo){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoEnAsginarModulo('{$idAsignarModulo}','{$estadoAsignarModuloActual}','{$estadoAsignarModuloNuevo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 }
