@@ -15,6 +15,8 @@ use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\MetodosControladores;
 use Nel\Modelo\Entity\AsignarModulo;
+use Nel\Modelo\Entity\AsignarPrivilegio;
+use Nel\Modelo\Entity\Privilegios;
 use Nel\Modelo\Entity\Usuario;
 use Nel\Modelo\Entity\Modulos;
 use Zend\Session\Container;
@@ -217,6 +219,8 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objAsignarPrivilegio = new AsignarPrivilegio($this->dbAdapter);
+            $objPrivilegios = new Privilegios($this->dbAdapter);
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
@@ -241,29 +245,50 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                         $jmm = $post['jmm'];
                         $idselectModulosEncriptado = $post['selectModulos'];
                                
-                            $idModulo = $objMetodos->desencriptar($idselectModulosEncriptado);
-                            $listaModulo = $objModulo->FiltrarModulo($idModulo);
-                            if(count($listaModulo)==0)
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL MÓDULO REGISTRADO EN LA BASE DE DATOS DEL SISTEMA</div>';
-                            else{
-                                $idUsuarioM= $objMetodos->desencriptar($idUsuarioEncriptadoMO);
-                                $listaAsignarModulos = $objAsignarModulo->FiltrarAsignarModuloPorUsuarioYModulo($idUsuarioM, $idModulo, 0);
-                                if(count($listaAsignarModulos)>0)
-                                    $objAsignarModulo->ModificarEstadoEnAsginarModulo ($listaAsignarModulos[0]['idAsignarModulo'], $listaAsignarModulos[0]['estadoAsignarModulo'], 1);
-                                else
-                                {
-                                    ini_set('date.timezone','America/Bogota'); 
-                                    $hoy = getdate();
-                                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                        $idModulo = $objMetodos->desencriptar($idselectModulosEncriptado);
+                        $listaModulo = $objModulo->FiltrarModulo($idModulo);
+                        
+                        ini_set('date.timezone','America/Bogota'); 
+                        $hoy = getdate();
+                        $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
 
-                                    $resultado = $objAsignarModulo->IngresarAsignarModulo($idUsuarioM, $idModulo, $fechaSubida, 1);
-                                   
-                                    $mensaje = '<div class="alert alert-success text-center" role="alert">MODULO ASIGNADO CORRECTAMENTE</div>';
-                                    $validar = TRUE;
+                        if(count($listaModulo)==0)
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL MÓDULO REGISTRADO EN LA BASE DE DATOS DEL SISTEMA</div>';
+                        else{
+                            $idUsuarioM= $objMetodos->desencriptar($idUsuarioEncriptadoMO);
+                            $listaAsignarModulos = $objAsignarModulo->FiltrarAsignarModuloPorUsuarioYModulo($idUsuarioM, $idModulo, 0);
+                            $listaPrivilegios = $objPrivilegios->ObtenerPrivilegios();
+                            
+                            if(count($listaAsignarModulos)>0){
+                                $elemento= $objAsignarModulo->ModificarEstadoEnAsginarModulo ($listaAsignarModulos[0]['idAsignarModulo'], $listaAsignarModulos[0]['estadoAsignarModulo'], 1);
+                                foreach($listaPrivilegios as $valuePrivilegio){
+                                    $res = $objAsignarPrivilegio->FiltrarAsignarPrivilegio($valuePrivilegio['idPrivilegio'], $listaAsignarModulos[0]['idAsignarModulo']);
+                                    if(count($res)==0){
+                                        $elementoAsignarP = $objAsignarPrivilegio->IngresarAsignarPrivilegio($valuePrivilegio['idPrivilegio'], $listaAsignarModulos[0]['idAsignarModulo'], $fechaSubida, 0);
+                                        $res=0;                                        
+                                    }
+                                }
+                                $mensaje = '<div class="alert alert-success text-center" role="alert">MODULO ASIGNADO CORRECTAMENTE</div>';
+                                $validar = TRUE;
 
-                                    return new JsonModel(array('idUsuarioEncriptado'=>$idUsuarioEncriptadoMO,'jmm'=>$jmm,'imm'=>$imm,'mensaje'=>$mensaje,'validar'=>$validar));
+                                return new JsonModel(array('idUsuarioEncriptado'=>$idUsuarioEncriptadoMO,'jmm'=>$jmm,'imm'=>$imm,'mensaje'=>$mensaje,'validar'=>$validar));
 
-                                }             
+                                
+                            }                            
+                            else
+                            {
+                                $elementoAsignarModulo = $objAsignarModulo->IngresarAsignarModulo($idUsuarioM, $idModulo, $fechaSubida, 1);
+
+                                foreach ($listaPrivilegios as $valuePrivilegio) {
+                                    $elementoAsignarPrivilegio = $objAsignarPrivilegio->IngresarAsignarPrivilegio($valuePrivilegio['idPrivilegio'], $elementoAsignarModulo[0]['idAsignarModulo'], $fechaSubida, 0);                                    
+                                }
+
+                                $mensaje = '<div class="alert alert-success text-center" role="alert">MODULO ASIGNADO CORRECTAMENTE</div>';
+                                $validar = TRUE;
+
+                                return new JsonModel(array('idUsuarioEncriptado'=>$idUsuarioEncriptadoMO,'jmm'=>$jmm,'imm'=>$imm,'mensaje'=>$mensaje,'validar'=>$validar));
+
+                            }             
                             }
                     }
                 }
