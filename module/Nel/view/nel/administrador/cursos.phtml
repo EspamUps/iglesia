@@ -1,13 +1,13 @@
 <?php
 $validacionPrivilegio = $this->validacionPrivilegio;
- include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/misas/misas.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/cursos/cursos.php');
 // include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
  ?>
 <div class="content-wrapper" style="min-height: 1123px;">
     <br><br>
     <section class="content-header">
         <h1>
-            MISAS
+            CURSOS
             <small>SWGP</small>
         </h1>
     </section>
@@ -19,14 +19,14 @@ $validacionPrivilegio = $this->validacionPrivilegio;
         <div class="box-body nav-tabs-custom">
             <div class="row ">
                 <div class="col-lg-12 ">
-                    <div id="mensajeFormIngresarMisa"> </div>
-                    <form method="post" action="<?php echo $this->basePath()?>/misas/ingresarmisa" id="formIngresarMisa">
+                    <div id="mensajeFormIngresarCurso"> </div>
+                    <form method="post" action="<?php echo $this->basePath()?>/cursos/ingresarcurso" id="formIngresarCurso">
                         <div class="form-group col-lg-6">
-                            <label for="nombreProvincia">NOMBRE DE LA MISA</label>
+                            <label for="nombreProvincia">NOMBRE DEL CURSO</label>
                             <div class="input-group margin">
-                                <input autofocus=""  type="text" id="descripcionMisa" name="descripcionMisa" class="form-control">
+                                <input autofocus=""  type="text" id="descripcionCurso" name="descripcionCurso" class="form-control">
                                 <span class="input-group-btn">
-                                    <button style="margin-left: 10%;" name="btnGuardarMisa" id="btnGuardarMisa" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
+                                    <button style="margin-left: 10%;" name="btnGuardarCurso" id="btnGuardarCurso" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
                                 </span>
                             </div>
                         </div>
@@ -42,8 +42,8 @@ $validacionPrivilegio = $this->validacionPrivilegio;
         <div class="box-body nav-tabs-custom">
             <div class="row ">
                 <div class="col-lg-12 ">
-                    <div id="mensajeTablaMisas"> </div>
-                    <div id="contenedorTablaMisas"></div>
+                    <div id="mensajeTablaCurso"> </div>
+                    <div id="contenedorTablaCurso"></div>
                 </div>
             </div>
         </div>
@@ -54,8 +54,8 @@ $validacionPrivilegio = $this->validacionPrivilegio;
 
 <script type="text/javascript">  
 $(document).ready(function(){
-    cargandoMisas("#contenedorTablaMisas");
-   obtenerMisas(); 
+    cargandoCursos("#contenedorTablaCurso");
+   obtenerCursos(); 
 });
 
 
