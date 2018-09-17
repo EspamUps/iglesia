@@ -17,8 +17,6 @@ class ConfigurarCurso extends TableGateway
     {
         return parent::__construct('configurarcurso', $adapter, $databaseSchema, $selectResultPrototype);
     }
-    
-    
     public function FiltrarConfigurarCursoPorCursoLimit1($idCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorCursoLimit1('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

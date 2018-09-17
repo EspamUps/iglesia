@@ -81,7 +81,7 @@ class CursosController extends AbstractActionController
                                     else
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE DESHABILITÓ EL CURSO</div>';
                                 }else{
-                                    $tabla = $this->CargarTablaCrusosAction($idUsuario, $this->dbAdapter, $resultado, 0, count($resultado));
+                                    $tabla = $this->CargarTablaCrusosAction($idUsuario, $this->dbAdapter, $resultado, $numeroFila, $numeroFila2);
                                     $mensaje = '';
                                     $validar = TRUE;
                                     return new JsonModel(array('tabla'=>$tabla,'numeroFila'=>$numeroFila,'numeroFila2'=>$numeroFila2,'mensaje'=>$mensaje,'validar'=>$validar));
@@ -154,9 +154,7 @@ class CursosController extends AbstractActionController
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-    }
-//    
-//    
+    } 
     public function obtenercursosAction()
     {
         $this->layout("layout/administrador");
@@ -193,12 +191,10 @@ class CursosController extends AbstractActionController
     
     function CargarTablaCrusosAction($idUsuario,$adaptador,$listaCursos, $i, $j)
     {
-//        $objCursos = new Cursos($adaptador);
         $objConfigurarCurso = new ConfigurarCurso($adaptador);
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
         $objMetodosC = new MetodosControladores();
-    //                    $objConfiguarMisa = new ConfigurarMisa($this->dbAdapter);
         $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 8, 1);
         $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 8, 2);
         $array1 = array();
@@ -220,8 +216,6 @@ class CursosController extends AbstractActionController
                 else
                     $botonDeshabilitarCurso = '<button id="btnDeshabilitarCurso'.$i.'" title="HABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarCurso(\''.$idCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-minus-square"></i></button>';
             }
-            
-            
             $botones =  $botonDeshabilitarCurso.' '.$botonEliminarCurso;     
             $array1[$i] = array(
                 '_j'=>$j,
