@@ -22,6 +22,11 @@ class ConfigurarCurso extends TableGateway
         return $resultado;
     }
     
+     public function FiltrarConfigurarCursoPorPeriodoLimit1($idPeriodo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorPeriodoLimit1('{$idPeriodo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     
 //    
 //    public function ObtenerCursos(){

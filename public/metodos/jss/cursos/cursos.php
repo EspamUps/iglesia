@@ -1,6 +1,6 @@
 <script type="text/javascript">
 function deshabilitarCurso(vari, ID,ID2){
-    var _estado = $("#estadoCursoA").val();
+    var _estado = $("#estadoCursoA"+ID).val();
     var _mensaje = "HABILITAR";
     if(_estado == true){
         _mensaje = "DESHABILITAR";
