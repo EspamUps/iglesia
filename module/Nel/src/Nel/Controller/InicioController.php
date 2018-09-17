@@ -88,19 +88,76 @@ class InicioController extends AbstractActionController
                                 
                                 $menu_slide = "";
                                 $submenu_slide = "";
+                                $menuMisas = '';
+                                $subMenuMisas = '';
+                                $menuCatesismo = '';
+                                $subMenuCatesismo = '';
                                 foreach ($listaAsignarModulo as $valueAsignarM)
                                 {
-                                    $submenu_slide=$submenu_slide.'
+                                    if($valueAsignarM['identificadorModulo'] == 2 || 
+                                        $valueAsignarM['identificadorModulo'] == 4 || 
+                                        $valueAsignarM['identificadorModulo'] == 5 ||
+                                        $valueAsignarM['identificadorModulo'] == 6){
+                                        $subMenuMisas=$subMenuMisas.'
                                         <li>
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
                                         </li>';
+                                    }
+                                    if($valueAsignarM['identificadorModulo'] == 1 || 
+                                        $valueAsignarM['identificadorModulo'] == 3 || 
+                                        $valueAsignarM['identificadorModulo'] == 7){
+                                        $submenu_slide=$submenu_slide.'
+                                        <li>
+                                            <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
+                                        </li>';
+                                    }
+                                    
+                                    if($valueAsignarM['identificadorModulo'] == 8){
+                                        $subMenuCatesismo=$subMenuCatesismo.'
+                                        <li>
+                                            <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
+                                        </li>';
+                                    }
+                                    
                                 }
-                                if(!empty($submenu_slide))
+                                
+                                if(!empty($subMenuCatesismo))
                                 {
-                                    $menu_slide='<ul class="sidebar-menu">'.$submenu_slide.' <li>
+                                    $menuCatesismo = '<li class="treeview">
+                                        <a href="#">
+                                          <i class="fa fa-dashboard"></i> <span>CATEQUESIS</span>
+                                          <span class="pull-right-container">
+                                            <i class="fa fa-angle-left pull-right"></i>
+                                          </span>
+                                        </a>
+                                        <ul class="treeview-menu" style="display: none;">
+                                        '.$subMenuCatesismo.'
+                                        </ul>
+                                      </li>';
+                                    
+                                    
+                                }
+                                    
+                                
+                                
+                                if(!empty($subMenuMisas))
+                                {
+                                    $menuMisas = '<li class="treeview">
+                                        <a href="#">
+                                          <i class="fa fa-dashboard"></i> <span>EUCARISTÍA</span>
+                                          <span class="pull-right-container">
+                                            <i class="fa fa-angle-left pull-right"></i>
+                                          </span>
+                                        </a>
+                                        <ul class="treeview-menu" style="display: none;">
+                                        '.$subMenuMisas.'
+                                        </ul>
+                                      </li>';
+                                }
+                                $menu_slide='<ul class="sidebar-menu">'.$submenu_slide.$menuMisas.$menuCatesismo.' <li>
                                         <a  href="'.$this->getRequest()->getBaseUrl().'/inicio/salir" ><i class="fa fa-sign-out"></i><span>SALIR</span></a>
                                     </li></ul>';
-                                }
+                                
                                 
                                 $sesionUsuario->offsetSet('menu_slide',$menu_slide);
 
