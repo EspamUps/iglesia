@@ -1,0 +1,74 @@
+<?php
+$optionSelectPeriodos = $this->optionSelectPeriodos;
+$optionSelectCurso = $this->optionSelectCurso;
+$optionSelectDocentes = $this->optionSelectDocentes;
+$validacionPrivilegio = $this->validacionPrivilegio;
+
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/configurarmisas/configurarmisas.php');
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/configurarmisas/sacerdotes.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            CONFIGURAR CURSOS
+            <small>SWGP</small>
+        </h1>
+    </section>
+        <?php
+        if($validacionPrivilegio==true)
+        {
+        ?>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarConfigurarCurso"> </div>
+                    <form onsubmit="return validarIngresoConfigurarCurso(this)" method="post" action="<?php echo $this->basePath()?>/configurarcurso/ingresarconfigurarcurso" id="formIngresarConfigurarCurso">
+                        <div class="col-lg-4 form-group">
+                            <label for="selectPeriodo">SELECCIONE UN PERIODO</label>
+                            <select  class="form-control" id="selectPeriodo" name="selectPeriodo">
+                                <?php echo $optionSelectPeriodos;?>
+                            </select>
+                        </div> 
+                        <div class="col-lg-4 form-group">
+                            <label for="selectCurso">SELECCIONE UNA CURSO</label>
+                            <select class="form-control" id="selectCurso" name="selectCurso">
+                                <?php echo $optionSelectCurso;?>
+                            </select>
+                        </div> 
+                        <div class="col-lg-4 form-group">
+                            <label for="selectDocente">SELECCIONE UN DOCENTE</label>
+                            <select class="form-control" id="selectDocente" name="selectDocente">
+                                <?php echo $optionSelectDocentes;?>
+                            </select>
+                        </div> 
+                        <div class="col-lg-12 form-group">
+                            <button data-loading-text="GUARDANDO..." class="btn btn-primary pull-right btn-flat" id="btnGuardarConfigurarMisa" name="btnGuardarConfigurarMisa"><i class="fa fa-save"></i>GUARDAR</button>
+                        </div> 
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+           <?php } ?>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaConfigurarCurso"> </div>
+                    <div id="contenedorTablaConfigurarCurso"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<!--<script type="text/javascript">
+$(document).ready(function(){
+    cargandoConfigurarMisa('#contenedorTablaConfigurarMisas');
+    obtenerConfigurarMisa();
+});
+
+</script>-->

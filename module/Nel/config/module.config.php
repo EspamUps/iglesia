@@ -79,6 +79,7 @@ return array(
             'Nel\Controller\Cursos' => 'Nel\Controller\CursosController',
             'Nel\Controller\Periodos' => 'Nel\Controller\PeriodosController',
             'Nel\Controller\Docentes' => 'Nel\Controller\DocentesController',
+            'Nel\Controller\Horarios' => 'Nel\Controller\HorariosController',
             
         ),
     ),

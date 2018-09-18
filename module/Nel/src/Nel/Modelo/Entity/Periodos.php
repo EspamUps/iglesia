@@ -23,6 +23,13 @@ class Periodos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerPeriodos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    public function ObtenerPeriodosEstado($estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerPeriodosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    
+    
     public function IngresarPeriodo($nombrePeriodo,$fechaInicio,$fechaFin,$fechaIngreso,$estadoPeriodo){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarPeriodo('{$nombrePeriodo}','{$fechaInicio}','{$fechaFin}','{$fechaIngreso}','{$estadoPeriodo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

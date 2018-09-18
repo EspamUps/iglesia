@@ -16,7 +16,10 @@ use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
-use Nel\Modelo\Entity\AsignarPrivilegio;
+use Nel\Modelo\Entity\ConfigurarCurso;
+use Nel\Modelo\Entity\Periodos;
+use Nel\Modelo\Entity\Cursos;
+use Nel\Modelo\Entity\Docentes;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
@@ -28,6 +31,107 @@ use Zend\Db\Adapter\Adapter;
 class AdministradorController extends AbstractActionController
 {
     public $dbAdapter;
+    
+    public function  configurarcursoAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 12);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 12, 3);
+                
+//                $objMisas = new Misas($this->dbAdapter);
+                $objCursos = new Cursos($this->dbAdapter);
+                $objPeriodos = new Periodos($this->dbAdapter);
+                $objDocentes = new Docentes($this->dbAdapter);
+               
+//                $objLugaresMisa = new LugaresMisa($this->dbAdapter);
+//                $objDireccionLugarMisa = new DireccionLugarMisa($this->dbAdapter);
+                $objMetodos = new Metodos();
+                $listaPeriodo = $objPeriodos->ObtenerPeriodosEstado(1);
+                $optionSelectPeriodos = '<option value="0">SELECCIONE UN PERIODO</option>';
+                foreach ($listaPeriodo as $valuePeriodo) {
+                    $idPeriodoEncriptado = $objMetodos->encriptar($valuePeriodo['idPeriodo']);
+                    $optionSelectPeriodos = $optionSelectPeriodos.'<option value="'.$idPeriodoEncriptado.'">'.$valuePeriodo['nombrePeriodo'].'</option>';
+                }
+                        
+                $listaCursos = $objCursos->ObtenerCursosEstado(1);
+                $optionSelectCurso = '<option value="0">SELECCIONE UN CURSO</option>';
+                foreach ($listaCursos as $valueCursos) {
+                    $idCursoMisaEncriptado = $objMetodos->encriptar($valueCursos['idCurso']);
+                    $optionSelectCurso = $optionSelectCurso.'<option value="'.$idCursoMisaEncriptado.'">'.$valueCursos['nombreCurso'].'</option>';
+                }
+                
+                $listaDocentes = $objDocentes->ObtenerDocentesEstado(1);
+                $optionSelectDocentes = '<option value="0">SELECCIONE UN DOCENTE</option>';
+                foreach ($listaDocentes as $valueDocentes) {
+                    $idDocenteEncriptado = $objMetodos->encriptar($valueDocentes['idDocente']);
+                    $nombres = $valueDocentes['primerApellido'].' '.$valueDocentes['segundoApellido'].' '.$valueDocentes['primerNombre'].' '.$valueDocentes['segundoApellido'];
+                    $optionSelectDocentes = $optionSelectDocentes.'<option value="'.$idDocenteEncriptado.'">'.$nombres.'</option>';
+                }
+                
+                 $array = array(
+                    'optionSelectPeriodos'=>$optionSelectPeriodos,
+                     'optionSelectCurso'=>$optionSelectCurso,
+                     'optionSelectDocentes'=>$optionSelectDocentes,
+                     'validacionPrivilegio' =>  $validarprivilegio
+
+                );
+            }
+        }
+        return new ViewModel($array);
+    }
+    
+    
+    public function  horariosAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 11);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 11, 3);
+                
+                $objCursos = new Cursos($this->dbAdapter);
+               $objMetodos = new Metodos();
+
+                        
+                $listaCursos = $objCursos->ObtenerCursosEstado(1);
+                $optionSelectCurso = '<option value="0">SELECCIONE UN CURSO</option>';
+                foreach ($listaCursos as $valueCursos) {
+                    $idCursoMisaEncriptado = $objMetodos->encriptar($valueCursos['idCurso']);
+                    $optionSelectCurso = $optionSelectCurso.'<option value="'.$idCursoMisaEncriptado.'">'.$valueCursos['nombreCurso'].'</option>';
+                }
+                
+
+                
+                 $array = array(
+                     'optionSelectCurso'=>$optionSelectCurso,
+                     'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+        }
+        return new ViewModel($array);
+    }
     
     
      public function docentesAction()

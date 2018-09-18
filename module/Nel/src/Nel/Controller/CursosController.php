@@ -16,6 +16,8 @@ use Nel\Metodos\MetodosControladores;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\ConfigurarCurso;
+use Nel\Modelo\Entity\Horario;
+use Nel\Modelo\Entity\Dias;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -258,6 +260,8 @@ class CursosController extends AbstractActionController
                     }else{
                         $objMetodos = new Metodos();
                        $objCurso = new Cursos($this->dbAdapter);
+                       $objDias = new Dias($this->dbAdapter);
+                       $objHorario = new Horario($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -275,8 +279,29 @@ class CursosController extends AbstractActionController
                             if(count($resultado) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
                             }else{ 
-                                $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
-                                $validar = TRUE;
+                                $listaDias = $objDias->ObtenerDias();
+                                if(count($listaDias) != 7){
+                                    $objCurso->EliminarCurso($resultado[0]['idCurso']);
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">ERROR INTERNO DEL SISTEMA POR FAVOR VERIFIQUE LOS DÍAS</div>';
+                                }else{
+                                    $validarIngresoHorario = TRUE;
+                                    $idCurso = $resultado[0]['idCurso'];
+                                    foreach ($listaDias as $valueDias){
+                                        
+                                        $resultadoHorario = $objHorario->IngresarHorario($idCurso, $valueDias['idDia'], 1);
+                                        if(count($resultadoHorario) == 0){
+                                            $validarIngresoHorario = FALSE;
+                                            break;
+                                        }
+                                    } 
+                                    if($validarIngresoHorario == FALSE){
+                                        $objCurso->EliminarCurso($idCurso);
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
+                                    }else{
+                                        $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
+                                        $validar = TRUE;
+                                    }
+                                }
                             }
                         }
                     }

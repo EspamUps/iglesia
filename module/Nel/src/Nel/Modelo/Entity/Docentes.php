@@ -18,6 +18,12 @@ class Docentes extends TableGateway
         return parent::__construct('docentes', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
+    
+    public function ObtenerDocentesEstado($estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerDocentesEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function ObtenerDocentes(){
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerDocentes()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

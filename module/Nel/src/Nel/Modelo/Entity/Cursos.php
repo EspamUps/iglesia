@@ -23,6 +23,11 @@ class Cursos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function ObtenerCursosEstado($estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

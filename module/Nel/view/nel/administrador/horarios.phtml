@@ -1,0 +1,55 @@
+<?php
+
+$optionSelectCurso = $this->optionSelectCurso;
+
+$validacionPrivilegio = $this->validacionPrivilegio;
+
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/horarios/horarios.php');
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/configurarmisas/sacerdotes.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            CONFIGURAR HORARIOS
+            <small>SWGP</small>
+        </h1>
+    </section>
+        <?php
+//        if($validacionPrivilegio==true)
+//        {
+        ?>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormHorarios"> </div>
+                    <div class="col-lg-4 form-group">
+                        <label for="selectCurso">SELECCIONE UN CURSO</label>
+                        <select onchange="cargandoHorarios('#contenedorTablaHorarios');filtrarHorariosPorCurso();" class="form-control" id="selectCurso" name="selectCurso">
+                            <?php echo $optionSelectCurso;?>
+                        </select>
+                    </div> 
+                    <div class="col-lg-12 ">
+                        <div id="mensajeTablaHorarios"> </div>
+                        <div id="contenedorTablaHorarios"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+           <?php // } ?>
+    
+<!--    <section class="content" style="">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaHorarios"> </div>
+                    <div id="contenedorTablaHorarios"></div>
+                </div>
+            </div>
+        </div>
+    </section>-->
+</div>
+
