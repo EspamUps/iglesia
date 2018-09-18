@@ -28,6 +28,11 @@ class AsignarPrivilegio extends TableGateway
         return $resultado;
     }
     
+    public function ModificarEstadoAsignarPrivilegio($idAsignarPrivilegio, $fechaAsignacion, $estadoAsignacion){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoAsignarPrivilegio('{$idAsignarPrivilegio}','{$fechaAsignacion}','{$estadoAsignacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function FiltrarAsignarPrivilegio($idPrivilegio,$idAsignarModulo){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarPrivilegio('{$idPrivilegio}','{$idAsignarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -38,5 +43,8 @@ class AsignarPrivilegio extends TableGateway
         return $resultado;
     }
 
-
+    public function FiltrarAsignarPrivilegioPorId($idAsignarPrivilegio){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarPrivilegioPorId('{$idAsignarPrivilegio}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 }

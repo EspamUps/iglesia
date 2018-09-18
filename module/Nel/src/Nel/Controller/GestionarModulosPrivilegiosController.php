@@ -301,7 +301,7 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
     
     
     
-     public function cargarprivilegiospormoduloAction()
+    public function cargarprivilegiospormoduloAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -350,9 +350,9 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                 foreach ($listaAsignarPrivilegios as $valueAsignarPrivilegios) {
                                     $idAsignarPrivilegioEncriptado = $objMetodos->encriptar($valueAsignarPrivilegios['idAsignarPrivilegios']);
                                     if($valueAsignarPrivilegios['estadoAsignacion']==0)
-                                      $botonAsignarPrivilegio = '<button id="btnHabilitarAsignarPrivilegio'.$imm.'" title="HABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="HabilitarPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                                      $botonAsignarPrivilegio = '<button id="btnHabilitarAsignarPrivilegio'.$imm.'" title="HABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="CambiarEstadoPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
                                     else 
-                                      $botonAsignarPrivilegio = '<button id="btnDeshabilitartAsignarPrivilegio'.$imm.'" title="DESHABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="HabilitarPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                      $botonAsignarPrivilegio = '<button id="btnHabilitartAsignarPrivilegio'.$imm.'" title="DESHABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="CambiarEstadoPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
 
                                      $cuerpoTabla =$cuerpoTabla. '<tr>
                                             <td>'.$valueAsignarPrivilegios['nombrePrivilegio'].'</td>
@@ -393,9 +393,89 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
+ 
     
+    public function administrarprivilegioAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objAsignarPrivilegios = new AsignarPrivilegio($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else{
+                
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{               
+                    $objMetodos = new Metodos();
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+
+                    $idAsignarPrivilegioEncriptado = $post['id'];
+                    $i = $post['i'];
+                    $j = $post['j'];
+                    if($idAsignarPrivilegioEncriptado == NULL || $idAsignarPrivilegioEncriptado == "" ){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL ASIGNAR PRIVILEGIO</div>';
+                    }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else if(!is_numeric($j)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else{
+                        $idAsignarPrivilegio = $objMetodos->desencriptar($idAsignarPrivilegioEncriptado); 
+                        $listaAsignarPrivilegio = $objAsignarPrivilegios->FiltrarAsignarPrivilegioPorId($idAsignarPrivilegio);
+                        if(count($listaAsignarPrivilegio) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL ELEMENTO ASIGNAR PRIVILEGIO NO EXISTE EN NUESTRA BASE DE DATOS</div>';
+                        }else{
+                            $idAsignarModuloEncriptado = $objMetodos->encriptar($listaAsignarPrivilegio[0]['idAsignarModulo']);
+                            ini_set('date.timezone','America/Bogota'); 
+                            $hoy = getdate();
+                            $fechaActualizacion = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                            $estadoActual = $listaAsignarPrivilegio[0]['estadoAsignacion'];
+                            $nuevoEstado =0;
+                            if($estadoActual==0)
+                            {
+                                $mensaje = '<div class="alert alert-success text-center" role="alert">SE HABILITÓ DE FORMA EXITOSA EL PRIVILEGIO</div>';                         
+                                $nuevoEstado=1;    
+                            }
+                                
+                            $resultado = $objAsignarPrivilegios->ModificarEstadoAsignarPrivilegio($idAsignarPrivilegio, $fechaActualizacion, $nuevoEstado);
+                            if(count($resultado)==0)
+                              $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUDO ACUTALIZAR EL ESTADO DEL PRIVILEGIO</div>';                         
+                            
+                            $div = '<div class="col-lg-9">
+                                   <input type="hidden" id="selectModulosE" name ="selectModulosE" value="'.$idAsignarModuloEncriptado.'">
+                                   <input type="hidden" value="'.$i.'" id="ip" name="ip">
+                                    <input type="hidden" value="'.$j.'" id="jp" name="jp">'
+                                    . '</div>';
+                            
+                            
+                            $mensaje = '<div class="alert alert-success text-center" role="alert">SE DESHABILITÓ DE FORMA EXITOSA EL PRIVILEGIO</div>';                         
+                            $validar = TRUE;
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+                            }
+                        }
+                    }
+
+                }  
+            }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
     
-    public function obtenerformularioadministrarprivilegiosAction()
+     public function obtenerformularioadministrarprivilegiosAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -425,14 +505,11 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                         $request->getPost()->toArray(),
                         $request->getFiles()->toArray()
                     );
-
-
                     $idUsuarioEncriptado = $post['id'];
                     $i = $post['i'];
                     $j = $post['j'];
                     if($idUsuarioEncriptado == NULL || $idUsuarioEncriptado == "" ){
                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
-
                     }else if(!is_numeric($i)){
                         $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
                     }else if(!is_numeric($j)){
@@ -453,7 +530,7 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                 
                             }
                            
-                           $selectModulo = '<div class="col-lg-9">
+                           $selectModulo = '<div class="col-lg-12">
                                    <input type="hidden" id="usuarioEncriptadoP" name ="usuarioEncriptadoP" value="'.$idUsuarioEncriptado.'">
                                        <input type="hidden" value="'.$i.'" id="ip" name="ip">
                                     <input type="hidden" value="'.$j.'" id="jp" name="jp">
@@ -470,7 +547,6 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                             return new JsonModel(array('select'=>$selectModulo,'mensaje'=>$mensaje,'validar'=>$validar));
                         }
                     }
-
                 }  
             }
         
