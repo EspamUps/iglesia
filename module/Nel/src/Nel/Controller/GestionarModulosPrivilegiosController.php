@@ -296,6 +296,184 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
+    
+    
+    
+     public function cargarprivilegiospormoduloAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objAsignarPrivilegio = new AsignarPrivilegio($this->dbAdapter);
+            $objPrivilegios = new Privilegios($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 7, 2);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS PARA MODIFICAR EN ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos(); 
+                        $objModulo = new  Modulos($this->dbAdapter);
+                        $objAsignarPrivilegios = new AsignarPrivilegio($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+//                        $idUsuarioEncriptadoP = $post['usuarioEncriptadoP'];
+                        $imm = $post['i'];
+                        $jmm = $post['j'];
+                        $idselectModulosEncriptado = $post['id'];
+                               
+                        $idAsignarModulo = $objMetodos->desencriptar($idselectModulosEncriptado);
+                        $listaAsignarModulos = $objAsignarModulo->FiltrarAsignarModulo($idAsignarModulo);
+
+                        if(count($listaAsignarModulos)>0){
+                            $cuerpoTabla='';
+                                
+                                $listaAsignarPrivilegios = $objAsignarPrivilegios->FiltrarAsignarPrivilegioPorIdAsignarModulo($idAsignarModulo); 
+                                foreach ($listaAsignarPrivilegios as $valueAsignarPrivilegios) {
+                                    $idAsignarPrivilegioEncriptado = $objMetodos->encriptar($valueAsignarPrivilegios['idAsignarPrivilegios']);
+                                    if($valueAsignarPrivilegios['estadoAsignacion']==0)
+                                      $botonAsignarPrivilegio = '<button id="btnHabilitarAsignarPrivilegio'.$imm.'" title="HABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="HabilitarPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                                    else 
+                                      $botonAsignarPrivilegio = '<button id="btnDeshabilitartAsignarPrivilegio'.$imm.'" title="DESHABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="HabilitarPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+
+                                     $cuerpoTabla =$cuerpoTabla. '<tr>
+                                            <td>'.$valueAsignarPrivilegios['nombrePrivilegio'].'</td>
+                                            <td>'.$botonAsignarPrivilegio.'</td>
+                                            </tr>';
+                                }                                
+                                
+                                $tabla = '';
+                                if(!empty($cuerpoTabla)){
+                                $tabla =$tabla. '<div class="col-lg-12"><label>PRIVILEGIOS DEL MÓDULO SELECCIONADO</label>                                                  
+                                                    <table class="table table-bordered table-hover dataTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <td><b>NOMBRE PRIVILEGIO</b></td>
+                                                            <td><b>OPCIONES</b></td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            '.$cuerpoTabla.'
+                                                        </tbody>
+                                                    </table>
+                                                    </div>';
+                                }
+                                $mensaje = '<div class="alert alert-success text-center" role="alert">PRIVILEGIOS CARGADOS CORRECTAMENTE</div>';
+                                $validar = TRUE;
+
+                            return new JsonModel(array('tabla'=>$tabla,'jmm'=>$jmm,'imm'=>$imm,'mensaje'=>$mensaje,'validar'=>$validar));
+
+                               
+                        }                            
+                        else
+                        {      
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO CONTIENE MODULOS ASIGNADOS</div>';
+                        }                       
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function obtenerformularioadministrarprivilegiosAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objAsignarPrivilegios = new AsignarPrivilegio($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else{
+                $objMetodosControlador =  new MetodosControladores();
+                
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{               
+                    $objMetodos = new Metodos();
+                    $objUsuario = new Usuario($this->dbAdapter);
+                    $objModulo = new Modulos($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+
+                    $idUsuarioEncriptado = $post['id'];
+                    $i = $post['i'];
+                    $j = $post['j'];
+                    if($idUsuarioEncriptado == NULL || $idUsuarioEncriptado == "" ){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
+
+                    }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else if(!is_numeric($j)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else{
+                        $idUsuarioM = $objMetodos->desencriptar($idUsuarioEncriptado); 
+                        $listaUsuarios = $objUsuario->FiltrarUsuario($idUsuario);
+                        if(count($listaUsuarios) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL USUARIO SELECCIONADO NO EXISTE EN NUESTRA BASE DE DATOS</div>';
+                        }else{
+                            
+                            $listaAsignarModulos = $objAsignarModulo->FiltrarModulosPorUsuario($idUsuarioM);
+                           
+                            $optionModulos = '<option value="0">SELECCIONE UN MÓDULO</option>';
+                            foreach ($listaAsignarModulos as $valueAsignarModulos) {
+                                $idAsignarModuloEncriptado = $objMetodos->encriptar($valueAsignarModulos['idAsignarModulo']);
+                                $optionModulos = $optionModulos.'<option value="'.$idAsignarModuloEncriptado.'">'.$valueAsignarModulos['nombreModulo'].'</option>'; 
+                                
+                            }
+                           
+                           $selectModulo = '<div class="col-lg-9">
+                                   <input type="hidden" id="usuarioEncriptadoP" name ="usuarioEncriptadoP" value="'.$idUsuarioEncriptado.'">
+                                       <input type="hidden" value="'.$i.'" id="ip" name="ip">
+                                    <input type="hidden" value="'.$j.'" id="jp" name="jp">
+                                        <select onchange="cargandoPrivilegios(\'#contenedorTablaPrivilegios\');CargarPrivilegiosPorModulo();" class="form-control" id="selectModulosE" name="selectModulosE">
+                                        '.$optionModulos.'
+                                    </select> 
+                                    <br><br></div>';
+                            
+                           
+                            }
+                            
+                            $mensaje = '';
+                            $validar = TRUE;
+                            return new JsonModel(array('select'=>$selectModulo,'mensaje'=>$mensaje,'validar'=>$validar));
+                        }
+                    }
+
+                }  
+            }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
       
 
 

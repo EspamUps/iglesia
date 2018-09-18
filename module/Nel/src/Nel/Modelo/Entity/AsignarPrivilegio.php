@@ -32,6 +32,11 @@ class AsignarPrivilegio extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarPrivilegio('{$idPrivilegio}','{$idAsignarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function FiltrarAsignarPrivilegioPorIdAsignarModulo($idAsignarModulo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsignarPrivilegioPorIdAsignarModulo('{$idAsignarModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 }

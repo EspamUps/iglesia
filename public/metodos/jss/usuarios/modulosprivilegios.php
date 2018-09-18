@@ -50,6 +50,53 @@
 //}); 
 
 
+function obtenerFormularioGestionPrivilegios(id,i,j){
+    var url = $("#rutaBase").text();
+    $.ajax({
+        url : url+'/gestionarmodulosprivilegios/obtenerformularioadministrarprivilegios',
+        type: 'post',
+        dataType: 'JSON',
+        data: {id:id, i:i,j:j},
+        beforeSend: function(){
+            $("#mensajeAdministrarPrivilegios").html('');
+            cargandoUsuarios("#contenedorAdministrarPrivilegios")
+            $("#contenedorTablaPrivilegios").html("");
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+        },
+        success: function(data){  
+            if(data.validar == true){
+                $("#contenedorAdministrarPrivilegios").html(data.select);
+            }else{
+                $("#contenedorAdministrarPrivilegios").html('');
+                $("#contenedorTablaPrivilegios").html("");
+            }
+            $("#mensajeAdministrarPrivilegios").html(data.mensaje);
+            
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#contenedorAdministrarPrivilegios").html('');
+            $("#contenedorTablaPrivilegios").html("");
+            if(xhr.status === 0){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    }); 
+}
 
 
 
@@ -190,4 +237,65 @@ $(function(){
         }
     });    
 }); 
+
+
+
+
+function cargandoPrivilegios(contenedor){
+    $("#contenedorTablaPrivilegios").html('');
+    var url = $("#rutaBase").text();
+    $(contenedor).html('<img style="margin:0 auto 0 auto; text-aling:center; width: 10%;" class="img-responsive" src="'+url+'/public/librerias/images/pagina/cargando.gif">');
+    
+}
+
+function CargarPrivilegiosPorModulo(){
+    var url = $("#rutaBase").text();
+    var idAsignarModuloEncriptado = $("#selectModulosE").val();
+    var i = $("#ip").val();
+    var j = $("#jp").val();
+    $.ajax({
+        url : url+'/gestionarmodulosprivilegios/cargarprivilegiospormodulo',
+        type: 'post',
+        dataType: 'JSON',
+        data: {id:idAsignarModuloEncriptado,i:i,j:j},
+        beforeSend: function(){
+       //     $("#mensajeAdministrarPrivilegios").html('');
+         //   $("#contenedorTablaPrivilegios").html("");
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+        },
+        success: function(data){  
+            if(data.validar == true){
+             // console.log(data)
+                $("#contenedorTablaPrivilegios").html(data.tabla);
+            }else{
+                //$("#contenedorAdministrarPrivilegios").html('');
+                $("#contenedorTablaPrivilegios").html("");
+            }
+            $("#mensajeAdministrarPrivilegios").html(data.mensaje);
+            
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#contenedorTablaPrivilegios").html("");
+            $("#mensajeAdministrarPrivilegios").html("");
+            if(xhr.status === 0){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeAdministrarPrivilegios").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    }); 
+}
 </script>
