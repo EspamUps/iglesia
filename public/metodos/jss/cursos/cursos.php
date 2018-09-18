@@ -1,6 +1,6 @@
 <script type="text/javascript">
 function deshabilitarCurso(vari, ID,ID2){
-    var _estado = $("#estadoCursoA").val();
+    var _estado = $("#estadoCursoA"+ID).val();
     var _mensaje = "HABILITAR";
     if(_estado == true){
         _mensaje = "DESHABILITAR";
@@ -20,7 +20,6 @@ function deshabilitarCurso(vari, ID,ID2){
             uploadProgress: function (event, position, total, percentComplete) {
             },
             success: function (data) {
-                console.log(data)
                 if (data.validar == true) {
                     var table = $('#tablaCruso').DataTable();
                     table.row(data.numeroFila).data(data.tabla[data.numeroFila]).draw();
@@ -52,10 +51,7 @@ function deshabilitarCurso(vari, ID,ID2){
             }
         });
     }
-}
-            
-            
-            
+}         
 function eliminarCurso(vari, ID){
     if (confirm('¿DESEAS ELIMINAR '+$("#nombreCurso"+ID).text()+'?')) {
         var url = $("#rutaBase").text();
@@ -71,7 +67,6 @@ function eliminarCurso(vari, ID){
             uploadProgress: function (event, position, total, percentComplete) {
             },
             success: function (data) {
-                console.log(data)
                 if (data.validar == true) {
                     
                     $("#filaTablaCurso"+data.numeroFila).remove();
@@ -107,8 +102,7 @@ function eliminarCurso(vari, ID){
             }
         });
     }
-}
-//    
+}   
 function seleccionarFila(ID)
 {
     var menues2 = $("#tablaCruso tbody tr td");
@@ -202,7 +196,6 @@ function obtenerCursos(){
         }
     }); 
 }
-////    
 function limpiarFormIngresarCurso()
 {
     $('#formIngresarCurso').each(function () {

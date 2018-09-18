@@ -1,113 +1,113 @@
 <script type="text/javascript">
-function EliminarSacerdote(vari, ID){
-    if (confirm('¿DESEAS ELIMINAR A '+$("#nombreSacerdote"+ID).text()+'?')) {
+function EliminarDocente(vari, ID){
+    if (confirm('¿DESEAS ELIMINAR A '+$("#nombreDocente"+ID).text()+'?')) {
         var url = $("#rutaBase").text();
         $.ajax({
-            url : url+'/sacerdote/eliminarsacerdote',
+            url : url+'/docentes/eliminardocente',
             type: 'post',
             dataType: 'JSON',
             data: { id: vari, numeroFila: ID },
             beforeSend: function () {
-                $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-spinner"></i>');
-                $("#mensajeTablaSacerdotes").html('');
+                $("#btnEliminarDocente" + ID).html('<i class="fa fa-spinner"></i>');
+                $("#mensajeTablaDocente").html('');
             },
             uploadProgress: function (event, position, total, percentComplete) {
             },
             success: function (data) {
                 if (data.validar == true) {
-                    $("#filaTablaSacerdotes"+data.numeroFila).remove();
+                    $("#filaTablaDocentes"+data.numeroFila).remove();
                     if (data.numeroFila == 0) {
                         seleccionarFila(data.numeroFila + 1);
                     } else {
                         seleccionarFila(data.numeroFila - 1);
                     }
                 } else {
-                    $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-times"></i>');
+                    $("#btnEliminarDocente" + ID).html('<i class="fa fa-times"></i>');
                 }
-                $("#mensajeTablaSacerdotes").html(data.mensaje);
+                $("#mensajeTablaDocente").html(data.mensaje);
             },
             complete: function () {
             },
             error: function (xhr, textStatus, errorThrown) {
-                $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-times"></i>');
+                $("#btnEliminarDocente" + ID).html('<i class="fa fa-times"></i>');
                 if (xhr.status === 0) {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
                 } else if (xhr.status == 404) {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
                 } else if (xhr.status == 500) {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
                 } else if (errorThrown === 'parsererror') {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
                 } else if (errorThrown === 'timeout') {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
                 } else if (errorThrown === 'abort') {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
                 } else {
-                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                    $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
                 }
             }
         });
     }
 }
-    
-    
-function validarIngresoSacerdote(f){
+//    
+//    
+function validarIngresoDocente(f){
     var _validar = false;
-    if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTE SACERDOTE?")){
+    if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTE DOCENTE?")){
         _validar = true;
     }
     return _validar;
 }
-    
-function limpiarFormIngresarSacerdote()
+//    
+function limpiarFormIngresarDocente()
 {
-    $('#formIngresoSacerdote').each(function () {
+    $('#formIngresoDocente').each(function () {
         this.reset();
     });
-    $("#contenedorDatosSacerdote").html('');
-    setTimeout(function() {$("#mensajeFormIngresoSacerdote").html('');},1500);
+    $("#contenedorDatosDocente").html('');
+    setTimeout(function() {$("#mensajeFormIngresoDocente").html('');},1500);
 }
 $(function(){
-    $("#formIngresoSacerdote").ajaxForm({
+    $("#formIngresoDocente").ajaxForm({
         beforeSend: function(){
-            $("#mensajeFormIngresoSacerdote").html('');
-            $("#btnGuardarSacerdote").button('loading');
+            $("#mensajeFormIngresoDocente").html('');
+            $("#btnGuardarDocente").button('loading');
         },
         uploadProgress: function(event,position,total,percentComplete){
 
         },
         success: function(data){
             if(data.validar==true){
-                limpiarFormIngresarSacerdote();
-                obtenerSacerdotes();
+                limpiarFormIngresarDocente();
+                obtenerDocentes();
             }
-            $("#btnGuardarSacerdote").button('reset');
-            $("#mensajeFormIngresoSacerdote").html(data.mensaje);
+            $("#btnGuardarDocente").button('reset');
+            $("#mensajeFormIngresoDocente").html(data.mensaje);
         },
         complete: function(){
         },
         error: function(xhr, textStatus, errorThrown) {
-            $("#btnGuardarSacerdote").button('reset');
+            $("#btnGuardarDocente").button('reset');
             if(xhr.status === 0){
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
             }else if(xhr.status == 404){
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
             }else if(xhr.status == 500){
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
             }else if(errorThrown === 'parsererror'){
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
             }else if(errorThrown === 'timeout'){
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
             }else if(errorThrown === 'abort'){
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
             }else{
-                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
             }
         }
     });    
 }); 
-
-function filtrarSacerdotePorIdentificacion(event){
+//
+function filtrarDocentePorIdentificacion(event){
     var codigo = event.which || event.keyCode;
     if (codigo==13){
         return false;
@@ -115,86 +115,87 @@ function filtrarSacerdotePorIdentificacion(event){
         var url = $("#rutaBase").text();
         var identificacion = $("#identificacion").val();
         if(identificacion.length < 10){
-            $("#mensajeFormIngresoSacerdote").html('');
-            $("#contenedorDatosSacerdote").html('');
+            $("#mensajeFormIngresoDocente").html('');
+            $("#contenedorDatosDocente").html('');
         }else{
             $.ajax({
-                url : url+'/sacerdote/filtrarsacerdoteporidentificacion',
+                url : url+'/docentes/filtrardocenteporidentificacion',
                 type: 'post',
                 dataType: 'JSON',
                 data: {identificacion:identificacion},
                 beforeSend: function(){
 
-                    $("#mensajeFormIngresoSacerdote").html('');
-                    cargandoSacerdotes('#contenedorDatosSacerdote');
+                    $("#mensajeFormIngresoDocente").html('');
+                    cargandoDocentes('#contenedorDatosDocente');
                 },
                 uploadProgress: function(event,position,total,percentComplete){
                 },
                 success: function(data){  
                     if(data.validar == true){
-                        $("#contenedorDatosSacerdote").html(data.tabla);
+                        $("#contenedorDatosDocente").html(data.tabla);
                     }else{
-                        $("#contenedorDatosSacerdote").html('');
+                        $("#contenedorDatosDocente").html('');
                     }
-                    $("#mensajeFormIngresoSacerdote").html(data.mensaje);
+                    $("#mensajeFormIngresoDocente").html(data.mensaje);
                 },
                 complete: function(){
                 },
                 error: function(xhr, textStatus, errorThrown) {
-                    $("#contenedorDatosSacerdote").html('');
+                    $("#contenedorDatosDocente").html('');
                     if(xhr.status === 0){
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
                     }else if(xhr.status == 404){
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
                     }else if(xhr.status == 500){
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
                     }else if(errorThrown === 'parsererror'){
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
                     }else if(errorThrown === 'timeout'){
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
                     }else if(errorThrown === 'abort'){
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
                     }else{
-                        $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                        $("#mensajeFormIngresoDocente").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
                     }
                 }
             }); 
         }
     }
 }
-
-
+//
+//
 function seleccionarFila(ID)
 {
-    var menues2 = $("#tablaSacerdotes tbody tr td");
+    var menues2 = $("#tablaDocente tbody tr td");
     menues2.removeAttr("style");
     menues2.css({ 'cursor': 'pointer' });
-    $("#filaTablaSacerdotes" + ID + " td").removeAttr("style");
-    $("#filaTablaSacerdotes" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
+    $("#filaTablaDocentes" + ID + " td").removeAttr("style");
+    $("#filaTablaDocentes" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
 }
 
-function cargandoSacerdotes(contenedor){
+function cargandoDocentes(contenedor){
     var url = $("#rutaBase").text();
     $(contenedor).html('<img style="margin:0 auto 0 auto; text-aling:center; width: 10%;" class="img-responsive" src="'+url+'/public/librerias/images/pagina/cargando.gif">');
     
 }
 
-function obtenerSacerdotes(){
+function obtenerDocentes(){
     var url = $("#rutaBase").text();
     $.ajax({
-        url : url+'/sacerdote/obtenersacerdotes',
+        url : url+'/docentes/obtenerdocentes',
         type: 'post',
         dataType: 'JSON',
         beforeSend: function(){
-            $("#mensajeTablaSacerdotes").html('');
+            $("#mensajeTablaDocente").html('');
             
         },
         uploadProgress: function(event,position,total,percentComplete){
         },
         success: function(data){  
+            
             if(data.validar == true){
-                $("#contenedorTablaSacerdotes").html('<hr><div class="box-body table-responsive no-padding"><table class="table table-hover" id="tablaSacerdotes"></table></div>');
-                $('#tablaSacerdotes').DataTable({
+                $("#contenedorTablaDocente").html('<hr><div class="box-body table-responsive no-padding"><table class="table table-hover" id="tablaDocente"></table></div>');
+                $('#tablaDocente').DataTable({
                     destroy: true,
                     order: [],
                     data: data.tabla,
@@ -207,13 +208,13 @@ function obtenerSacerdotes(){
                             $(row).attr('style', 'background-color: #CFCFCF;text-align: center;font-weight: bold;');
                         }
                         $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
-                        $(row).attr('id', 'filaTablaSacerdotes' + dataIndex);
+                        $(row).attr('id', 'filaTablaDocentes' + dataIndex);
                     },
                     'columnDefs': [
                         {
                            'targets': 2,
                            'createdCell':  function (td, cellData, rowData, row, col) {
-                                $(td).attr('id','nombreSacerdote'+row); 
+                                $(td).attr('id','nombreDocente'+row); 
                            },
                         }
                      ],
@@ -278,28 +279,28 @@ function obtenerSacerdotes(){
                 });    
                 seleccionarFila(0)
             }else{
-                $("#contenedorTablaSacerdotes").html('');
+                $("#contenedorTablaDocente").html('');
             }
-            $("#mensajeTablaSacerdotes").html(data.mensaje);
+            $("#mensajeTablaDocente").html(data.mensaje);
         },
         complete: function(){
         },
         error: function(xhr, textStatus, errorThrown) {
-            $("#contenedorTablaSacerdotes").html('');
+            $("#contenedorTablaDocente").html('');
             if(xhr.status === 0){
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
             }else if(xhr.status == 404){
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
             }else if(xhr.status == 500){
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
             }else if(errorThrown === 'parsererror'){
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
             }else if(errorThrown === 'timeout'){
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
             }else if(errorThrown === 'abort'){
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
             }else{
-                $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                $("#mensajeTablaDocente").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
             }
         }
     }); 

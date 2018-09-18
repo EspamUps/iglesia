@@ -78,6 +78,7 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                             $listaModulos = $objModulo->ObtenerModulos();
                             $cuerpoTabla  = '';
                             $optionModulos = '<option value="0">SELECCIONE LOS MÓDULOS A ASIGNAR</option>';
+                            $iContador = 0;
                             foreach ($listaModulos as $valueModulos) {
                                 $listaAsignarModulos = $objAsignarModulo->FiltrarAsignarModuloPorUsuarioYModulo($idUsuarioM, $valueModulos['idModulo'], 1);
                                 $idModuloEncriptado = $objMetodos->encriptar($valueModulos['idModulo']);
@@ -93,7 +94,8 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                             <td>'.$botonEliminarModulo.'</td>
                                             </tr>';
 
-                                }     
+                                } 
+                                $iContador++;
                             }
                            
                            $selectModulo = '<div class="col-lg-9">

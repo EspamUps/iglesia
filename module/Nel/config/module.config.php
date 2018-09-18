@@ -77,6 +77,8 @@ return array(
             'Nel\Controller\Usuario' => 'Nel\Controller\UsuarioController',
             'Nel\Controller\GestionarModulosPrivilegios' => 'Nel\Controller\GestionarModulosPrivilegiosController',
             'Nel\Controller\Cursos' => 'Nel\Controller\CursosController',
+            'Nel\Controller\Periodos' => 'Nel\Controller\PeriodosController',
+            'Nel\Controller\Docentes' => 'Nel\Controller\DocentesController',
             
         ),
     ),

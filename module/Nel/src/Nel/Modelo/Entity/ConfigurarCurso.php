@@ -17,13 +17,20 @@ class ConfigurarCurso extends TableGateway
     {
         return parent::__construct('configurarcurso', $adapter, $databaseSchema, $selectResultPrototype);
     }
-    
-    
     public function FiltrarConfigurarCursoPorCursoLimit1($idCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorCursoLimit1('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     
+     public function FiltrarConfigurarCursoPorPeriodoLimit1($idPeriodo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorPeriodoLimit1('{$idPeriodo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarConfigurarCursoPorDocenteLimit1($idDocente){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorDocenteLimit1('{$idDocente}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
 //    
 //    public function ObtenerCursos(){

@@ -14,17 +14,17 @@ use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\MetodosControladores;
 use Nel\Modelo\Entity\AsignarModulo;
-use Nel\Modelo\Entity\Cursos;
+use Nel\Modelo\Entity\Periodos;
 use Nel\Modelo\Entity\ConfigurarCurso;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
 
-class CursosController extends AbstractActionController
+class PeriodosController extends AbstractActionController
 {
     public $dbAdapter;
     
-    public function modificarestadocursoAction()
+    public function modificarestadoperiodoAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -36,12 +36,12 @@ class CursosController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 9);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 8);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
                 $objMetodosC = new MetodosControladores();
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 9, 2);
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 8, 2);
                 if ($validarprivilegio==false)
                     $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE MODIFICAR DATOS PARA ESTE MÓDULO</div>';
                 else{
@@ -50,38 +50,38 @@ class CursosController extends AbstractActionController
                         $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{               
                         $objMetodos = new Metodos();
-                        $objCurso = new Cursos($this->dbAdapter);
+                        $objPeriodo = new Periodos($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
                         );
-                        $idCursoEncriptado = $post['id'];
+                        $idPeriodoEncriptado = $post['id'];
                         $numeroFila = $post['numeroFila'];
                         $numeroFila2 = $post['numeroFila2'];
-                        if($idCursoEncriptado == NULL || $idCursoEncriptado == ""){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CUROS</div>';
+                        if($idPeriodoEncriptado == NULL || $idPeriodoEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL PERIODO</div>';
                         }else if(!is_numeric($numeroFila)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
                         }else  if(!is_numeric($numeroFila2)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
                         }else{
-                            $idCurso = $objMetodos->desencriptar($idCursoEncriptado);
-                            $listaCurso = $objCurso->FiltrarCurso($idCurso);
-                            if(count($listaCurso) == 0){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADA NO EXISTE</div>';
+                            $idPeriodo = $objMetodos->desencriptar($idPeriodoEncriptado);
+                            $listaPeriodo = $objPeriodo->FiltrarPeriodo($idPeriodo);
+                            if(count($listaPeriodo) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PERIODO SELECCIONADA NO EXISTE</div>';
                             }else{
-                                $estadoCurso = FALSE;
-                                if($listaCurso[0]['estadoCurso'] == FALSE){
-                                    $estadoCurso = TRUE;
+                                $estadoPeriodo = FALSE;
+                                if($listaPeriodo[0]['estadoPeriodo'] == FALSE){
+                                    $estadoPeriodo = TRUE;
                                 }
-                                $resultado = $objCurso->ModificarEstadoCurso($idCurso,$estadoCurso);
+                                $resultado = $objPeriodo->ModificarEstadoPeriodo($idPeriodo, $estadoPeriodo);
                                 if(count($resultado) == 0){
-                                    if($estadoCurso == TRUE)
-                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE HABILITÓ EL CURSO</div>';
+                                    if($estadoPeriodo == TRUE)
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE HABILITÓ EL PERIODO</div>';
                                     else
-                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE DESHABILITÓ EL CURSO</div>';
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE DESHABILITÓ EL PERIODO</div>';
                                 }else{
-                                    $tabla = $this->CargarTablaCrusosAction($idUsuario, $this->dbAdapter, $resultado, $numeroFila, $numeroFila2);
+                                    $tabla = $this->CargarTablaPeriodosAction($idUsuario, $this->dbAdapter, $resultado, $numeroFila, $numeroFila2);
                                     $mensaje = '';
                                     $validar = TRUE;
                                     return new JsonModel(array('tabla'=>$tabla,'numeroFila'=>$numeroFila,'numeroFila2'=>$numeroFila2,'mensaje'=>$mensaje,'validar'=>$validar));
@@ -94,8 +94,8 @@ class CursosController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
-    
-    public function eliminarcursoAction()
+//    
+    public function eliminarperiodoAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -107,12 +107,12 @@ class CursosController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 9);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 8);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
                 $objMetodosC = new MetodosControladores();
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 9, 1);
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 8, 1);
                 if ($validarprivilegio==false)
                     $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
                 else{
@@ -121,27 +121,27 @@ class CursosController extends AbstractActionController
                         $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{               
                         $objMetodos = new Metodos();
-                        $objCurso = new Cursos($this->dbAdapter);
+                        $objPeriodo = new Periodos($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
                         );
 
-                        $idCursoEncriptado = $post['id'];
+                        $idPeriodoEncriptado = $post['id'];
                         $numeroFila = $post['numeroFila'];
-                        if($idCursoEncriptado == NULL || $idCursoEncriptado == ""){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
+                        if($idPeriodoEncriptado == NULL || $idPeriodoEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL PERIODO</div>';
                         }else if(!is_numeric($numeroFila)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
                         }else{
-                            $idCurso = $objMetodos->desencriptar($idCursoEncriptado);
-                            $listaCurso = $objCurso->FiltrarCurso($idCurso);
-                            if(count($listaCurso) == 0){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADA NO EXISTE</div>';
+                            $idPeriodo = $objMetodos->desencriptar($idPeriodoEncriptado);
+                            $listaPeriodo = $objPeriodo->FiltrarPeriodo($idPeriodo);
+                            if(count($listaPeriodo) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PERIODO SELECCIONADA NO EXISTE</div>';
                             }else{
-                                $resultado = $objCurso->EliminarCurso($idCurso);
+                                $resultado = $objPeriodo->EliminarPeriodo($idPeriodo);
                                 if(count($resultado) > 0){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ EL CURSO</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ EL PERIODO</div>';
                                 }else{
                                     $mensaje = '';
                                     $validar = TRUE;
@@ -155,7 +155,7 @@ class CursosController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     } 
-    public function obtenercursosAction()
+    public function obtenerperiodosAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -167,7 +167,7 @@ class CursosController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 9);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 8);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
@@ -175,10 +175,10 @@ class CursosController extends AbstractActionController
                 if(!$request->isPost()){
                     $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                 }else{
-                    $objCursos = new Cursos($this->dbAdapter);
+                    $objPeriodo = new Periodos($this->dbAdapter);
                     ini_set('date.timezone','America/Bogota'); 
-                    $listaCursos = $objCursos->ObtenerCursos();
-                    $tabla = $this->CargarTablaCrusosAction($idUsuario, $this->dbAdapter, $listaCursos, 0, count($listaCursos));
+                    $listaPeriodos = $objPeriodo->ObtenerPeriodos();
+                    $tabla = $this->CargarTablaPeriodosAction($idUsuario, $this->dbAdapter, $listaPeriodos, 0, count($listaPeriodos));
                     $mensaje = '';
                     $validar = TRUE;
                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
@@ -188,38 +188,44 @@ class CursosController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
-    
-    function CargarTablaCrusosAction($idUsuario,$adaptador,$listaCursos, $i, $j)
+//    
+    function CargarTablaPeriodosAction($idUsuario,$adaptador,$listaPeriodo, $i, $j)
     {
         $objConfigurarCurso = new ConfigurarCurso($adaptador);
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
         $objMetodosC = new MetodosControladores();
-        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 9, 1);
-        $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 9, 2);
+        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 8, 1);
+        $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 8, 2);
         $array1 = array();
-        foreach ($listaCursos as $value) {
-            $idCursoEncriptado = $objMetodos->encriptar($value['idCurso']);
-            $nombreCurso = '<input type="hidden" id="estadoCursoA'.$i.'" name="estadoCursoA'.$i.'" value="'.$value['estadoCurso'].'">'.$value['nombreCurso'];
+        foreach ($listaPeriodo as $value) {
+            $idPeriodoEncriptado = $objMetodos->encriptar($value['idPeriodo']);
+            $nombrePeriodo = '<input type="hidden" id="estadoPeriodoA'.$i.'" name="estadoPeriodoA'.$i.'" value="'.$value['estadoPeriodo'].'">'.$value['nombrePeriodo'];
             $fechaIngreso = $objMetodos->obtenerFechaEnLetra($value['fechaIngreso']);
 
-            $botonEliminarCurso = '';
+            $botonEliminarPeriodo = '';
             if($validarprivilegioEliminar == TRUE){
-                if(count($objConfigurarCurso->FiltrarConfigurarCursoPorCursoLimit1($value['idCurso'])) == 0)
-                    $botonEliminarCurso = '<button id="btnEliminarCurso'.$i.'" title="ELIMINAR '.$value['nombreCurso'].'" onclick="eliminarCurso(\''.$idCursoEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                if(count($objConfigurarCurso->FiltrarConfigurarCursoPorPeriodoLimit1($value['idPeriodo'])) == 0)
+                    $botonEliminarPeriodo = '<button id="btnEliminarPeriodo'.$i.'" title="ELIMINAR '.$value['nombrePeriodo'].'" onclick="eliminarPeriodo(\''.$idPeriodoEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             }
 
-            $botonDeshabilitarCurso = '';
+            $botonDeshabilitarPeriodo = '';
             if($validarprivilegioModificar == TRUE){
-                if($value['estadoCurso'] == TRUE)
-                    $botonDeshabilitarCurso = '<button id="btnDeshabilitarCurso'.$i.'" title="DESHABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarCurso(\''.$idCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
+                if($value['estadoPeriodo'] == TRUE)
+                    $botonDeshabilitarPeriodo = '<button id="btnDeshabilitarPeriodo'.$i.'" title="DESHABILITAR '.$value['nombrePeriodo'].'" onclick="deshabilitarPeriodo(\''.$idPeriodoEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
                 else
-                    $botonDeshabilitarCurso = '<button id="btnDeshabilitarCurso'.$i.'" title="HABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarCurso(\''.$idCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-minus-square"></i></button>';
+                    $botonDeshabilitarPeriodo = '<button id="btnDeshabilitarPeriodo'.$i.'" title="HABILITAR '.$value['nombrePeriodo'].'" onclick="deshabilitarPeriodo(\''.$idPeriodoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-minus-square"></i></button>';
             }
-            $botones =  $botonDeshabilitarCurso.' '.$botonEliminarCurso;     
+            $botones =  $botonDeshabilitarPeriodo.' '.$botonEliminarPeriodo;     
+            
+            $fechaInicio = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaInicio']);
+            $fechaFin = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaFin']);
+            
             $array1[$i] = array(
                 '_j'=>$j,
-                'nombreCurso'=>$nombreCurso,
+                'nombrePeriodo'=>$nombrePeriodo,
+                'fechaInicio'=>$fechaInicio,
+                'fechaFin'=>$fechaFin,
                 'fechaIngreso'=>$fechaIngreso,
                 'opciones'=>$botones,
             );
@@ -231,7 +237,7 @@ class CursosController extends AbstractActionController
     }
     
     
-    public function ingresarcursoAction()
+    public function ingresarperiodoAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -243,12 +249,12 @@ class CursosController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 9);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 8);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
                 $objMetodosC = new MetodosControladores();
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 9, 3);
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 8, 3);
                 if ($validarprivilegio==false)
                     $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
                 else{
@@ -257,26 +263,45 @@ class CursosController extends AbstractActionController
                         $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{
                         $objMetodos = new Metodos();
-                       $objCurso = new Cursos($this->dbAdapter);
+                       $objPeriodo = new Periodos($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
                         );
-                        $descripcionCruso = trim(strtoupper($post['descripcionCurso']));
-                        if(empty ($descripcionCruso) || strlen($descripcionCruso) > 100){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DEL CURSO MÁXIMO 100 CARACTERES</div>';
-                        }else if(count( $objCurso->FiltrarCursoPorNombre($descripcionCruso)) > 0){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA CRUSO LLAMADO '.$descripcionCruso.'</div>';
+                        $nombrePeriodo = trim(strtoupper($post['descripcionPeriodo']));
+                        $fechaInicio = $post['fechaInicio'];
+                        $fechaFin = $post['fechaFin'];
+                        if(empty ($nombrePeriodo) || strlen($nombrePeriodo) > 100){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DEL PERIODO MÁXIMO 100 CARACTERES</div>';
+                        }else if(count( $objPeriodo->FiltrarPeriodoPorNombre($nombrePeriodo)) > 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN PERIODO LLAMADO '.$nombrePeriodo.'</div>';
+                        }else if(empty ($fechaInicio)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UNA FECHA DE INICIO</div>';
+                        }else if(empty ($fechaFin)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UNA FECHA FÍN</div>';
                         }else{
                             ini_set('date.timezone','America/Bogota'); 
                             $hoy = getdate();
                             $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                            $resultado =  $objCurso->IngresarCurso($descripcionCruso, $fechaSubida, 1);
-                            if(count($resultado) == 0){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
-                            }else{ 
-                                $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
-                                $validar = TRUE;
+                            $fecha_actual = strtotime(date("d-m-Y"));
+                            $fechaInicio2 = strtotime($fechaInicio);
+                            $fechaFin2 = strtotime($fechaFin);
+                            
+                            if($fechaInicio2 < $fecha_actual || $fechaFin2 < $fecha_actual){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LAS FECHAS INGRESADAS NO DEBEN SER MENORES A LA ACTUAL</div>';
+                            }else{
+                            
+                                if($fechaFin2 <= $fechaInicio2){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA FIN NO DEBE SER MENOR O IGUAL A LA DE INICIO</div>';
+                                }else{
+                                    $resultado = $objPeriodo->IngresarPeriodo($nombrePeriodo, $fechaInicio, $fechaFin, $fechaSubida, 1);
+                                    if(count($resultado) == 0){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL PERIODO POR FAVOR INTENTE MÁS TARDE</div>';
+                                    }else{ 
+                                        $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
+                                        $validar = TRUE;
+                                    }
+                                }
                             }
                         }
                     }
