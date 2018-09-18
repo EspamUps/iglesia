@@ -27,6 +27,10 @@ class ConfigurarCurso extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarConfigurarCursoPorDocenteLimit1($idDocente){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorDocenteLimit1('{$idDocente}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
 //    
 //    public function ObtenerCursos(){
