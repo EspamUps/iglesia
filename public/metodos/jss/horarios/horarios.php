@@ -1,112 +1,154 @@
 <script type="text/javascript">
-//function EliminarSacerdote(vari, ID){
-//    if (confirm('¿DESEAS ELIMINAR A '+$("#nombreSacerdote"+ID).text()+'?')) {
-//        var url = $("#rutaBase").text();
-//        $.ajax({
-//            url : url+'/sacerdote/eliminarsacerdote',
-//            type: 'post',
-//            dataType: 'JSON',
-//            data: { id: vari, numeroFila: ID },
-//            beforeSend: function () {
-//                $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-spinner"></i>');
-//                $("#mensajeTablaSacerdotes").html('');
-//            },
-//            uploadProgress: function (event, position, total, percentComplete) {
-//            },
-//            success: function (data) {
-//                if (data.validar == true) {
-//                    $("#filaTablaSacerdotes"+data.numeroFila).remove();
-//                    if (data.numeroFila == 0) {
-//                        seleccionarFila(data.numeroFila + 1);
-//                    } else {
-//                        seleccionarFila(data.numeroFila - 1);
-//                    }
-//                } else {
-//                    $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-times"></i>');
-//                }
-//                $("#mensajeTablaSacerdotes").html(data.mensaje);
-//            },
-//            complete: function () {
-//            },
-//            error: function (xhr, textStatus, errorThrown) {
-//                $("#btnEliminarSacerdote" + ID).html('<i class="fa fa-times"></i>');
-//                if (xhr.status === 0) {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//                } else if (xhr.status == 404) {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//                } else if (xhr.status == 500) {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//                } else if (errorThrown === 'parsererror') {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//                } else if (errorThrown === 'timeout') {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//                } else if (errorThrown === 'abort') {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//                } else {
-//                    $("#mensajeTablaSacerdotes").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//                }
-//            }
-//        });
-//    }
-//}
-//    
-//    
-//function validarIngresoSacerdote(f){
-//    var _validar = false;
-//    if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTE SACERDOTE?")){
-//        _validar = true;
-//    }
-//    return _validar;
-//}
-//    
-//function limpiarFormIngresarSacerdote()
-//{
-//    $('#formIngresoSacerdote').each(function () {
-//        this.reset();
-//    });
-//    $("#contenedorDatosSacerdote").html('');
-//    setTimeout(function() {$("#mensajeFormIngresoSacerdote").html('');},1500);
-//}
-//$(function(){
-//    $("#formIngresoSacerdote").ajaxForm({
-//        beforeSend: function(){
-//            $("#mensajeFormIngresoSacerdote").html('');
-//            $("#btnGuardarSacerdote").button('loading');
-//        },
-//        uploadProgress: function(event,position,total,percentComplete){
+function ModificarEstadoHoraHorario(vari, IDH,IDD){
+    if (confirm('¿DESEAS MODIFICAR LAS HORAS '+$("#nombreHorarios"+IDH).text()+' DEL DÍA '+$("#nombreDia"+IDD).text()+'?')) {
+        var url = $("#rutaBase").text();
+        var _nombreClase = $("#btnModificarEstadoHoraHorario" + IDH + " i").attr('class');
+        $.ajax({
+            url : url+'/horarios/modificarestadohorahorario',
+            type: 'post',
+            dataType: 'JSON',
+            data: { id: vari},
+            beforeSend: function () {
+                $("#btnModificarEstadoHoraHorario" + IDH).html('<i class="fa fa-spinner"></i>');
+                $("#mensajeTablaHorarios").html('');
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+            },
+            success: function (data) {
+                if (data.validar == true) {
+                    filtrarHorariosPorCurso();
+                } else {
+                    $("#btnModificarEstadoHoraHorario" + IDH).html('<i class="' + _nombreClase + '"></i>');
+                }
+                $("#mensajeTablaHorarios").html(data.mensaje);
+            },
+            complete: function () {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#btnModificarEstadoHoraHorario" + IDH).html('<i class="' + _nombreClase + '"></i>');
+                if (xhr.status === 0) {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                } else if (xhr.status == 404) {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                } else if (xhr.status == 500) {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                } else if (errorThrown === 'parsererror') {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                } else if (errorThrown === 'timeout') {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                } else if (errorThrown === 'abort') {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                } else {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        });
+    }
+}
+    
+function EliminarHoraHorario(vari, IDH,IDD){
+    if (confirm('¿DESEAS ELIMINAR LAS HORAS '+$("#nombreHorarios"+IDH).text()+' DEL DÍA '+$("#nombreDia"+IDD).text()+'?')) {
+        var url = $("#rutaBase").text();
+        $.ajax({
+            url : url+'/horarios/eliminarhorahorario',
+            type: 'post',
+            dataType: 'JSON',
+            data: { id: vari},
+            beforeSend: function () {
+                $("#btnEliminarHoraHorario" + IDH).html('<i class="fa fa-spinner"></i>');
+                $("#mensajeTablaHorarios").html('');
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+            },
+            success: function (data) {
+                if (data.validar == true) {
+                    filtrarHorariosPorCurso();
+                } else {
+                    $("#btnEliminarHoraHorario" + IDH).html('<i class="fa fa-times"></i>');
+                }
+                $("#mensajeTablaHorarios").html(data.mensaje);
+            },
+            complete: function () {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#btnEliminarHoraHorario" + IDH).html('<i class="fa fa-times"></i>');
+                if (xhr.status === 0) {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                } else if (xhr.status == 404) {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                } else if (xhr.status == 500) {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                } else if (errorThrown === 'parsererror') {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                } else if (errorThrown === 'timeout') {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                } else if (errorThrown === 'abort') {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                } else {
+                    $("#mensajeTablaHorarios").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        });
+    }
+}
+    
+function limpiarFormIngresarHoraHorario()
+{
+    $('#formIngresarHoraHorario').each(function () {
+        this.reset();
+    });
+    $("#horaInicio").val('');
+    $("#horaFin").val('');
+    setTimeout(function() {$("#mensajeFormHoraHorario").html('');},1500);
+}
+$(function(){
+    $("#formIngresarHoraHorario").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeFormHoraHorario").html('');
+            $("#btnGuardarHoraHorario").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){
+            if(data.validar==true){
+                limpiarFormIngresarHoraHorario();
+                filtrarHorariosPorCurso();
+            }
+            $("#btnGuardarHoraHorario").button('reset');
+            $("#mensajeFormHoraHorario").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnGuardarHoraHorario").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeFormHoraHorario").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
 //
-//        },
-//        success: function(data){
-//            if(data.validar==true){
-//                limpiarFormIngresarSacerdote();
-//                obtenerSacerdotes();
-//            }
-//            $("#btnGuardarSacerdote").button('reset');
-//            $("#mensajeFormIngresoSacerdote").html(data.mensaje);
-//        },
-//        complete: function(){
-//        },
-//        error: function(xhr, textStatus, errorThrown) {
-//            $("#btnGuardarSacerdote").button('reset');
-//            if(xhr.status === 0){
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//            }else if(xhr.status == 404){
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//            }else if(xhr.status == 500){
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//            }else if(errorThrown === 'parsererror'){
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//            }else if(errorThrown === 'timeout'){
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//            }else if(errorThrown === 'abort'){
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//            }else{
-//                $("#mensajeFormIngresoSacerdote").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//            }
-//        }
-//    });    
-//}); 
-//
+function obtenerIdHorario(vari,ID){
+    $("#contenedorTitulo").html($("#nombreDia"+ID).text());
+    $("#idHorarioEncriptado").val(vari);
+    $("#mensajeFormHoraHorario").html('');
+}
+
+
+
 function filtrarHorariosPorCurso(){
     var url = $("#rutaBase").text();
     var idCurso = $("#selectCurso").val();

@@ -48,6 +48,7 @@ function obtenerTelefonoModal(ID,ID2,_idPersonaEncriptado){
     $("#numeroFilaT").val(ID);
     $("#numeroFila2T").val(ID2);
     $("#idPersonaEncriptado").val(_idPersonaEncriptado);
+    $("#mensajeModifcarTelefono").html('');
 }
     
 function EliminarPersona(vari, ID){
@@ -136,7 +137,7 @@ $(function(){
         },
         success: function(data){
             if(data.validar==true){
-                limpiarFormIngresarPersona();
+//                limpiarFormIngresarPersona();
                 obtenerPersonas();
             }
             $("#btnGuardarPersona").button('reset');
