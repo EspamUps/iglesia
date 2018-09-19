@@ -28,35 +28,41 @@ class HoraHorario extends TableGateway
 //        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-//    public function IngresarHorario($idCurso,$idDia,$estadoHorario){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarHorario('{$idCurso}','{$idDia}','{$estadoHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function IngresarHoraHorario($idHorario,$horaInicio,$horaFin,$fechaIngreso,$estadoHoraHorario){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarHoraHorario('{$idHorario}','{$horaInicio}','{$horaFin}','{$fechaIngreso}','{$estadoHoraHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function FiltrarHoraHorarioPorHorario($idHorario){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarHoraHorarioPorHorario('{$idHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
 ////    
-//    public function FiltrarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarHoraHorario($idHoraHorario){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarHoraHorario('{$idHoraHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
-//    public function FiltrarCursoEstado($idCurso,$estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarChoqueHorasHoraHorario($idHoraHorario,$idHorario,$horaInicio,$horaFin,$estadoHoraHorario){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarChoqueHorasHoraHorario('{$idHoraHorario}','{$idHorario}','{$horaInicio}','{$horaFin}','{$estadoHoraHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarHoraHorarioPorHorarioPorHoras($idHorario,$horaInicio,$horaFin){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarHoraHorarioPorHorarioPorHoras('{$idHorario}','{$horaInicio}','{$horaFin}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
 //    
 ////    
-//    public function EliminarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function EliminarHoraHorario($idHoraHorario){
+        $resultado = $this->getAdapter()->query("CALL Sp_EliminarHoraHorario('{$idHoraHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
-//    public function ModificarEstadoCurso($idCurso,$estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoCurso('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function ModificarEstadoHoraHorario($idHoraHorario,$estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoHoraHorario('{$idHoraHorario}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
 //    
 //    

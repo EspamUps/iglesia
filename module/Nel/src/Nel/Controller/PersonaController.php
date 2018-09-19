@@ -86,6 +86,8 @@ class PersonaController extends AbstractActionController
                             if(count($listaPersona) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE</div>';
                             }else{
+                                
+                                
                                 $listaTelefonoActual = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($idPersona, true);
                                 
                                 
@@ -316,7 +318,7 @@ class PersonaController extends AbstractActionController
                                         $listaTelefono = $objTelefono->FiltrarTelefonoPorNumero($numeroTelefono);
                                         $idTelefono = 0;
                                         if(count($listaTelefono) > 0){
-                                            $idTelefono = $listaTelefono[0]['numeroTelefono'];
+                                            $idTelefono = $listaTelefono[0]['idTelefono'];
                                         }else{
                                             $resultadoTelefono = $objTelefono->IngresarTelefono($numeroTelefono,1);
                                             if(count($resultadoTelefono) > 0){

@@ -38,7 +38,7 @@ class TelefonoPersona extends TableGateway
         return $resultado;
     }
     public function FiltrarTelefonoPersonaPorNumeroPersonaEstado($numeroTelefono,$idPersona){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTelefonoPorNumero('{$numeroTelefono}','{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTelefonoPorNumeroPersona('{$numeroTelefono}','{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     
