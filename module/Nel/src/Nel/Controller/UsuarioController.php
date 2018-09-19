@@ -72,10 +72,15 @@ class UsuarioController extends AbstractActionController
             
             $botonModificarEstadoUsuario = '';
             $botonModificarUsuario ='';
+            $botonGestionModulos ='';
+            $botonGestionPrivilegios ='';
             
             if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 7, 1) == true){
                 if($idUsuario != $value['idUsuario'])
                 {
+                    $botonGestionModulos = '<button data-target="#modalAdministrarModulos" data-toggle="modal" id="btnAdministrarModulos'.$i.'" title="ADMINISTRAR MODULOS DE '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionModulos(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-cog"></i></button>';
+                    $botonGestionPrivilegios = '<button data-target="#modalAdministrarPrivilegios" data-toggle="modal" id="btnAdministrarPrivilegios'.$i.'" title="ADMINISTRAR PRIVILEGIOS DE '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionPrivilegios(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-default btn-sm btn-flat"><i class="fa fa-cogs"></i></button>';
+
                     if($value['estadoUsuario']==0)
                     $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="HABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                     else
@@ -86,9 +91,7 @@ class UsuarioController extends AbstractActionController
             if($objMetodosControlador->ValidarPrivilegioAction($adaptador, $idUsuario, 7, 2) == true)
                 $botonModificarUsuario = '<button data-target="#modalModificarUsuario" data-toggle="modal" id="btnModificarUsuario'.$i.'" title="MODIFICAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-warning btn-sm btn-flat"><i class="fa fa-pencil"></i></button>';
             
-            $botonGestionModulos = '<button data-target="#modalAdministrarModulos" data-toggle="modal" id="btnAdministrarModulos'.$i.'" title="ADMINISTRAR MODULOS DE '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionModulos(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-cog"></i></button>';
-            $botonGestionPrivilegios = '<button data-target="#modalAdministrarPrivilegios" data-toggle="modal" id="btnAdministrarPrivilegios'.$i.'" title="ADMINISTRAR PRIVILEGIOS DE '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioGestionPrivilegios(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-default btn-sm btn-flat"><i class="fa fa-cogs"></i></button>';
-
+            
             
             $identificacion = $value['identificacion'];
             $nombres = $value['primerNombre'].' '.$value['segundoNombre'];
