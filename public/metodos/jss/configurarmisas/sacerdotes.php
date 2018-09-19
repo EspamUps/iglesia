@@ -12,7 +12,6 @@ function filtrarSacerdotePorIdentificacion(){
             dataType: 'JSON',
             data: {identificacion:identificacion},
             beforeSend: function(){
-                
                 $("#mensajeContenedorDatos").html('');
                 $("#idSacerdoteEncriptado").val('0');
                 cargandoSacerdotes('#contenedorDatosSacerdote');

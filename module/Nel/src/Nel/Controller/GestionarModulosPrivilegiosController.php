@@ -445,6 +445,7 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                             $fechaActualizacion = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
                             $estadoActual = $listaAsignarPrivilegio[0]['estadoAsignacion'];
                             $nuevoEstado =0;
+                            $mensaje = '<div class="alert alert-success text-center" role="alert">SE DESHABILITÓ DE FORMA EXITOSA EL PRIVILEGIO</div>';                         
                             if($estadoActual==0)
                             {
                                 $mensaje = '<div class="alert alert-success text-center" role="alert">SE HABILITÓ DE FORMA EXITOSA EL PRIVILEGIO</div>';                         
@@ -462,7 +463,6 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                     . '</div>';
                             
                             
-                            $mensaje = '<div class="alert alert-success text-center" role="alert">SE DESHABILITÓ DE FORMA EXITOSA EL PRIVILEGIO</div>';                         
                             $validar = TRUE;
                             return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
                             }

@@ -43,6 +43,11 @@ class Usuario extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarUsuarioUltimoModificadoPorPersona($idPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarUsuarioUltimoModificadoPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function ModificarUsuario($idUsuario, $contraseña, $idTipoUsuario){
         $resultado = $this->getAdapter()->query("CALL Sp_ModificarUsuario('{$idUsuario}','{$contraseña}','{$idTipoUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -55,6 +60,11 @@ class Usuario extends TableGateway
     
      public function ObtenerUsuarios(){
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerUsuarios()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarUsuarioPorNombreUsuario($nombreUsuario){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarUsuarioPorNombreUsuario('{$nombreUsuario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

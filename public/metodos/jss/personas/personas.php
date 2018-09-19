@@ -136,6 +136,7 @@ $(function(){
         },
         success: function(data){
             if(data.validar==true){
+                
                 limpiarFormIngresarPersona();
                 obtenerPersonas();
             }
