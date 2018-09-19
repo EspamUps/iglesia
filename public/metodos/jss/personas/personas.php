@@ -137,7 +137,7 @@ $(function(){
         },
         success: function(data){
             if(data.validar==true){
-//                limpiarFormIngresarPersona();
+                limpiarFormIngresarPersona();
                 obtenerPersonas();
             }
             $("#btnGuardarPersona").button('reset');

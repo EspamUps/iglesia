@@ -4,6 +4,7 @@
 $validacionPrivilegio = $this->validacionPrivilegio;
 include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuarios/usuarios.php');
 include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuarios/modulosprivilegios.php');
+include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuarios/buscarpersona.php');
 
  ?>
 
@@ -16,6 +17,33 @@ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/usuari
             <small>SWGP</small>
         </h1>
     </section>
+    
+    <?php
+        if($validacionPrivilegio==true)
+        {
+        ?>
+    <section class="">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresoUsuario"> </div>
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoUsuario(this)" id="formIngresoUsuario" method="post" action="<?php echo $this->basePath();?>/usuario/ingresarusuario">
+                            
+                        <div class="form-group col-lg-5">
+                            <label for="identificacion">IDENTIFICACIÓN DE LA PERSONA</label>
+                            <input onkeyup="filtrarUsuarioPorIdentificacion(event);" onkeydown="validarNumeros('identificacion');" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
+                        </div>
+
+                        <div class="form-group col-lg-1">
+                        </div>
+                        <div class="form-group col-lg-6" id="contenedorDatosPersona">
+                        </div>
+                    </form>                  
+                </div>
+            </div>
+        </div>
+    </section>
+       <?php } ?>
     
     <section class="content">
         <div class="box-body nav-tabs-custom">
