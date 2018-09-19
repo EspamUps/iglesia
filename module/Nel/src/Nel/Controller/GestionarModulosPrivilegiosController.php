@@ -350,9 +350,9 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                 foreach ($listaAsignarPrivilegios as $valueAsignarPrivilegios) {
                                     $idAsignarPrivilegioEncriptado = $objMetodos->encriptar($valueAsignarPrivilegios['idAsignarPrivilegios']);
                                     if($valueAsignarPrivilegios['estadoAsignacion']==0)
-                                      $botonAsignarPrivilegio = '<button id="btnHabilitarAsignarPrivilegio'.$imm.'" title="HABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="CambiarEstadoPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                                      $botonAsignarPrivilegio = '<button id="btnHabilitarAsignarPrivilegio'.$imm.'" title="HABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="CambiarEstadoPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                                     else 
-                                      $botonAsignarPrivilegio = '<button id="btnHabilitartAsignarPrivilegio'.$imm.'" title="DESHABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="CambiarEstadoPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                      $botonAsignarPrivilegio = '<button id="btnHabilitartAsignarPrivilegio'.$imm.'" title="DESHABILITAR PRIVILEGIO '.$valueAsignarPrivilegios['nombrePrivilegio'].'" onclick="CambiarEstadoPrivilegio(\''.$idAsignarPrivilegioEncriptado.'\','.$imm.','.$jmm.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
 
                                      $cuerpoTabla =$cuerpoTabla. '<tr>
                                             <td>'.$valueAsignarPrivilegios['nombrePrivilegio'].'</td>

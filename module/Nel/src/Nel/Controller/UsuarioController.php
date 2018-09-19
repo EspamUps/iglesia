@@ -77,9 +77,9 @@ class UsuarioController extends AbstractActionController
                 if($idUsuario != $value['idUsuario'])
                 {
                     if($value['estadoUsuario']==0)
-                    $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="HABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                    $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="HABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                     else
-                    $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="DESHABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                    $botonModificarEstadoUsuario = '<button data-target="#modalModificarEstadoUsuario" data-toggle="modal"  id="btnModificarEstadoUsuario'.$i.'" title="DESHABILITAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="obtenerFormularioModificarEstadoUsuario(\''.$idUsuarioEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
                 }
             }
             
