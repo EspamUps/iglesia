@@ -150,7 +150,7 @@ function obtenerFormularioGestionModulos(id,i,j){
 }
 
 
-function EliminarModulo(vari, ID, j, idAM){
+function EliminarModulo(vari, ID, j, idAM, c){
     if (confirm('¿DESEAS DESHABILITARLE EL ACCESO A ESTE MÓDULO?')) {
         var url = $("#rutaBase").text();
         $.ajax({
@@ -159,7 +159,7 @@ function EliminarModulo(vari, ID, j, idAM){
             dataType: 'JSON',
             data: { usuario: vari, fila: ID, fila2:j, idAsignarModulo:idAM},
             beforeSend: function () {
-                $("#btnEliminarAsignarModulo"+ID).html('<i class="fa fa-spinner"></i>');
+                $("#btnEliminarAsignarModulo"+c).html('<i class="fa fa-spinner"></i>');
                 $("#mensajeAdministrarModulos").html('');
             },
             uploadProgress: function (event, position, total, percentComplete) {
@@ -169,14 +169,14 @@ function EliminarModulo(vari, ID, j, idAM){
                 if (data.validar == true) {
                    obtenerFormularioGestionModulos(data.idUsuarioEncriptado,data.fila, data.fila2);
                 } else {
-                    $("#btnEliminarAsignarModulo"+ID).html('<i class="fa fa-times"></i>');
+                    $("#btnEliminarAsignarModulo"+c).html('<i class="fa fa-times"></i>');
                 }
                 $("#mensajeAdministrarModulos").html(data.mensaje);
             },
             complete: function () {
             },
             error: function (xhr, textStatus, errorThrown) {
-                $("#btnEliminarAsignarModulo"+ID).html('<i class="fa fa-times"></i>');
+                $("#btnEliminarAsignarModulo"+c).html('<i class="fa fa-times"></i>');
                 if (xhr.status === 0) {
                     $("#mensajeAdministrarModulos").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
                 } else if (xhr.status == 404) {

@@ -87,7 +87,7 @@ class GestionarModulosPrivilegiosController extends AbstractActionController
                                     
                                 }else{
                                     $idAsignarModuloEncriptado = $objMetodos->encriptar($listaAsignarModulos[0]['idAsignarModulo']);
-                                    $botonEliminarModulo = '<button id="btnEliminarAsignarModulo'.$i.'" title="ELIMINAR MÓDULO '.$valueModulos['nombreModulo'].'" onclick="EliminarModulo(\''.$idUsuarioEncriptado.'\','.$i.','.$j.',\''.$idAsignarModuloEncriptado.'\')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                    $botonEliminarModulo = '<button id="btnEliminarAsignarModulo'.$iContador.'" title="ELIMINAR MÓDULO '.$valueModulos['nombreModulo'].'" onclick="EliminarModulo(\''.$idUsuarioEncriptado.'\','.$i.','.$j.',\''.$idAsignarModuloEncriptado.'\','.$iContador.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             
                                     $cuerpoTabla =$cuerpoTabla. '<tr>
                                             <td>'.$valueModulos['nombreModulo'].'</td>
