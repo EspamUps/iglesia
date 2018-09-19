@@ -23,6 +23,8 @@ class Modulos extends TableGateway
         return $resultado;
     }
     
+
+    
     public function FiltrarModulo($idModulo){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarModulo('{$idModulo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

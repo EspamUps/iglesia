@@ -76,7 +76,7 @@ class AdministradorController extends AbstractActionController
                 $optionSelectDocentes = '<option value="0">SELECCIONE UN DOCENTE</option>';
                 foreach ($listaDocentes as $valueDocentes) {
                     $idDocenteEncriptado = $objMetodos->encriptar($valueDocentes['idDocente']);
-                    $nombres = $valueDocentes['primerApellido'].' '.$valueDocentes['segundoApellido'].' '.$valueDocentes['primerNombre'].' '.$valueDocentes['segundoApellido'];
+                    $nombres = $valueDocentes['primerApellido'].' '.$valueDocentes['segundoApellido'].' '.$valueDocentes['primerNombre'].' '.$valueDocentes['segundoNombre'];
                     $optionSelectDocentes = $optionSelectDocentes.'<option value="'.$idDocenteEncriptado.'">'.$nombres.'</option>';
                 }
                 
