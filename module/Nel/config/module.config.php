@@ -80,6 +80,7 @@ return array(
             'Nel\Controller\Periodos' => 'Nel\Controller\PeriodosController',
             'Nel\Controller\Docentes' => 'Nel\Controller\DocentesController',
             'Nel\Controller\Horarios' => 'Nel\Controller\HorariosController',
+            'Nel\Controller\RangoAsistencia' => 'Nel\Controller\RangoAsistenciaController',
             
         ),
     ),

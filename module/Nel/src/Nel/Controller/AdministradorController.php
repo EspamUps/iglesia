@@ -24,6 +24,7 @@ use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
 use Nel\Modelo\Entity\DireccionLugarMisa;
+use Nel\Modelo\Entity\RangoAsistencia;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -43,18 +44,19 @@ class AdministradorController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 12);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 13);
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
             else{
                 $objMetodosC = new MetodosControladores();
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 12, 3);
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 13, 3);
+                
                 
 //                $objMisas = new Misas($this->dbAdapter);
                 $objCursos = new Cursos($this->dbAdapter);
                 $objPeriodos = new Periodos($this->dbAdapter);
                 $objDocentes = new Docentes($this->dbAdapter);
-               
+                $objRangoAsistencia = new RangoAsistencia($this->dbAdapter);
 //                $objLugaresMisa = new LugaresMisa($this->dbAdapter);
 //                $objDireccionLugarMisa = new DireccionLugarMisa($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -80,8 +82,14 @@ class AdministradorController extends AbstractActionController
                     $optionSelectDocentes = $optionSelectDocentes.'<option value="'.$idDocenteEncriptado.'">'.$nombres.'</option>';
                 }
                 
+                $validarRangoAsistencia = TRUE;
+                if(count($objRangoAsistencia->ObtenerRangoAsistenciaAcivo()) != 1){
+                    $validarRangoAsistencia = FALSE;
+                }
+                
                  $array = array(
-                    'optionSelectPeriodos'=>$optionSelectPeriodos,
+                     'validarRangoAsistencia'=>$validarRangoAsistencia,
+                     'optionSelectPeriodos'=>$optionSelectPeriodos,
                      'optionSelectCurso'=>$optionSelectCurso,
                      'optionSelectDocentes'=>$optionSelectDocentes,
                      'validacionPrivilegio' =>  $validarprivilegio
@@ -92,6 +100,33 @@ class AdministradorController extends AbstractActionController
         return new ViewModel($array);
     }
     
+    
+    public function rangoasistenciaAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }
+        else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 12);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                 $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 12, 3);
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+            
+        }
+        return new ViewModel($array);
+    }
     
     public function  horariosAction()
     {
