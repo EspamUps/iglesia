@@ -31,7 +31,10 @@ if(!$sesionUsuario->offsetExists('idUsuario')){
                 ->prependFile($this->basePath() . '/public/librerias/js/price-range.js')   
                 ->prependFile($this->basePath() . '/public/librerias/js/jquery.scrollUp.min.js') 
                 ->prependFile($this->basePath() . '/public/librerias/js/bootstrap.min.js')   
-                ->prependFile($this->basePath() . '/public/librerias/js/jquery-2.1.1.min.js'); ?>
+                ->prependFile($this->basePath() . '/public/librerias/js/jquery-2.1.1.min.js');
+                header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+                header("Expires: Sat, 1 Jul 2000 05:00:00 GMT"); // Fecha en el pasado ?>
+    
     </head>
     
     <body>
@@ -46,47 +49,17 @@ if(!$sesionUsuario->offsetExists('idUsuario')){
             
         </style>
     <header id="header"><!--header-->
-        <div class="header_top"><!--header_top-->
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="contactinfo">
-                            <ul class="nav nav-pills">
-                                <li><a href="#"><i class="fa fa-phone"></i> +593 99 029 6319</a></li>
-                                <li><a href="#"><i class="fa fa-envelope"></i> junimaci-22@live.com</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-<!--                        <div class="social-icons pull-right">
-                            <ul class="nav navbar-nav">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                                <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-                                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                            </ul>
-                        </div>-->
-                    </div>
-                </div>
-            </div>
-        </div><!--/header_top-->
 		
         <div class="header-middle"><!--header-middle-->
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-4">
+<!--                    <div class="col-sm-4">
                         <div class="logo pull-left">
-                            <a href="<?php echo $this->basePath();?>/inicio/inicio"><span>SGP</span></a>
+                            <a href="<?php echo $this->basePath();?>/inicio/inicio"><h2><strong>SGP</strong></h2></a>
                         </div>
                     </div>
                     <div class="col-sm-8">
-<!--                        <div class="shop-menu pull-right">
-                            <ul class="nav navbar-nav">
-                                <li><a href="informacion.php"><i class="fa fa-user"></i>Información</a></li>
-                            </ul>
-                        </div>-->
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>
@@ -94,12 +67,10 @@ if(!$sesionUsuario->offsetExists('idUsuario')){
   
     
     <?php echo $this->content; ?>
-    
-
-    <br>
+        
     <footer id="footer"><!--Footer-->
         <div class="footer-top">
-            <div class="container">
+<!--            <div class="container">
                 <div class="row">
                     <div class="col-sm-2">
                         <div class="companyinfo">
@@ -112,34 +83,28 @@ if(!$sesionUsuario->offsetExists('idUsuario')){
                     </div>
                     <div class="col-sm-3">
                         <div class="address">
-                            <img src="<?php echo $this->basePath();?>/public/librerias/images/pagina/logoiglesia.png" alt="">
+                            <img src="<?php echo $this->basePath();?>/public/librerias/images/pagina/logoiglesia2.png" alt="">
                             <p>Ecuador</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
         </div>
 		
         <div class="footer-widget">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-2">
-                        <div class="single-widget">
-                            <h2>Políticas</h2>
-                            <ul class="nav nav-pills nav-stacked">
-<!--                                <li><a href="<?php echo $this->basePath();?>/legal/terminosycondiciones">Términos de servicio</a></li>
-                                <li><a href="<?php echo $this->basePath();?>/legal/privacidad">Política de privacidad</a></li>
-                                <li><a href="<?php echo $this->basePath();?>/legal/reembolso">Política de reembolso</a></li>-->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
 		
         <div class="footer-bottom">
             <div class="container">
-                <div class="row">
+                <div class="col-sm-12 text-center">
+                    <div class="companyinfo">
+                        <p> © 2018 Unidad de Producción de Software. 
+                            Todos los Derechos Reservados | Desarrollado por 
+                            <a target="_blank" href="https://github.com/dayubadel"> Bailón D. Dayana </a> |
+                            <a target="_blank" href="https://github.com/chavomacias"> Macías I. Nel </a> 
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
