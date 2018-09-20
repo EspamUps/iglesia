@@ -81,6 +81,7 @@ return array(
             'Nel\Controller\Docentes' => 'Nel\Controller\DocentesController',
             'Nel\Controller\Horarios' => 'Nel\Controller\HorariosController',
             'Nel\Controller\RangoAsistencia' => 'Nel\Controller\RangoAsistenciaController',
+            'Nel\Controller\ConfigurarCurso' => 'Nel\Controller\ConfigurarCursoController',
             
         ),
     ),

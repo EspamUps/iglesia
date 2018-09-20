@@ -83,6 +83,7 @@ class AdministradorController extends AbstractActionController
                 }
                 
                 $validarRangoAsistencia = TRUE;
+                $mensaje = '';
                 if(count($objRangoAsistencia->ObtenerRangoAsistenciaAcivo()) != 1){
                     $validarRangoAsistencia = FALSE;
                 }

@@ -24,10 +24,10 @@ class HoraHorario extends TableGateway
 //        return $resultado;
 //    }
 //    
-//    public function ObtenerCursosEstado($estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarHoraHorarioPorHorarioActivo($idHorario){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarHoraHorarioPorHorarioActivo('{$idHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function IngresarHoraHorario($idHorario,$horaInicio,$horaFin,$fechaIngreso,$estadoHoraHorario){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarHoraHorario('{$idHorario}','{$horaInicio}','{$horaFin}','{$fechaIngreso}','{$estadoHoraHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

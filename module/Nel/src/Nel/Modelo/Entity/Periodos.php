@@ -43,6 +43,8 @@ class Periodos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPeriodo('{$idPeriodo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+
+    
 //    
 //    public function FiltrarCursoEstado($idCurso,$estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

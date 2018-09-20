@@ -42,10 +42,10 @@ class ConfigurarCurso extends TableGateway
 //        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-//    public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function IngresarConfigurarCurso($idCurso,$idDocente,$idPeriodo,$idRangoAsistencia,$fechaInicioMatricula,$fechaFinMatricula,$fechaInicio,$fechaFin,$cupos,$precio,$fechaIngreso,$estadoConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarConfigurarCurso('{$idCurso}','{$idDocente}','{$idPeriodo}','{$idRangoAsistencia}','{$fechaInicioMatricula}','{$fechaFinMatricula}','{$fechaInicio}','{$fechaFin}','{$cupos}','{$precio}','{$fechaIngreso}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    public function FiltrarCursoPorNombre($nombreCurso){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
@@ -62,10 +62,10 @@ class ConfigurarCurso extends TableGateway
 //    }
     
 //    
-//    public function EliminarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function EliminarConfigurarCurso($idConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_EliminarConfigurarCurso('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function ModificarEstadoCurso($idCurso,$estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoCurso('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

@@ -25,7 +25,7 @@ $validarRangoAsistencia = $this->validarRangoAsistencia;
             <div class="row ">
                 <div class="col-lg-12 ">
                     <div id="mensajeFormIngresarConfigurarCurso"> </div>
-                    <form onsubmit="return validarIngresoConfigurarCurso(this)" method="post" action="<?php echo $this->basePath()?>/configurarcurso/ingresarconfigurarcurso" id="formIngresarConfigurarCurso">
+                    <form  method="post" action="<?php echo $this->basePath()?>/configurarcurso/ingresarconfigurarcurso" id="formIngresarConfigurarCurso">
                         <div class="col-lg-4 form-group">
                             <label for="selectPeriodo">SELECCIONE UN PERIODO</label>
                             <select  class="form-control" id="selectPeriodo" name="selectPeriodo">
@@ -44,26 +44,35 @@ $validarRangoAsistencia = $this->validarRangoAsistencia;
                                 <?php echo $optionSelectDocentes;?>
                             </select>
                         </div> 
-                        <div class="col-lg-3 form-group">
-                            <label for="fechaInicio">FECHA INICIO</label>
-                            <input type="date" id="fechaInicio" name="fechaInicio" class="form-control">
+                        <div class="col-lg-4 form-group">
+                            <label for="fechaInicioMatricula">FECHA INICIO MATRÍCULA</label>
+                            <input type="date" id="fechaInicioMatricula" name="fechaInicioMatricula" class="form-control">
                         </div>
-                        <div class="col-lg-3 form-group">
-                            <label for="fechaFin">FECHA FÍN</label>
-                            <input type="date" id="fechaFin" name="fechaFin" class="form-control">
+                        <div class="col-lg-4 form-group">
+                            <label for="fechaFinMatricula">FECHA FÍN MATRÍCULA</label>
+                            <input type="date" id="fechaFinMatricula" name="fechaFinMatricula" class="form-control">
                         </div>
-                        <div class="col-lg-3 form-group">
+                        <div class="col-lg-4 form-group">
                             <label for="cupos">CUPOS</label>
                             <input type="text" onkeydown="validarNumeros('cupos')" min="1" max="100" step="1" id="cupos" name="cupos" class="form-control">
                         </div>
-                        <div class="col-lg-3 form-group">
+                        <div class="col-lg-4 form-group">
+                            <label for="fechaInicio">FECHA INICIO</label>
+                            <input type="date" id="fechaInicio" name="fechaInicio" class="form-control">
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label for="fechaFin">FECHA FÍN</label>
+                            <input type="date" id="fechaFin" name="fechaFin" class="form-control">
+                        </div>
+                        <div class="col-lg-4 form-group">
                             <label for="valor">VALOR</label>
                             <input type="number" step="0.01" min="0.00" max="100.00" id="valor" name="valor" class="form-control">
                         </div>
                         <div class="col-lg-12 form-group">
                             <div id="mensajeContenedorDatosCurso"></div>
-                            <div id="contenedorDatosCurso" class="col-lg-6"></div>
-                            <!--<button data-loading-text="GUARDANDO..." class="btn btn-primary pull-right btn-flat" id="btnGuardarConfigurarMisa" name="btnGuardarConfigurarMisa"><i class="fa fa-save"></i>GUARDAR</button>-->
+                            <div class="col-lg-4"></div>
+                            <div id="contenedorDatosCurso" class="col-lg-4"></div>
+                            <div class="col-lg-4"></div>
                         </div> 
                     </form>
                 </div>
@@ -93,10 +102,10 @@ $validarRangoAsistencia = $this->validarRangoAsistencia;
         </div>
     </section>
 </div>
-<!--<script type="text/javascript">
+<script type="text/javascript">
 $(document).ready(function(){
-    cargandoConfigurarMisa('#contenedorTablaConfigurarMisas');
-    obtenerConfigurarMisa();
+    cargandoConfigurarCurso('#contenedorTablaConfigurarCurso');
+    obtenerConfigurarCurso();
 });
 
-</script>-->
+</script>

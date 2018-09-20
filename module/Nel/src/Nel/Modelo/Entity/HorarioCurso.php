@@ -28,10 +28,10 @@ class HorarioCurso extends TableGateway
 //        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-//    public function IngresarHorario($idCurso,$idDia,$estadoHorario){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarHorario('{$idCurso}','{$idDia}','{$estadoHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function IngresarHorarioCurso($idConfigurarCurso,$idHoraHorario,$estadoHorarioCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarHorarioCurso('{$idConfigurarCurso}','{$idHoraHorario}','{$estadoHorarioCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function FiltrarHorarioCursoPorHoraHorarioLimit1($idHoraHorario){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarHorarioCursoPorHoraHorarioLimit1('{$idHoraHorario}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

@@ -42,10 +42,7 @@ class Cursos extends TableGateway
         return $resultado;
     }
     
-    public function FiltrarCursoEstado($idCurso,$estado){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+
     
 //    
     public function EliminarCurso($idCurso){

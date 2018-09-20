@@ -53,184 +53,174 @@
 //    
 //    
 
-//function seleccionarFila(ID)
-//{
-//    var menues2 = $("#tablaConfigurarMisa tbody tr td");
-//    menues2.removeAttr("style");
-//    menues2.css({ 'cursor': 'pointer' });
-//    $("#filaTablaConfigurarMisa" + ID + " td").removeAttr("style");
-//    $("#filaTablaConfigurarMisa" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
-//}
-//function obtenerConfigurarMisa(){
-//    var url = $("#rutaBase").text();
-//    $.ajax({
-//        url : url+'/configurarmisa/obtenerconfigurarmisa',
-//        type: 'post',
-//        dataType: 'JSON',
-//        beforeSend: function(){
-//            $("#mensajeTablaConfigurarMisas").html('');
-//            
-//        },
-//        uploadProgress: function(event,position,total,percentComplete){
-//        },
-//        success: function(data){  
-//            if(data.validar == true){
-//                $("#contenedorTablaConfigurarMisas").html('<hr><div class="box-body table-responsive no-padding"><table class="table table-hover" id="tablaConfigurarMisa"></table></div>');
-//                $('#tablaConfigurarMisa').DataTable({
-//                    destroy: true,
-//                    order: [],
-//                    data: data.tabla,
-//                    'createdRow': function (row, data, dataIndex) {
-//                        var division = dataIndex % 2;
-//                        if (division == "0")
-//                        {
-//                            $(row).attr('style', 'background-color: #DCFBFF;text-align: center;font-weight: bold;');
-//                        } else {
-//                            $(row).attr('style', 'background-color: #CFCFCF;text-align: center;font-weight: bold;');
-//                        }
-//                        $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
-//                        $(row).attr('id', 'filaTablaConfigurarMisa' + dataIndex);
-//                    },
-//                    'columnDefs': [
-//                        {
-//                           'targets': 1,
-//                           'createdCell':  function (td, cellData, rowData, row, col) {
-//                                $(td).attr('id','nombreMisa'+row); 
-//                           },
-//                        }
-//                        
-//                     ],
-//                    columns: [
-//                        {
-//                            title: '#',
-//                            data: '_j'
-//                        },
-//                        {
-//                            title: 'MISA',
-//                            data: 'nombreMisa'
-//                        },
-//                        {
-//                            title: 'DESCRIPCIÓN',
-//                            data: 'descripcionMisa'
-//                        },
-//                        {
-//                            title: 'FECHA',
-//                            data: 'fechaMisa'
-//                        },
-//                        {
-//                            title: 'HORA INICIO',
-//                            data: 'horaInicio'
-//                        },
-//                        {
-//                            title: 'HORA FIN',
-//                            data: 'horaFin'
-//                        },
-//                        {
-//                            title: 'VALOR',
-//                            data: 'valorMisa'
-//                        },
-//                        {
-//                            title: 'SACERDOTE',
-//                            data: 'sacerdote'
-//                        },
-//                        {
-//                            title: 'OPC.',
-//                            data: 'opciones'
-//                        }
-//                    ],
-//                });    
-//                seleccionarFila(0)
-//            }else{
-//                $("#contenedorTablaPersonas").html('');
-//            }
-//            $("#mensajeTablaConfigurarMisas").html(data.mensaje);
-//        },
-//        complete: function(){
-//        },
-//        error: function(xhr, textStatus, errorThrown) {
-//            $("#contenedorTablaPersonas").html('');
-//            if(xhr.status === 0){
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//            }else if(xhr.status == 404){
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//            }else if(xhr.status == 500){
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//            }else if(errorThrown === 'parsererror'){
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//            }else if(errorThrown === 'timeout'){
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//            }else if(errorThrown === 'abort'){
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//            }else{
-//                $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//            }
-//        }
-//    }); 
-//}
+function seleccionarFila(ID)
+{
+    var menues2 = $("#tablaConfigurarCurso tbody tr td");
+    menues2.removeAttr("style");
+    menues2.css({ 'cursor': 'pointer' });
+    $("#filaTablaConfigurarCurso" + ID + " td").removeAttr("style");
+    $("#filaTablaConfigurarCurso" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
+}
+function obtenerConfigurarCurso(){
+    var url = $("#rutaBase").text();
+    $.ajax({
+        url : url+'/configurarcurso/obtenerconfigurarcurso',
+        type: 'post',
+        dataType: 'JSON',
+        beforeSend: function(){
+            $("#mensajeTablaConfigurarCurso").html('');
+            
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+        },
+        success: function(data){  
+            if(data.validar == true){
+                $("#contenedorTablaConfigurarCurso").html('<hr><div class="box-body table-responsive no-padding"><table class="table table-hover" id="tablaConfigurarCurso"></table></div>');
+                $('#tablaConfigurarCurso').DataTable({
+                    destroy: true,
+                    order: [],
+                    data: data.tabla,
+                    'createdRow': function (row, data, dataIndex) {
+                        var division = dataIndex % 2;
+                        if (division == "0")
+                        {
+                            $(row).attr('style', 'background-color: #DCFBFF;text-align: center;font-weight: bold;');
+                        } else {
+                            $(row).attr('style', 'background-color: #CFCFCF;text-align: center;font-weight: bold;');
+                        }
+                        $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
+                        $(row).attr('id', 'filaTablaConfigurarCurso' + dataIndex);
+                    },
+                    'columnDefs': [
+                        {
+                           'targets': 1,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('id','nombreCurso'+row); 
+                           },
+                        }
+                        
+                     ],
+                    columns: [
+                        {
+                            title: '#',
+                            data: '_j'
+                        },
+                        {
+                            title: 'CURSO',
+                            data: 'nombreCurso'
+                        },
+                        {
+                            title: 'DOCENTE',
+                            data: 'docente'
+                        },
+                        {
+                            title: 'PERIODO',
+                            data: 'periodo'
+                        },
+                        {
+                            title: 'FECHA INICIO',
+                            data: 'fechaInicio'
+                        },
+                        {
+                            title: 'FECHA FÍN',
+                            data: 'fechaFin'
+                        },
+                        {
+                            title: 'HORARIO',
+                            data: 'btnVerHorario'
+                        },
+                        {
+                            title: 'FECHA REGISTRO',
+                            data: 'fechaIngreso'
+                        },
+                        {
+                            title: 'VALOR',
+                            data: 'valorCurso'
+                        },
+                        {
+                            title: 'OPC.',
+                            data: 'opciones'
+                        }
+                    ],
+                });    
+                seleccionarFila(0)
+            }else{
+                $("#contenedorTablaConfigurarCurso").html('');
+            }
+            $("#mensajeTablaConfigurarCurso").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#contenedorTablaConfigurarCurso").html('');
+            if(xhr.status === 0){
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeTablaConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    }); 
+}
 //    
 //    
 //    
-//function limpiarFormIngresarConfigurarMisa()
-//{
-//    $('#formIngresarConfigurarMisa').each(function () {
-//        this.reset();
-//    });
-//    $("#idSacerdoteEncriptado").val('0');
-//    $("#contenedorDatosSacerdote").html('');
-//    $("#contenedorDatosLugar").html('');
-//    $("#mensajeContenedorDatos").html('');
-//    setTimeout(function() {$("#mensajeFormIngresarConfigurarMisa").html('');},1500);
-//}
-//function validarIngresoConfigurarMisa(f){
-//    var _validar = false;
-//    var valorMisa = parseFloat(f.valorMisa.value);
-//    if(valorMisa == 0){
-//        if(confirm("¿ESTAS SEGURO DE GUARDAR ESTA MISA SIN COSTO MONETARIO?")){
-//            _validar = true;
-//        }
-//    }
-//    else _validar=true ;
-//    return _validar;
-//}
-//$(function(){
-//    $("#formIngresarConfigurarMisa").ajaxForm({
-//        beforeSend: function(){
-//            $("#mensajeFormIngresarConfigurarMisa").html('');
-//            $("#btnGuardarConfigurarMisa").button('loading');
-//        },
-//        uploadProgress: function(event,position,total,percentComplete){
-//
-//        },
-//        success: function(data){
-//            if(data.validar==true){
-//                limpiarFormIngresarConfigurarMisa();
-//                obtenerConfigurarMisa();
-//            }
-//            $("#btnGuardarConfigurarMisa").button('reset');
-//            $("#mensajeFormIngresarConfigurarMisa").html(data.mensaje);
-//        },
-//        complete: function(){
-//        },
-//        error: function(xhr, textStatus, errorThrown) {
-//            $("#btnGuardarConfigurarMisa").button('reset');
-//            if(xhr.status === 0){
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//            }else if(xhr.status == 404){
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//            }else if(xhr.status == 500){
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//            }else if(errorThrown === 'parsererror'){
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//            }else if(errorThrown === 'timeout'){
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//            }else if(errorThrown === 'abort'){
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//            }else{
-//                $("#mensajeFormIngresarConfigurarMisa").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//            }
-//        }
-//    });    
-//}); 
+function limpiarFormIngresarConfigurarCurso()
+{
+    $('#formIngresarConfigurarCurso').each(function () {
+        this.reset();
+    });
+    $("#contenedorDatosCurso").html('');
+    setTimeout(function() {$("#mensajeFormIngresarConfigurarCurso").html('');},1500);
+}
+$(function(){
+    $("#formIngresarConfigurarCurso").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeFormIngresarConfigurarCurso").html('');
+            $("#btnGuardarConfigurarCurso").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){
+            if(data.validar==true){
+                limpiarFormIngresarConfigurarCurso();
+                obtenerConfigurarCurso();
+            }
+            $("#btnGuardarConfigurarCurso").button('reset');
+            $("#mensajeFormIngresarConfigurarCurso").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnGuardarConfigurarCurso").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeFormIngresarConfigurarCurso").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
 
     
     

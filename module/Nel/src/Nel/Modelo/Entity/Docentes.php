@@ -32,6 +32,8 @@ class Docentes extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarDocente('{$idDocente}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+
+    
 //    
     public function FiltrarDocentePorPersona($idPersona){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarDocentePorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

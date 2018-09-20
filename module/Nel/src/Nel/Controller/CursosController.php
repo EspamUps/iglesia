@@ -124,6 +124,7 @@ class CursosController extends AbstractActionController
                     }else{               
                         $objMetodos = new Metodos();
                         $objCurso = new Cursos($this->dbAdapter);
+                        $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -135,11 +136,13 @@ class CursosController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
                         }else if(!is_numeric($numeroFila)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
-                        }else{
+                        }else {
                             $idCurso = $objMetodos->desencriptar($idCursoEncriptado);
                             $listaCurso = $objCurso->FiltrarCurso($idCurso);
                             if(count($listaCurso) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADA NO EXISTE</div>';
+                            }else if(count($objConfigurarCurso->FiltrarConfigurarCursoPorCursoLimit1($idCurso)) > 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO YA HA SISDO SELECCIONADO PARA UNA CONFIGURACIÓN POR LO TANTO NO PUEDE SER ELIMINADO</div>';
                             }else{
                                 $resultado = $objCurso->EliminarCurso($idCurso);
                                 if(count($resultado) > 0){

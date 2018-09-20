@@ -145,14 +145,14 @@ function obtenerConfigurarMisa(){
                 });    
                 seleccionarFila(0)
             }else{
-                $("#contenedorTablaPersonas").html('');
+                $("#contenedorTablaConfigurarMisas").html('');
             }
             $("#mensajeTablaConfigurarMisas").html(data.mensaje);
         },
         complete: function(){
         },
         error: function(xhr, textStatus, errorThrown) {
-            $("#contenedorTablaPersonas").html('');
+            $("#contenedorTablaConfigurarMisas").html('');
             if(xhr.status === 0){
                 $("#mensajeTablaConfigurarMisas").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
             }else if(xhr.status == 404){
