@@ -87,6 +87,16 @@ if($sesionUsuario->offsetExists('idUsuario')){
 
             }
         </script>
+        <script type="text/javascript">
+        function validarNumerosR(vari) {
+            $('#' + vari).on('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if($("#"+vari).val() > 100){
+                    $("#"+vari).val(100);
+                }
+            });
+        }
+    </script>
         <div class="wrapper">
             <header class="main-header">
                 <a style="position: fixed;" href="<?php echo $this->basePath();?>/administrador/inicio" class="logo">

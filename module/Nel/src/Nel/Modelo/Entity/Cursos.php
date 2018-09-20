@@ -28,11 +28,16 @@ class Cursos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-    public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
-        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function IngresarCurso($nombreCurso,$nivelCurso,$fechaIngreso,$estadoCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$nivelCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-    public function FiltrarCursoPorNombre($nombreCurso){
+    public function FiltrarCursoPorNivelEstado($nivelCurso,$estadoCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNivelEstado('{$nivelCurso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+     public function FiltrarCursoPorNombre($nombreCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }

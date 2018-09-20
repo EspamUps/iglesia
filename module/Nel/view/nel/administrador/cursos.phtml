@@ -21,14 +21,16 @@ $validacionPrivilegio = $this->validacionPrivilegio;
                 <div class="col-lg-12 ">
                     <div id="mensajeFormIngresarCurso"> </div>
                     <form method="post" action="<?php echo $this->basePath()?>/cursos/ingresarcurso" id="formIngresarCurso">
-                        <div class="form-group col-lg-6">
+                        <div class="form-group col-lg-8">
                             <label for="nombreProvincia">NOMBRE DEL CURSO</label>
-                            <div class="input-group margin">
-                                <input autofocus=""  type="text" id="descripcionCurso" name="descripcionCurso" class="form-control">
-                                <span class="input-group-btn">
-                                    <button style="margin-left: 10%;" name="btnGuardarCurso" id="btnGuardarCurso" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat"><i class="fa fa-save"></i>GUARDAR</button>
-                                </span>
-                            </div>
+                            <input autofocus=""  type="text" id="descripcionCurso" name="descripcionCurso" class="form-control">
+                        </div>
+                        <div class="form-group col-lg-4">
+                            <label for="nombreProvincia">NIVEL DEL CURSO</label>
+                            <input autofocus=""  onkeydown="validarNumerosR('nivelCurso')"  type="text" id="nivelCurso" name="nivelCurso" class="form-control">
+                        </div>
+                        <div class="form-group col-lg-12">
+                            <button type="submit" name="btnGuardarCurso" id="btnGuardarCurso" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat pull-right"><i class="fa fa-save"></i>GUARDAR</button>
                         </div>
                     </form>
                 </div>

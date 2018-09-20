@@ -15,7 +15,8 @@ use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
-use Nel\Modelo\Entity\Persona;
+use Nel\Modelo\Entity\Matricula;
+use Nel\Modelo\Entity\Dias;
 use Nel\Modelo\Entity\Horario;
 use Nel\Modelo\Entity\AsignarModulo; 
 use Nel\Modelo\Entity\HoraHorario;
@@ -32,6 +33,314 @@ use Zend\Db\Adapter\Adapter;
 class ConfigurarCursoController extends AbstractActionController
 {
     public $dbAdapter;
+    public function filtrarhorariocursoAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 13);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else{
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objMetodos = new Metodos();
+                    $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+                    $objHorario = new Horario($this->dbAdapter);
+                    $objHoraHorario = new HoraHorario($this->dbAdapter);
+                    $objDias = new Dias($this->dbAdapter); 
+                    $objHorarioCurso = new HorarioCurso($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+                     $idConfigurarCursoEncriptado = $post['id'];
+
+                    if(empty($idConfigurarCursoEncriptado)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
+                    }else{
+                        $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
+                        $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
+                        if(count($listaConfigurarCurso) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO NO EXISTE</div>';
+                        }else{
+                            $listaHorarioCurso = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($idConfigurarCurso);
+                            $cuerpoTablaHorario = '';
+                            foreach ($listaHorarioCurso as $valueHorarioCurso) {
+                                $horaInicio = strtotime ( '-1 second' , strtotime($valueHorarioCurso['horaInicio']));
+                                $horaInicio = date( 'H:i:s' , $horaInicio );
+                                $horaFin = strtotime ( '+1 second' , strtotime($valueHorarioCurso['horaFin']));
+                                $horaFin = date( 'H:i:s' , $horaFin );
+                                $horas = $horaInicio.' - '.$horaFin;
+                                $cuerpoTablaHorario = $cuerpoTablaHorario.'<tr><td>'.$valueHorarioCurso['nombreDia'].'</td><td>'.$horas.'</td></tr>';
+                            }
+                            $tabla = '<div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>DÍA</td>
+                                                    <th>HORAS</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                '.$cuerpoTablaHorario.'
+                                            </tbody>
+                                        </table>
+                                    </div>';
+                            $mensaje = '';
+                            $validar = TRUE;
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                        }
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    public function modificarestadoconfigurarcursoAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 13);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 13, 2);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE MODIFICAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idConfigurarCursoEncriptado = $post['id'];
+                        $numeroFila = $post['numeroFila'];
+                        $numeroFila2 = $post['numeroFila2'];
+                        if($idConfigurarCursoEncriptado == NULL || $idConfigurarCursoEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
+                        }else if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else  if(!is_numeric($numeroFila2)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else{
+                            $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
+                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
+                            if(count($listaConfigurarCurso) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO NO EXISTE</div>';
+                            }else {
+                                $estadoConfigurarCurso = FALSE;
+                                if($listaConfigurarCurso[0]['estadoConfigurarCurso'] == FALSE){
+                                    $estadoConfigurarCurso = TRUE;
+                                }
+                                $resultado = $objConfigurarCurso->ModificarEstadoConfigurarCurso($idConfigurarCurso, $estadoConfigurarCurso);
+                                if(count($resultado) == 0){
+                                    if($estadoConfigurarCurso == TRUE)
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE HABILITÓ EL CURSO</div>';
+                                    else
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE DESHABILITÓ EL CURSO</div>';
+                                }else{
+                                    $tabla = $this->CargarTablaConfigurarCrusosAction($idUsuario, $this->dbAdapter, $resultado, $numeroFila, $numeroFila2);
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('tabla'=>$tabla,'numeroFila'=>$numeroFila,'numeroFila2'=>$numeroFila2,'mensaje'=>$mensaje,'validar'=>$validar));
+                                }
+                            }
+                        }   
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    public function eliminarconfigurarcursoAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 13);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 13, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objMatricula = new Matricula($this->dbAdapter);
+                        $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+
+                        $idConfigurarCursoEncriptado = $post['id'];
+                        $numeroFila = $post['numeroFila'];
+                        if($idConfigurarCursoEncriptado == NULL || $idConfigurarCursoEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
+                        }else if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else {
+                            $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
+                            
+                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
+                            if(count($listaConfigurarCurso) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADA NO EXISTE</div>';
+                            }else if(count($objMatricula->FiltrarMatriculaPorConfigurarCursoLimit1($idConfigurarCurso)) > 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO YA TIENE PERSONAS MATRICULADAS POR LO TANTO NO PUEDE SER ELIMINADO</div>';
+                            }else{
+                                $resultado = $objConfigurarCurso->EliminarConfigurarCurso($idConfigurarCurso);
+                                if(count($resultado) > 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ EL CURSO</div>';
+                                }else{
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('numeroFila'=>$numeroFila,'mensaje'=>$mensaje,'validar'=>$validar));
+                                }
+                            }
+                        }   
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    } 
+    public function obtenerconfigurarcursoAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 13);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+                    ini_set('date.timezone','America/Bogota'); 
+                    $listaConfigurarCurso = $objConfigurarCurso->ObtenerConfigurarCurso();
+                    $tabla = $this->CargarTablaConfigurarCrusosAction($idUsuario, $this->dbAdapter, $listaConfigurarCurso, 0, count($listaConfigurarCurso));
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                }
+            
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    function CargarTablaConfigurarCrusosAction($idUsuario,$adaptador,$listaConfigurarCursos, $i, $j)
+    {
+        $objMatricula = new Matricula($this->dbAdapter);
+        $objMetodos = new Metodos();
+        ini_set('date.timezone','America/Bogota'); 
+        $objMetodosC = new MetodosControladores();
+        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 13, 1);
+        $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 13, 2);
+        $array1 = array();
+        foreach ($listaConfigurarCursos as $value) {
+            $idConfigurarCursoEncriptado = $objMetodos->encriptar($value['idConfigurarCurso']);
+            $nombreCurso = '<input type="hidden" id="estadoConfigurarCursoA'.$i.'" name="estadoConfigurarCursoA'.$i.'" value="'.$value['estadoConfigurarCurso'].'">'.$value['nombreCurso'];
+            $fechaIngreso = $objMetodos->obtenerFechaEnLetra($value['fechaIngreso']);
+
+   
+            
+            
+            $botonEliminarConfigurarCurso = '';
+            if($validarprivilegioEliminar == TRUE){
+                if(count($objMatricula->FiltrarMatriculaPorConfigurarCursoLimit1($value['idConfigurarCurso'])) == 0)
+                    $botonEliminarConfigurarCurso = '<button id="btnEliminarConfigurarCurso'.$i.'" title="ELIMINAR '.$value['nombreCurso'].'" onclick="eliminarConfigurarCurso(\''.$idConfigurarCursoEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+            }
+
+            $botonDeshabilitarConfigurarCurso = '';
+            if($validarprivilegioModificar == TRUE){
+                if($value['estadoConfigurarCurso'] == TRUE)
+                    $botonDeshabilitarConfigurarCurso = '<button id="btnDeshabilitarConfigurarCurso'.$i.'" title="DESHABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarConfigurarCurso(\''.$idConfigurarCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
+                else
+                    $botonDeshabilitarConfigurarCurso = '<button id="btnDeshabilitarConfigurarCurso'.$i.'" title="HABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarConfigurarCurso(\''.$idConfigurarCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-minus-square"></i></button>';
+            }
+            $botones =  $botonDeshabilitarConfigurarCurso.' '.$botonEliminarConfigurarCurso;    
+            $nombreDocente = $value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'];
+            $fechaInicio = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaInicio']);
+            $fechaFin = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaFin']);
+            
+            
+            $array1[$i] = array(
+                '_j'=>$j,
+                'idConfigurarCursoEncriptado'=>$idConfigurarCursoEncriptado,
+                'nombreCurso'=>$nombreCurso,
+                'docente'=>$nombreDocente,
+                'periodo'=>$value['nombrePeriodo'],
+                'fechaInicio'=>$fechaInicio,
+                'fechaFin'=>$fechaFin,
+                'nivelCurso'=>$value['nivelCurso'],
+                'valorCurso'=>$value['precio'],
+                'fechaIngreso'=>$fechaIngreso,
+                'opciones'=>$botones,
+            );
+            $j--;
+            $i++;
+        }
+        
+        return $array1;
+    }
+    
+    
+    
     public function filtrardatoscursoAction()
     {
         $this->layout("layout/administrador");
@@ -136,82 +445,7 @@ class ConfigurarCursoController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-//    public function eliminarsacerdoteAction()
-//    {
-//        $this->layout("layout/administrador");
-//        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
-//        $validar = false;
-//        $sesionUsuario = new Container('sesionparroquia');
-//        if(!$sesionUsuario->offsetExists('idUsuario')){
-//            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
-//        }else{
-//            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-//            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
-//            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-//            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 2);
-//            if (count($AsignarModulo)==0)
-//                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-//            else {
-//                $objMetodosC = new MetodosControladores();
-//                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 2, 1);
-//                if ($validarprivilegio==false)
-//                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE ELIMINAR DATOS PARA ESTE MÓDULO</div>';
-//                else{
-//                    $request=$this->getRequest();
-//                    if(!$request->isPost()){
-//                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-//                    }else{               
-//                        $objMetodos = new Metodos();
-//                        $objSacerdote = new Sacerdotes($this->dbAdapter);
-//                        $post = array_merge_recursive(
-//                            $request->getPost()->toArray(),
-//                            $request->getFiles()->toArray()
-//                        );
-//
-//                        $idSacerdoteEncriptado = $post['id'];
-//                        $numeroFila = $post['numeroFila'];
-//                     
-//                        if($idSacerdoteEncriptado == NULL || $idSacerdoteEncriptado == ""){
-//                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL SACERDOTE</div>';
-//                        }else if(!is_numeric($numeroFila)){
-//                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
-//                        }else{
-//                            $idSacerdote = $objMetodos->desencriptar($idSacerdoteEncriptado);
-//                            $listaSacerdote = $objSacerdote->FiltrarSacerdote($idSacerdote);
-//                            if(count($listaSacerdote) == 0){
-//                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SACERDOTE SELECCIONADO NO EXISTE</div>';
-//                            }else{
-//                                $resultado = $objSacerdote->EliminarSacerdote($idSacerdote);
-//                                if(count($resultado) > 0){
-//                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ELIMINÓ  EL SACERDOTE</div>';
-//                                }else{
-//                                    $mensaje = '';
-//                                    $validar = TRUE;
-//                                    return new JsonModel(array('numeroFila'=>$numeroFila,'mensaje'=>$mensaje,'validar'=>$validar));
-//                                }
-//                            }
-//                 
-//                        }   
-//                    }
-//                }
-//            }
-//        }
-//        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-//    }
-//    
-//    
-//    
+
     public function ingresarconfigurarcursoAction()
     {
         $this->layout("layout/administrador");
@@ -384,191 +618,7 @@ class ConfigurarCursoController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
-//    public function filtrarsacerdoteporidentificacionAction()
-//    {
-//        $this->layout("layout/administrador");
-//        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
-//        $validar = false;
-//        $sesionUsuario = new Container('sesionparroquia');
-//        if(!$sesionUsuario->offsetExists('idUsuario')){
-//            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
-//        }else{
-//            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-//            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
-//            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-//            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 2);
-//            if (count($AsignarModulo)==0)
-//                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-//            else {
-//                $objMetodosC = new MetodosControladores();
-//                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 2, 3);
-//                if ($validarprivilegio==false)
-//                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
-//                else{
-//                    $request=$this->getRequest();
-//                    if(!$request->isPost()){
-//                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-//                    }else{
-//                        $objMetodos = new Metodos();
-//                        $objPersona = new Persona($this->dbAdapter);
-//                        $objSacerdotes = new Sacerdotes($this->dbAdapter);
-//                        $post = array_merge_recursive(
-//                            $request->getPost()->toArray(),
-//                            $request->getFiles()->toArray()
-//                        );
-//                         $identificacion = trim($post['identificacion']);
-//
-//                        if(strlen($identificacion) > 10){
-//                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA IDENTIFICACIÓN NO DEBE TENER MÁS DE 10 DÍGITOS</div>';
-//                        }else{
-//                            $listaPersona = $objPersona->FiltrarPersonaPorIdentificacion($identificacion);
-//                            if(count($listaPersona) == 0){
-//                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE UNA PERSONA CON LA IDENTIFICACIÓN '.$identificacion.'</div>';
-//                            }else if($listaPersona[0]['estadoPersona'] == FALSE){
-//                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA HA SIDO DESHABILITADA POR LO TANTO NO PUEDE SER UTILIZADA HASTA QUE SEA HABILITADA</div>';
-//                            } else{
-//
-//                                $listaSacerdote = $objSacerdotes->FiltrarSacerdotePorPersona($listaPersona[0]['idPersona']);
-//                                if(count($listaSacerdote) > 0){
-//                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN SACERDOTE CON LA IDENTIFICACIÓN '.$identificacion.'</div>';
-//                                }else{
-//                                    $idPersonaEncriptado = $objMetodos->encriptar($listaPersona[0]['idPersona']);
-//                                    $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
-//                                    $apellidos = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'];
-//                                    $botonGuardar = '<button data-loading-text="GUARDANDO..." id="btnGuardarSacerdote" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>';
-//                                    $tabla = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">
-//                                        <div class="table-responsive"><table class="table">
-//                                        <thead> 
-//                                            <tr>
-//                                                <th>NOMBRES</th>
-//                                                <td>'.$nombres.'</td>
-//                                            </tr>
-//                                            <tr>
-//                                                <th>APELLIDOS</th>
-//                                                <td>'.$apellidos.'</td>
-//                                            </tr>
-//                                            <tr>
-//                                                <td colspan="2">'.$botonGuardar.'</td>
-//                                            </tr>
-//                                        </thead>
-//                                    </table></div>';
-//                                    $mensaje = '';
-//                                    $validar = TRUE;
-//                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-//    }
-//    public function obtenersacerdotesAction()
-//    {
-//        $this->layout("layout/administrador");
-//        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
-//        $validar = false;
-//        $sesionUsuario = new Container('sesionparroquia');
-//        if(!$sesionUsuario->offsetExists('idUsuario')){
-//            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
-//        }else{
-//            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-//            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
-//            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-//            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 2);
-//            if (count($AsignarModulo)==0)
-//                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-//            else 
-//                {
-//                $request=$this->getRequest();
-//                if(!$request->isPost()){
-//                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-//                }else{
-//                    $objPersona = new Persona($this->dbAdapter);
-//                    $objSacerdotes = new Sacerdotes($this->dbAdapter);
-//                    $objTelefono = new Telefonos($this->dbAdapter);
-//                    $objTelefonoPersona = new TelefonoPersona($this->dbAdapter);
-//                    $objDireccionPersona = new DireccionPersona($this->dbAdapter);
-//                    $objConfigurarMisa = new ConfigurarMisa($this->dbAdapter);
-//                    
-//                    $objMetodos = new Metodos();
-//                    ini_set('date.timezone','America/Bogota'); 
-//                    $listaSacerdotes = $objSacerdotes->ObtenerSacerdotes();
-//                    $array1 = array();
-//                    $i = 0;
-//                    $j = count($listaSacerdotes);
-//                    
-//                    $objMetodosC = new MetodosControladores();
-//                    $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 2, 1);
-//                 
-//                    
-//                    foreach ($listaSacerdotes as $value) {
-//                        $idSacerdoteEncriptado = $objMetodos->encriptar($value['idSacerdote']);
-//                        $listaPersona = $objPersona->FiltrarPersona($value['idPersona']);
-//                        $listaTelefonoPersona = $objTelefonoPersona->FiltrarTelefonoPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
-//                        $numeroTelefono = '';
-//                        if(count($listaTelefonoPersona) > 0){
-//                            $listaTelefono = $objTelefono->FiltrarTelefono($listaTelefonoPersona[0]['idTelefono']);
-//                            $numeroTelefono = $listaTelefono[0]['numeroTelefono'];
-//                        }
-//
-//                        $listaDireccionPersona = $objDireccionPersona->FiltrarDireccionPersonaPorPersonaEstado($listaPersona[0]['idPersona'], 1);
-//                        $provincia = '';
-//                        $canton = '';
-//                        $parroquia = '';
-//                        $direccion = '';
-//                        $referencia = '';
-//                        if(count($listaDireccionPersona) > 0){
-//                            $provincia = $listaDireccionPersona[0]['nombreProvincia'];
-//                            $canton = $listaDireccionPersona[0]['nombreCanton'];
-//                            $parroquia = $listaDireccionPersona[0]['nombreParroquia'];
-//                            $direccion = $listaDireccionPersona[0]['direccionPersona'];
-//                            $referencia = $listaDireccionPersona[0]['referenciaDireccionPersona'];
-//                        }
-//                        $identificacion = $listaPersona[0]['identificacion'];
-//                        $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
-//                        $apellidos = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'];
-//                        $fechaRegistro = $objMetodos->obtenerFechaEnLetra($value['fechaIngresoSacerdote']);
-//
-//                        $fechaNacimiento2 = new \DateTime($listaPersona[0]['fechaNacimiento']);
-//                        $fechaActual = new \DateTime(date("d-m-Y"));
-//                        $diff = $fechaActual->diff($fechaNacimiento2);
-//                        $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($listaPersona[0]['fechaNacimiento']);
-//                        
-//                        $botonEliminarSacerdote = '';
-//                        if($validarprivilegioEliminar == TRUE){
-//                            if(count($objConfigurarMisa->FiltrarConfigurarMisaPorSacerdoteLimite1($value['idSacerdote'])) == 0){
-//                                $botonEliminarSacerdote = '<button id="btnEliminarSacerdote'.$i.'" title="ELIMINAR A '.$nombres.'" onclick="EliminarSacerdote(\''.$idSacerdoteEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
-//                            }
-//                        }
-//                        $botones = $botonEliminarSacerdote;     
-//                        $array1[$i] = array(
-//                            '_j'=>$j,
-//                            'identificacion'=>$identificacion,
-//                            'nombres'=>$nombres,
-//                            'apellidos'=>$apellidos,
-//                            'fechaNacimiento'=>$fechaNacimiento,
-//                            'edad'=>$diff->y,
-//                            'numeroTelefono'=>$numeroTelefono,
-//                            'provincia'=>$provincia,
-//                            'canton'=>$canton,
-//                            'parroquia'=>$parroquia,
-//                            'direccion'=>$direccion,
-//                            'referencia'=>$referencia,
-//                            'fechaRegistro'=>$fechaRegistro,
-//                            'opciones'=>$botones,
-//                        );
-//                        $j--;
-//                        $i++;
-//                    }
-//                    $mensaje = '';
-//                    $validar = TRUE;
-//                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$array1));
-//                }
-//            }
-//        }
-//        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-//    }
+
+
 
 }
