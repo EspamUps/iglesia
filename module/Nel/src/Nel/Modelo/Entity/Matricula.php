@@ -11,18 +11,18 @@ namespace Nel\Modelo\Entity;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 
-class Dias extends TableGateway
+class Matricula extends TableGateway
 {
     public function __construct(Adapter $adapter = null, $databaseSchema = null, ResultSet $selectResultPrototype = null)
     {
-        return parent::__construct('dias', $adapter, $databaseSchema, $selectResultPrototype);
+        return parent::__construct('matricula', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
 //    
-    public function ObtenerDias(){
-        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerDias()", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+//    public function ObtenerDias(){
+//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerDias()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
 //    
 //    public function ObtenerCursosEstado($estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
@@ -32,11 +32,15 @@ class Dias extends TableGateway
 //        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-//    public function FiltrarCursoPorNombre($nombreCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function FiltrarMatriculaPorConfigurarCursoLimit1($idConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorConfigurarCursoLimit1('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+////    
+//    public function FiltrarCurso($idCurso){
+//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-////    
 //    
 //    public function FiltrarCursoEstado($idCurso,$estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

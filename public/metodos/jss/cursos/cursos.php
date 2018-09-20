@@ -159,6 +159,10 @@ function obtenerCursos(){
                             data: 'nombreCurso'
                         },
                         {
+                            title: 'NIVEL',
+                            data: 'nivelCurso'
+                        },
+                        {
                             title: 'FECHA DE REGISTRO',
                             data: 'fechaIngreso'
                         },

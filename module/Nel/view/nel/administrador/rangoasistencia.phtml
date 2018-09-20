@@ -36,16 +36,7 @@ $validacionPrivilegio = $this->validacionPrivilegio;
             </div>
         </div>
     </section>
-    <script type="text/javascript">
-        function validarNumerosR(vari) {
-            $('#' + vari).on('input', function () {
-                this.value = this.value.replace(/[^0-9]/g, '');
-                if($("#"+vari).val() > 100){
-                    $("#"+vari).val(100);
-                }
-            });
-        }
-    </script>
+    
     
        <?php } ?>
    

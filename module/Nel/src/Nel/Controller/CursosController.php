@@ -71,6 +71,8 @@ class CursosController extends AbstractActionController
                             $listaCurso = $objCurso->FiltrarCurso($idCurso);
                             if(count($listaCurso) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADA NO EXISTE</div>';
+                            }else if($listaCurso[0]['estadoCurso'] == FALSE && count($objCurso->FiltrarCursoPorNivelEstado($listaCurso[0]['nivelCurso'], 1)) > 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO NO SE PUEDE HABILITAR PORQUE YA HAY UN CURSO CON EL NIVEL '.$listaCurso[0]['nivelCurso'].' ACTIVO</div>';
                             }else{
                                 $estadoCurso = FALSE;
                                 if($listaCurso[0]['estadoCurso'] == FALSE){
@@ -226,6 +228,8 @@ class CursosController extends AbstractActionController
                 '_j'=>$j,
                 'nombreCurso'=>$nombreCurso,
                 'fechaIngreso'=>$fechaIngreso,
+                'nivelCurso'=>$value['nivelCurso'],
+                'estadoCurso'=>$value['estadoCurso'],
                 'opciones'=>$botones,
             );
             $j--;
@@ -270,15 +274,20 @@ class CursosController extends AbstractActionController
                             $request->getFiles()->toArray()
                         );
                         $descripcionCruso = trim(strtoupper($post['descripcionCurso']));
+                        $nivelCurso = $post['nivelCurso'];
                         if(empty ($descripcionCruso) || strlen($descripcionCruso) > 100){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NOMBRE DEL CURSO MÁXIMO 100 CARACTERES</div>';
                         }else if(count( $objCurso->FiltrarCursoPorNombre($descripcionCruso)) > 0){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA CRUSO LLAMADO '.$descripcionCruso.'</div>';
+                        }else if(!is_numeric($nivelCurso)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NIVEL DEL CURSO</div>';
+                        }else if(count( $objCurso->FiltrarCursoPorNivelEstado($nivelCurso,1)) > 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UNA CURSO ACTIVO CON EL NIVEL '.$nivelCurso.'</div>';
                         }else{
                             ini_set('date.timezone','America/Bogota'); 
                             $hoy = getdate();
                             $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                            $resultado =  $objCurso->IngresarCurso($descripcionCruso, $fechaSubida, 1);
+                            $resultado =  $objCurso->IngresarCurso($descripcionCruso,$nivelCurso, $fechaSubida, 1);
                             if(count($resultado) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
                             }else{ 

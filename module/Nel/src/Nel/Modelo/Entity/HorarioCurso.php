@@ -37,10 +37,10 @@ class HorarioCurso extends TableGateway
         return $resultado;
     }
 ////    
-//    public function FiltrarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarHorarioCursoPorConfiguCurso($idConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarHorarioCursoPorConfiguCurso('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function FiltrarCursoEstado($idCurso,$estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

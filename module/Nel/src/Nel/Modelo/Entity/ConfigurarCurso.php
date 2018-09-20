@@ -38,18 +38,18 @@ class ConfigurarCurso extends TableGateway
     
     
 //    
-//    public function ObtenerCursos(){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function ObtenerConfigurarCurso(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerConfigurarCurso()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function IngresarConfigurarCurso($idCurso,$idDocente,$idPeriodo,$idRangoAsistencia,$fechaInicioMatricula,$fechaFinMatricula,$fechaInicio,$fechaFin,$cupos,$precio,$fechaIngreso,$estadoConfigurarCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarConfigurarCurso('{$idCurso}','{$idDocente}','{$idPeriodo}','{$idRangoAsistencia}','{$fechaInicioMatricula}','{$fechaFinMatricula}','{$fechaInicio}','{$fechaFin}','{$cupos}','{$precio}','{$fechaIngreso}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    public function FiltrarCursoPorNombre($nombreCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarConfigurarCurso($idConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCurso('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function FiltrarCurso($idCurso){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
@@ -67,10 +67,10 @@ class ConfigurarCurso extends TableGateway
         return $resultado;
     }
 //    
-//    public function ModificarEstadoCurso($idCurso,$estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoCurso('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function ModificarEstadoConfigurarCurso($idConfigurarCurso,$estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoConfigurarCurso('{$idConfigurarCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
 //    
 //    
