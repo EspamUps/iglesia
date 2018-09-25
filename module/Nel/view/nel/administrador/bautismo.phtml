@@ -1,0 +1,107 @@
+<?php
+$validacionPrivilegio = $this->validacionPrivilegio;
+$optionSelectProvincias = $this->optionSelectProvincias;
+$optionSelectSacerdote = $this->optionSelectSacerdote;
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/bautismo/obtenerdireccionesselect.php');
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/direcciones/obtenerdireccionesselect.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            BAUTISMO
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <?php
+        if($validacionPrivilegio==true)
+        {
+        ?>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarBautismo"> </div>
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" method="post" action="<?php echo $this->basePath()?>/bautismo/ingresarbautismo" id="formIngresarBautismo">
+                        <div class="form-group col-lg-4">
+                            <h4 class="text-center">DATOS DEL BAUTIZO</h4>
+                            <label for="identificacion">NÚMERO</label>
+                            <input onkeydown="validarNumeros('numero');" maxlength="10" autocomplete="off" autofocus="" type="text" id="numero" name="numero" class="form-control">
+                            <label for="identificacion">IDENTIFICACIÓN</label>
+                            <input onkeyup="filtrarPersonaPorIdentificacion(event);" onkeydown="validarNumeros('identificacion');" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
+                            <label for="sacerdote">SACERDOTE</label>
+                            <select class="form-control" id="selectSacerdote" name="selectSacerdote">
+                                <?php echo $optionSelectSacerdote;?>
+                            </select>
+                            <label for="fechaBautizo">FECHA BAUTIZO</label>
+                            <input type="date" class="form-control" id="fechaBautizo" name="fechaBautizo">
+                            <label for="fechaNacimiento">FECHA NACIMIENTO</label>
+                            <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento">
+                        </div>
+                        <div class="col-lg-4">
+                            <h4 class="text-center">LUGAR DE NACIMIENTO</h4>
+                            <label for="selectProvincias">PROVINCIAS</label>
+                            <select class="form-control" onchange="filtrarCantonesPorProvincia()" id="selectProvincias" name="selectProvincias">
+                                <?php echo $optionSelectProvincias;?>
+                            </select>
+                            <label for="selectCantones">CANTÓN</label>
+                            <select class="form-control" onchange="filtrarParroquiasPorProvinciaCanton()" id="selectCantones" name="selectCantones">
+                                <option value="0">SELECCIONE UN CANTÓN</option>
+                            </select>
+                            <label for="selectParróquia">PARRÓQUIA</label>
+                            <select class="form-control" id="selectParroquias" name="selectParroquias">
+                                <option value="0">SELECCIONE UNA PARRÓQUIA</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-4">
+                            <h4 class="text-center">REGISTRO CIVIL</h4>
+                            <label for="ano">AÑO</label>
+                            <input onkeydown="validarNumeros('ano');" maxlength="10" autocomplete="off" autofocus="" type="text" id="ano" name="ano" class="form-control">
+                            <label for="tomo">TOMO</label>
+                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="tomo" name="tomo" class="form-control">
+                            <label for="folio">FOLIO</label>
+                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="folio" name="folio" class="form-control">
+                            <label for="acta">ACTA</label>
+                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="acta" name="acta" class="form-control">
+                            <label for="fechaInscripcion">FECHA DE INSCRIPCIÓN</label>
+                            <input type="date" class="form-control" id="fechaInscripcion" name="fechaInscripcion">
+                            
+                        </div>
+<!--                        <div class="form-group col-lg-4">
+                            <label for="nombreProvincia">NIVEL DEL CURSO</label>
+                            <input autofocus=""  onkeydown="validarNumerosR('nivelCurso')"  type="text" id="nivelCurso" name="nivelCurso" class="form-control">
+                        </div>-->
+                        <div class="form-group col-lg-12">
+                            <button type="submit" name="btnGuardarCurso" id="btnGuardarCurso" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+       <?php } ?>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaCurso"> </div>
+                    <div id="contenedorTablaCurso"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<script type="text/javascript">  
+$(document).ready(function(){
+    cargandoCursos("#contenedorTablaCurso");
+   obtenerCursos(); 
+});
+
+
+</script>
+    
