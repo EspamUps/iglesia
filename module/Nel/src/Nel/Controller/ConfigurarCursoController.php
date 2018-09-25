@@ -577,6 +577,28 @@ class ConfigurarCursoController extends AbstractActionController
                                             }else if($listaDocente[0]['estadoDocente'] == FALSE){
                                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">EL DOCENTE SELECCIONADO HA SIDO DESHABILITADO POR LO TANTO NO PUEDE SER UTILIZADO HASTA QUE SEA HABILITADO</div>';
                                             } else{
+//                                                $listaConfigurarCursoPD = $objConfigurarCurso->FiltrarConfigurarCursoPorPeriodoDocente($idPeriodo,$idDocente);
+//                                                $validarHorarioDocente = TRUE;
+//                                                foreach ($listaConfigurarCursoPD as $valuePD) {
+//                                                    $listaHorarioCursoPD = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($valuePD['idConfigurarCurso']);
+//                                                    foreach ($listaHorarioCursoPD as $valueHorarioCursoPD) {
+//                                                        $listaHoraHorarioPD = $objHoraHorario->FiltrarHoraHorarioPorHorario($valueHorarioCursoPD['idHorario']);
+//                                                        foreach ($listaHoraHorarioPD as $valueHoraHorarioPD) {
+//                                                            $listaHorarioPD = $objHorario->FiltrarHorario($valueHoraHorarioPD['idHorario']);
+                                                            
+//                                                            if(count($listaHorarioPD) > 0){
+                                                                
+                                                            
+//                                                            $horaInicio = $valueHoraHorarioPD['horaInicio'];
+//                                                                $horaFin = $valueHoraHorarioPD['horaFin'];
+//                                                            }
+//                                                            
+//                                                        }
+//                                                    }
+//                                                }
+                                                
+                                                
+                                                
                                                 $hoy = getdate();
                                                 $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
 
