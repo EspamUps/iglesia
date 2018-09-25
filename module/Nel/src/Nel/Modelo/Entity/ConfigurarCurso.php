@@ -56,25 +56,31 @@ class ConfigurarCurso extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCurso('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    
-//    public function FiltrarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
     
-//    public function FiltrarCursoEstado($idCurso,$estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarConfigurarCursoSiguienteDisponiblesParaMatricula($nivelActual, $fechaActual, $estadoConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoSiguienteDisponiblesParaMatricula('{$nivelActual}','{$fechaActual}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
-//    
+    public function FiltrarConfigurarCursoPorEstado($estadoConfigurarCurso, $fechaActual){
+    $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorEstado('{$estadoConfigurarCurso}','{$fechaActual}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    return $resultado;
+    }
+    
     public function EliminarConfigurarCurso($idConfigurarCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_EliminarConfigurarCurso('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    
-    public function ModificarEstadoConfigurarCurso($idConfigurarCurso,$estado){
+
+    
+     public function ModificarEstadoConfigurarCurso($idConfigurarCurso,$estado){
         $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoConfigurarCurso('{$idConfigurarCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    
+     public function FiltrarListaHorariosPorCursoYFechaActual($fechaActual,$idCurso, $estadoConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarListaHorariosPorCursoYFechaActual('{$fechaActual}','{$idCurso}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

@@ -20,7 +20,6 @@ function filtrarUsuarioPorIdentificacion(){
             },
             success: function(data){ 
                 if(data.validar == true){
-                    console.log(data.tabla)
                   $("#contenedorDatosPersona").html(data.tabla);
                   $("#idPersonaEncriptado").val(data.idPersonaEncriptado);
                     
@@ -88,7 +87,6 @@ $(function(){
 
         },
         success: function(data){
-            console.log(data)
             if(data.validar==true){
                 limpiarFormIngresarUsuarios();
                 obtenerUsuarios();

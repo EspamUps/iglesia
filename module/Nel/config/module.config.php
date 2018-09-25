@@ -82,8 +82,13 @@ return array(
             'Nel\Controller\Horarios' => 'Nel\Controller\HorariosController',
             'Nel\Controller\RangoAsistencia' => 'Nel\Controller\RangoAsistenciaController',
             'Nel\Controller\ConfigurarCurso' => 'Nel\Controller\ConfigurarCursoController',
+<<<<<<< HEAD
             'Nel\Controller\Certificados' => 'Nel\Controller\CertificadosController',
             
+=======
+            'Nel\Controller\Matriculas' => 'Nel\Controller\MatriculasController',
+
+>>>>>>> origin/master
         ),
     ),
     'view_manager' => array(
