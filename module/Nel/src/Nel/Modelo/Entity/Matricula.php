@@ -33,8 +33,13 @@ class Matricula extends TableGateway
         return $resultado;
     }
     
-    public function FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso, $estadoMatricula){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorConfigurarCurso('{$idConfigurarCurso}','{$estadoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorConfigurarCurso('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso, $estadoMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorConfigurarCursoYEstado('{$idConfigurarCurso}','{$estadoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

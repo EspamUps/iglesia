@@ -20,6 +20,7 @@ use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\HoraHorario;
 use Nel\Modelo\Entity\Horario;
+use Nel\Modelo\Entity\Periodos;
 use Nel\Modelo\Entity\HorarioCurso;
 use Nel\Modelo\Entity\ConfigurarCurso;
 use Zend\Session\Container;
@@ -184,11 +185,8 @@ class MatriculasController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
                         }else{
                             $idCurso=$objMetodos->desencriptar($idCursoEncriptado);
-                            ini_set('date.timezone','America/Bogota'); 
-                            $hoy = getdate();
-                            $fechaActual = $hoy['year']."-".$hoy['mon']."-".$hoy['mday'];                                            
                             
-                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarListaHorariosPorCursoYFechaActual($fechaActual, $idCurso, 1);
+                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarListaHorariosPorCurso($idCurso, 1);
                             
                             if(count($listaConfigurarCurso)==0)
                                 $mensaje = '<div class="alert alert-warning text-center" role="alert">ACTUALMENTE NO EXISTEN HORARIOS HABILITADOS PARA ESTE CURSO</div>';
@@ -276,7 +274,7 @@ class MatriculasController extends AbstractActionController
                                     $horas = $horaInicio.' - '.$horaFin;
                                     $cuerpoTablaHorario = $cuerpoTablaHorario.'<tr class="text-center"><td class="text-center">'.$valueHorarioCurso['nombreDia'].'</td><td>'.$horas.'</td></tr>';
                                 }
-                                $listaMatriculados = $objMatricula->FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso, 1); 
+                                $listaMatriculados = $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso, 1); 
                                 $cuposDisponibles = $listaConfigurarCurso[0]['cupos']-count($listaMatriculados);
                                 
                                 $div = '<h4 class="text-center">INFORMACIÓN GENERAL DEL HORARIO SELECCIONADO</h4>
@@ -338,8 +336,7 @@ class MatriculasController extends AbstractActionController
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
-    
-     public function obtenermatriculasAction()
+    public function obtenermatriculasAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -377,8 +374,7 @@ class MatriculasController extends AbstractActionController
                         if(count($listaConfCurso)==0)
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CONFIGURAR CURSO EN EL SISTEMA</div>';
                         else{                            
-                            $listaMatricula = $objMatricula->FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso, 1);
-                            
+                            $listaMatricula = $objMatricula->FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso);
                             if(count($listaMatricula)==0)
                             {
                                $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO TIENE ESTUDIANTES MATRICULADOS</div>';
@@ -387,6 +383,71 @@ class MatriculasController extends AbstractActionController
                                 $mensaje = '';
                                 $validar = TRUE;
                                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                            } 
+                        }
+                    }                   
+                }                    
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function obtenercursosAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
+            $objMetodos = new Metodos();
+            $objPeriodo = new Periodos($this->dbAdapter);
+            $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    
+                    $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                    $idPeriodoEncriptado = $post['id'];
+                    
+                    if(empty($idPeriodoEncriptado) || $idPeriodoEncriptado == NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DEL PERIODO VACÍO</div>';
+                    }else{
+                        $idPeriodo = $objMetodos->desencriptar($idPeriodoEncriptado);
+                        $listaPeriodo = $objPeriodo->FiltrarPeriodo($idPeriodo);
+                        if(count($listaPeriodo)==0)
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL PERIODO EN EL SISTEMA</div>';
+                        else{                            
+                            $listaCursos = $objConfigurarCurso->FiltrarConfigurarCursoPorPeriodo($idPeriodo);
+                            if(count($listaCursos)==0)
+                            {
+                               $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE PERIODO NO TIENE CURSOS HABILITADOS</div>';
+                            }else{
+                                $optionCurso = '<option value="0">SELECCIONE UN CURSO</option>';
+                                foreach ($listaCursos as $valueC) {
+                                    $idCursoEncriptado = $objMetodos->encriptar($valueC['idCurso']);
+                                    $optionCurso = $optionCurso.'<option value="'.$idCursoEncriptado.'">'.$valueC['nombreCurso'].'</option>';
+                                }
+                                
+                                $select = '<label for="selectCurso">CURSO</label><select onchange="filtrarlistaHorariosCursoSeleccionado();"  id="selectCurso" name="selectCurso" class="form-control">'.$optionCurso.'</select>';
+                                                
+                                
+                                $mensaje = '';
+                                $validar = TRUE;
+                                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'select'=>$select));
                             } 
                         }
                     }                   
@@ -406,9 +467,9 @@ class MatriculasController extends AbstractActionController
             
             $botonCambiarEstadoMatricula = '';
                         
-//            if($value['estadoMatricula']==0)
-//            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="HABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
-//            else
+            if($value['estadoMatricula']==0)
+            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="HABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+            else
             $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatriucla'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['segundoApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
        
             $identificacionEstudiante = $value['identificacion'];

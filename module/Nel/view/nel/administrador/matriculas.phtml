@@ -2,7 +2,7 @@
 //estas librerias php son llamadas ya que contienen los metodos ajax para obtener y envias
 //datos al respectivo controlador
 $validacionPrivilegio = $this->validacionPrivilegio;
-$optionCurso = $this->optionCurso;
+$optionPeriodo = $this->optionPeriodo;
 include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/matriculas/matriculas.php');
 
  ?>
@@ -25,13 +25,14 @@ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/matric
                    
                     <div class="col-lg-12 ">
                         <div id="mensajeContenedorHorario"></div>
-                        <div class="form-group col-lg-6" id="contenedorDatosMatricula">
-                            <label for="selectConfigurarCurso">CURSO</label>
-                            <select onchange="filtrarlistaHorariosCursoSeleccionado();" class="form-control" id="selectCurso" name="selectCurso">
-                            <?php echo $optionCurso;?>
+                        <div class="form-group col-lg-4" id="contenedorDatosMatricula">
+                            <label for="selectPeriodo">PERIODO</label>
+                            <select onchange="filtrarlistaCursosPorPeriodoSeleccionado();" class="form-control" id="selectPeriodo" name="selectPeriodo">
+                            <?php echo $optionPeriodo;?>
                             </select>
                         </div>  
-                        <div class="form-group col-lg-6" id="contenedorlistahorarios"> </div>
+                        <div class="form-group col-lg-4" id="contenedorlistacursos"> </div>
+                        <div class="form-group col-lg-4" id="contenedorlistahorarios"> </div>
                         <div class="form-group col-lg-6" id="contenedorInfoGeneralHorarioSeleccionado"> </div>
                         <div class="form-group col-lg-6" id="contenedorHorarioSeleccionado" >                       
                         </div> 

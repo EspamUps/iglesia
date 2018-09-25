@@ -16,9 +16,7 @@ use Nel\Metodos\MetodosControladores;
 use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
-use Nel\Modelo\Entity\ConfigurarCurso;
 use Nel\Modelo\Entity\Periodos;
-use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\Docentes;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\Provincias;
@@ -496,7 +494,7 @@ class AdministradorController extends AbstractActionController
         }else{
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
-            $objCurso = new Cursos($this->dbAdapter);
+            $objPerido = new Periodos($this->dbAdapter);
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
             $objMetodos = new Metodos();
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
@@ -505,17 +503,17 @@ class AdministradorController extends AbstractActionController
             else {       
                 $objMetodosC = new MetodosControladores();
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 14, 3);
-                $listaCursos = $objCurso->ObtenerCursosEstado(1);
-                $optionCurso = '<option value="0">SELECCIONE UN CURSO</option>';
-                foreach ($listaCursos as $valueC) {
-                    $idCursoEncriptado = $objMetodos->encriptar($valueC['idCurso']);
-                    $optionCurso = $optionCurso.'<option value="'.$idCursoEncriptado.'">'.$valueC['nombreCurso'].'</option>';
+                $listaPeriodo = $objPerido->ObtenerPeriodosEstado(1);
+                $optionPeriodo = '<option value="0">SELECCIONE UN PERIODO</option>';
+                foreach ($listaPeriodo as $valueP) {
+                    $idPeriodoEncriptado = $objMetodos->encriptar($valueP['idPeriodo']);
+                    $optionPeriodo = $optionPeriodo.'<option value="'.$idPeriodoEncriptado.'">'.$valueP['nombrePeriodo'].'</option>';
                 }
                 
                 
                 $array = array(
                     'validacionPrivilegio' =>  $validarprivilegio,
-                    'optionCurso' => $optionCurso
+                    'optionPeriodo' => $optionPeriodo
                 );
             }
         }

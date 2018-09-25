@@ -27,6 +27,11 @@ class ConfigurarCurso extends TableGateway
         return $resultado;
     }
     
+     public function FiltrarConfigurarCursoPorPeriodo($idPeriodo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorPeriodo('{$idPeriodo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function FiltrarConfigurarCursoPorDocenteLimit1($idDocente){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarCursoPorDocenteLimit1('{$idDocente}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -81,6 +86,11 @@ class ConfigurarCurso extends TableGateway
     
      public function FiltrarListaHorariosPorCursoYFechaActual($fechaActual,$idCurso, $estadoConfigurarCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarListaHorariosPorCursoYFechaActual('{$fechaActual}','{$idCurso}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+     public function FiltrarListaHorariosPorCurso($idCurso, $estadoConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarListaHorariosPorCurso('{$idCurso}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

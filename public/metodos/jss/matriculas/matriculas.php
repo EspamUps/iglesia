@@ -238,6 +238,73 @@ function filtrarlistaHorariosCursoSeleccionado(){
     }
 } 
 
+function filtrarlistaCursosPorPeriodoSeleccionado(){
+    var url = $("#rutaBase").text();
+    var idPeriodo = $("#selectPeriodo").val();
+
+    if(idPeriodo == 0){
+        $("#contenedorHorarioSeleccionado").html('');
+        $("#contenedorlistacursos").html('');
+        $("#contenedorlistahorarios").html('');
+        $("#contenedorInfoGeneralHorarioSeleccionado").html("");
+    }else{
+        $.ajax({
+            url : url+'/matriculas/obtenercursos',
+            type: 'post',
+            dataType: 'JSON',
+            data: {id:idPeriodo},
+            beforeSend: function(){
+                cargandoMatriculas("#contenedorlistahorarios");
+                $("#mensajeContenedorHorario").html('');
+                $("#contenedorlistahorarios").html('');
+                $("#contenedorlistacursos").html("");
+                $("#contenedorHorarioSeleccionado").html('');
+                $("#contenedorInfoGeneralHorarioSeleccionado").html("");
+                $("#mensajeTablaMatriculasActuales").html('');
+                $("#contenedorTablaMatriculasActuales").html('');
+            },
+            uploadProgress: function(event,position,total,percentComplete){
+
+            },
+            success: function(data){ 
+                if(data.validar == true)
+                {               
+                     $("#contenedorlistacursos").html(data.select);
+                     $("#contenedorlistahorarios").html("");
+                     $("#contenedorInfoGeneralHorarioSeleccionado").html('');
+                     $("#contenedorHorarioSeleccionado").html('');   
+                }else{
+                     $("#contenedorlistacursos").html('');
+                }
+                $("#mensajeContenedorHorario").html(data.mensaje);
+            },
+            complete: function(){
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                $("#contenedorlistacursos").html('');
+                if(xhr.status === 0){
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                }else if(xhr.status == 404){
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                }else if(xhr.status == 500){
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                }else if(errorThrown === 'parsererror'){
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                }else if(errorThrown === 'timeout'){
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                }else if(errorThrown === 'abort'){
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                }else{
+                    $("#mensajeContenedorHorario").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        }); 
+    }
+} 
+
+
+
+
 
 function filtrarHorarioCursoSeleccionado(){
     var url = $("#rutaBase").text();
