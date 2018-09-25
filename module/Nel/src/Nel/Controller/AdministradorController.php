@@ -477,18 +477,45 @@ class AdministradorController extends AbstractActionController
             else {       
                 $objMetodosC = new MetodosControladores();
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 7, 3);
-//                $objProvincias = new Provincias($this->dbAdapter);
-//                $objMetodos = new Metodos();
-//
-//                $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
-//                $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-//                foreach ($listaProvincias as $valueProvincias) {
-//                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-//                    $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
-//                }
+
                 $array = array(
-//                    'optionSelectProvincias'=>$optionSelectProvincias,
                     'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+        }
+        return new ViewModel($array);
+    }
+    
+    public function matriculasAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objCurso = new Cursos($this->dbAdapter);
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objMetodos = new Metodos();
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {       
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 14, 3);
+                $listaCursos = $objCurso->ObtenerCursosEstado(1);
+                $optionCurso = '<option value="0">SELECCIONE UN CURSO</option>';
+                foreach ($listaCursos as $valueC) {
+                    $idCursoEncriptado = $objMetodos->encriptar($valueC['idCurso']);
+                    $optionCurso = $optionCurso.'<option value="'.$idCursoEncriptado.'">'.$valueC['nombreCurso'].'</option>';
+                }
+                
+                
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio,
+                    'optionCurso' => $optionCurso
                 );
             }
         }

@@ -17,70 +17,28 @@ class Matricula extends TableGateway
     {
         return parent::__construct('matricula', $adapter, $databaseSchema, $selectResultPrototype);
     }
-    
-//    
-//    public function ObtenerDias(){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerDias()", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function ObtenerCursosEstado($estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+
     public function FiltrarMatriculaPorConfigurarCursoLimit1($idConfigurarCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorConfigurarCursoLimit1('{$idConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-////    
-//    public function FiltrarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function FiltrarCursoEstado($idCurso,$estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-////    
-//    public function EliminarCurso($idCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function ModificarEstadoCurso($idCurso,$estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoCurso('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
     
-//    
-//    
-//    
-//    public function FiltrarPersona($idPersona){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function FiltrarPersonaPorIdentificacion($identificacion){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//
-//    
-//    public function EliminarLugarMisa($idLugarMisa){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarLugarMisa('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarMatriculaPorPersonaPorEstado($idPersona, $estadoMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorPersonaPorEstado('{$idPersona}','{$estadoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function IngresarMatricula($idPersona, $idConfigurarCurso, $fechaMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarMatricula('{$idPersona}','{$idConfigurarCurso}','{$fechaMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso, $estadoMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorConfigurarCurso('{$idConfigurarCurso}','{$estadoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
     
-   
-
 
 
 }

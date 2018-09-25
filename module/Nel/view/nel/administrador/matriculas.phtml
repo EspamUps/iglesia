@@ -1,0 +1,77 @@
+<?php
+//estas librerias php son llamadas ya que contienen los metodos ajax para obtener y envias
+//datos al respectivo controlador
+$validacionPrivilegio = $this->validacionPrivilegio;
+$optionCurso = $this->optionCurso;
+include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/matriculas/matriculas.php');
+
+ ?>
+
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Matrículas
+            <small>SWGP</small>
+        </h1>
+    </section>
+    
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoMatricula(this)" id="formIngresoMatricula" method="post" action="<?php echo $this->basePath();?>/matriculas/ingresarmatricula">
+                   
+                    <div class="col-lg-12 ">
+                        <div id="mensajeContenedorHorario"></div>
+                        <div class="form-group col-lg-6" id="contenedorDatosMatricula">
+                            <label for="selectConfigurarCurso">CURSO</label>
+                            <select onchange="filtrarlistaHorariosCursoSeleccionado();" class="form-control" id="selectCurso" name="selectCurso">
+                            <?php echo $optionCurso;?>
+                            </select>
+                        </div>  
+                        <div class="form-group col-lg-6" id="contenedorlistahorarios"> </div>
+                        <div class="form-group col-lg-6" id="contenedorInfoGeneralHorarioSeleccionado"> </div>
+                        <div class="form-group col-lg-6" id="contenedorHorarioSeleccionado" >                       
+                        </div> 
+                    </div>
+                            <?php
+                            if($validacionPrivilegio==true)
+                            {
+                            ?>
+<!--                        <div id="mensajeFormIngresoMatricula"> </div>
+                        <div class="form-group col-lg-4">
+                                <label for="identificacion">IDENTIFICACIÓN DE LA PERSONA</label>
+                                <input onkeyup="filtrarUsuarioPorIdentificacionEnMatricula(event);" onkeydown="validarNumeros('identificacion');" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
+                    
+                        </div>-->
+                        <?php } ?>
+                   
+                </form> 
+            </div>
+        </div>
+    </section>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row">
+                <div id="mensajeTablaMatriculasActuales">
+                    
+                </div>
+                
+                <div  class="col-lg-12" id="contenedorTablaMatriculasActuales">
+                 
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+   
+</div>
+<script type="text/javascript">
+
+</script>
+
+
