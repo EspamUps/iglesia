@@ -28,6 +28,11 @@ class Matricula extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarMatriculaPorPersona($idPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatriculaPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     public function IngresarMatricula($idPersona, $idConfigurarCurso, $fechaMatricula){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarMatricula('{$idPersona}','{$idConfigurarCurso}','{$fechaMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

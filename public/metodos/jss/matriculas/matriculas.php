@@ -1,43 +1,38 @@
 <script>
 
 
-function filtrarUsuarioPorIdentificacionEnMatricula(){
+function filtrarUsuarioPorIdentificacionEnMatricula(event){
     var url = $("#rutaBase").text();
     var identificacion = $("#identificacion").val();
+    var idConfCurso = $("#selectConfigurarCurso").val();
     if(identificacion.length < 10){
         $("#mensajeFormIngresoMatricula").html('');
-        $("#contenedorDatosMatricula").html('');
-        $("#contenedorHorarioSeleccionado").html('');
-        $("#contenedorlistahorarios").html('');
     }else{
         $.ajax({
             url : url+'/matriculas/filtrarpersonaporidentificacion',
             type: 'post',
             dataType: 'JSON',
-            data: {identificacion:identificacion},
+            data: {identificacion:identificacion, idConfCurso:idConfCurso},
             beforeSend: function(){
                 $("#mensajeFormIngresoMatricula").html('');
-                $("#idPersonaEncriptado").val('0');
-                cargandoMatriculas('#mensajeFormIngresoMatricula');
+                cargandoMatriculas('#contenedorDatosEstudianteParaMatricular');
             },
             uploadProgress: function(event,position,total,percentComplete){
             },
             success: function(data){ 
                 if(data.validar == true){
-                  $("#contenedorDatosMatricula").html(data.tabla);
-                  $("#idPersonaEncriptado").val(data.idPersonaEncriptado);
-                    
+                  $("#mensajeFormIngresoMatricula").html(data.mensaje);
+                  $("#contenedorDatosEstudianteParaMatricular").html(data.tabla);
+                  $("#botonMatricular").html(data.btnMatricular);
                 }else{
-                    $("#contenedorDatosPersona").html('');
-                    $("#idPersonaEncriptado").val('0');
+                    $("#contenedorDatosEstudianteParaMatricular").html('');
                 }
                 $("#mensajeFormIngresoMatricula").html(data.mensaje);
             },
             complete: function(){
             },
             error: function(xhr, textStatus, errorThrown) {
-                $("#idPersonaEncriptado").val('0');
-                $("#contenedorDatosMatricula").html('');
+                $("#contenedorDatosEstudianteParaMatricular").html('');
                 if(xhr.status === 0){
                     $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
                 }else if(xhr.status == 404){
@@ -71,6 +66,60 @@ function seleccionarFila(ID)
     menues2.css({ 'cursor': 'pointer' });
     $("#filaTablaMatriculas" + ID + " td").removeAttr("style");
     $("#filaTablaMatriculas" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
+}
+
+function cargarFormularioIngresarMatricula()
+{
+    var url = $("#rutaBase").text();
+    var idConfCurso = $("#selectConfigurarCurso").val();
+
+    if(idConfCurso == 0){
+        $("#contenedorHorarioSeleccionado").html('');
+        $("#contenedorlistahorarios").html('');
+        $("#contenedorInfoGeneralHorarioSeleccionado").html("");
+    }else{
+        $.ajax({
+            url : url+'/matriculas/cargarformularioingreso',
+            type: 'post',
+            dataType: 'JSON',
+            data: {id:idConfCurso},
+            beforeSend: function(){
+            },
+            uploadProgress: function(event,position,total,percentComplete){
+
+            },
+            success: function(data){ 
+                if(data.validar == true)
+                { 
+                    cargandoMatriculas("#contenedorFormIngresoMatricula");           
+                    $("#contenedorFormIngresoMatricula").html(data.div);
+                               
+                }else{
+                     $("#mensajeFormIngresoMatricula").html(data.mensaje);
+                }
+            },
+            complete: function(){
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                $("#contenedorFormIngresoMatricula").html('');
+                if(xhr.status === 0){
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                }else if(xhr.status == 404){
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                }else if(xhr.status == 500){
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                }else if(errorThrown === 'parsererror'){
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                }else if(errorThrown === 'timeout'){
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                }else if(errorThrown === 'abort'){
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                }else{
+                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        }); 
+    }
 }
 
 
@@ -181,9 +230,14 @@ function filtrarlistaHorariosCursoSeleccionado(){
     var idCurso = $("#selectCurso").val();
 
     if(idCurso == 0){
-        $("#contenedorHorarioSeleccionado").html('');
-        $("#contenedorlistahorarios").html('');
+        $("#contenedorHorarioSeleccionado").html("");
+        $("#contenedorlistahorarios").html("");
         $("#contenedorInfoGeneralHorarioSeleccionado").html("");
+        $("#mensajeTablaMatriculasActuales").html("");
+        $("#contenedorTablaMatriculasActuales").html("");
+        $("#mensajeFormIngresoMatricula").html("");
+        $("#contenedorFormIngresoMatricula").html("");
+        $("#contenedorDatosEstudianteParaMatricular").html("");
     }else{
         $.ajax({
             url : url+'/matriculas/obtenerhorarios',
@@ -192,12 +246,15 @@ function filtrarlistaHorariosCursoSeleccionado(){
             data: {id:idCurso},
             beforeSend: function(){
                 cargandoMatriculas("#contenedorlistahorarios");
-                $("#mensajeContenedorHorario").html('');
+                $("#mensajeContenedorHorario").html("");
                 $("#contenedorlistahorarios").html("");
-                $("#contenedorHorarioSeleccionado").html('');
+                $("#contenedorHorarioSeleccionado").html("");
                 $("#contenedorInfoGeneralHorarioSeleccionado").html("");
-                $("#mensajeTablaMatriculasActuales").html('');
-                $("#contenedorTablaMatriculasActuales").html('');
+                $("#mensajeTablaMatriculasActuales").html("");
+                $("#contenedorTablaMatriculasActuales").html("");
+                $("#mensajeFormIngresoMatricula").html("");
+                $("#contenedorFormIngresoMatricula").html("");
+                $("#contenedorDatosEstudianteParaMatricular").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
 
@@ -243,10 +300,15 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
     var idPeriodo = $("#selectPeriodo").val();
 
     if(idPeriodo == 0){
-        $("#contenedorHorarioSeleccionado").html('');
+       
         $("#contenedorlistacursos").html('');
         $("#contenedorlistahorarios").html('');
         $("#contenedorInfoGeneralHorarioSeleccionado").html("");
+        $("#contenedorHorarioSeleccionado").html("");
+        $("#mensajeFormIngresoMatricula").html("");
+        $("#contenedorFormIngresoMatricula").html("");
+        $("#contenedorDatosEstudianteParaMatricular").html("");
+        
     }else{
         $.ajax({
             url : url+'/matriculas/obtenercursos',
@@ -255,13 +317,14 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
             data: {id:idPeriodo},
             beforeSend: function(){
                 cargandoMatriculas("#contenedorlistahorarios");
-                $("#mensajeContenedorHorario").html('');
-                $("#contenedorlistahorarios").html('');
+                $("#mensajeContenedorHorario").html("");
+                $("#contenedorlistahorarios").html("");
                 $("#contenedorlistacursos").html("");
-                $("#contenedorHorarioSeleccionado").html('');
+                $("#contenedorHorarioSeleccionado").html("");
                 $("#contenedorInfoGeneralHorarioSeleccionado").html("");
-                $("#mensajeTablaMatriculasActuales").html('');
-                $("#contenedorTablaMatriculasActuales").html('');
+                $("#mensajeTablaMatriculasActuales").html("");
+                $("#contenedorTablaMatriculasActuales").html("");
+                $("#contenedorDatosEstudianteParaMatricular").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
 
@@ -272,7 +335,10 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
                      $("#contenedorlistacursos").html(data.select);
                      $("#contenedorlistahorarios").html("");
                      $("#contenedorInfoGeneralHorarioSeleccionado").html('');
-                     $("#contenedorHorarioSeleccionado").html('');   
+                     $("#contenedorHorarioSeleccionado").html(""); 
+                     $("#mensajeFormIngresoMatricula").html("");
+                     $("#contenedorFormIngresoMatricula").html("");
+                      $("#contenedorDatosEstudianteParaMatricular").html("");
                 }else{
                      $("#contenedorlistacursos").html('');
                 }
@@ -310,8 +376,11 @@ function filtrarHorarioCursoSeleccionado(){
     var url = $("#rutaBase").text();
     var idConfCurso = $("#selectConfigurarCurso").val();
     if(idConfCurso == 0){
-        $("#mensajeContenedorHorario").html('');
-        $("#contenedorHorarioSeleccionado").html('');
+        $("#mensajeContenedorHorario").html("");
+        $("#contenedorHorarioSeleccionado").html("");
+        $("#mensajeFormIngresoMatricula").html("");
+        $("#contenedorFormIngresoMatricula").html("");
+        $("#contenedorDatosEstudianteParaMatricular").html("");
     }else{
         $.ajax({
             url : url+'/matriculas/filtrardatoshorario',
@@ -321,8 +390,13 @@ function filtrarHorarioCursoSeleccionado(){
             beforeSend: function(){
                 cargandoMatriculas("#contenedorHorarioSeleccionado");
                 cargandoMatriculas("#contenedorInfoGeneralHorarioSeleccionado");
-                $("#mensajeContenedorHorario").html('');
-                $("#mensajeContenedorHorario").html('');
+                $("#mensajeContenedorHorario").html("");
+                $("#mensajeFormIngresoMatricula").html("");
+                $("#contenedorFormIngresoMatricula").html("");
+                $("#contenedorDatosEstudianteParaMatricular").html("");
+                $("#mensajeFormIngresoMatricula").html("");
+                $("#contenedorFormIngresoMatricula").html("");
+                
             },
             uploadProgress: function(event,position,total,percentComplete){
 
@@ -335,7 +409,6 @@ function filtrarHorarioCursoSeleccionado(){
                 }else{
                      $("#contenedorHorarioSeleccionado").html('');
                 }
-                console.log(data)
                 $("#mensajeContenedorHorario").html(data.mensaje);
             },
             complete: function(){
@@ -372,12 +445,9 @@ function validarIngresoMatricula(f){
 
 function limpiarFormIngresoMatriculas()
 {
-    $('#formIngresoUsuario').each(function () {
-        this.reset();
-    });
-    $("#contenedorDatosMatricula").html('');
-    $("#contenedorHorarioSeleccionado").html('');
-    $("#contenedorlistahorarios").html('');
+    $('input[id="identificacion"]').val('');
+    $("#botonMatricular").html('');
+    $("#contenedorDatosEstudianteParaMatricular").html('');
     
     setTimeout(function() {$("#mensajeFormIngresoMatricula").html('');},1500);
 }
@@ -394,6 +464,7 @@ $(function(){
         success: function(data){
             if(data.validar==true){
                 limpiarFormIngresoMatriculas();
+                obtenerMatriculas();
             }
             $("#btnGuardarMatricula").button('reset');
             $("#mensajeFormIngresoMatricula").html(data.mensaje);

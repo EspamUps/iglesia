@@ -1,7 +1,6 @@
 <?php
 //estas librerias php son llamadas ya que contienen los metodos ajax para obtener y envias
 //datos al respectivo controlador
-$validacionPrivilegio = $this->validacionPrivilegio;
 $optionPeriodo = $this->optionPeriodo;
 include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/matriculas/matriculas.php');
 
@@ -35,19 +34,15 @@ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/matric
                         <div class="form-group col-lg-4" id="contenedorlistahorarios"> </div>
                         <div class="form-group col-lg-6" id="contenedorInfoGeneralHorarioSeleccionado"> </div>
                         <div class="form-group col-lg-6" id="contenedorHorarioSeleccionado" >                       
-                        </div> 
+                        </div>  
                     </div>
-                            <?php
-                            if($validacionPrivilegio==true)
-                            {
-                            ?>
-<!--                        <div id="mensajeFormIngresoMatricula"> </div>
-                        <div class="form-group col-lg-4">
-                                <label for="identificacion">IDENTIFICACIÓN DE LA PERSONA</label>
-                                <input onkeyup="filtrarUsuarioPorIdentificacionEnMatricula(event);" onkeydown="validarNumeros('identificacion');" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
-                    
-                        </div>-->
-                        <?php } ?>
+                     <div class="col-lg-12 ">
+                        <div id="mensajeFormIngresoMatricula"> </div>
+                        <div class="form-group col-lg-4" id="contenedorFormIngresoMatricula">                                    
+                        </div>
+                        <div class="form-group col-lg-12" id="contenedorDatosEstudianteParaMatricular">  </div>
+                        <div id="botonMatricular">                        </div>
+                     </div>  
                    
                 </form> 
             </div>

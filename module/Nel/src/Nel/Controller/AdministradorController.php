@@ -18,6 +18,7 @@ use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Periodos;
 use Nel\Modelo\Entity\Docentes;
+use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\Misas;
 use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
