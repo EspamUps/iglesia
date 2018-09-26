@@ -6,7 +6,9 @@ function filtrarUsuarioPorIdentificacionEnMatricula(event){
     var identificacion = $("#identificacion").val();
     var idConfCurso = $("#selectConfigurarCurso").val();
     if(identificacion.length < 10){
-        $("#mensajeFormIngresoMatricula").html('');
+        $("#mensajeFormIngresoMatricula").html("");
+        $("#contenedorDatosEstudianteParaMatricular").html("");
+        $("#botonMatricular").html("");
     }else{
         $.ajax({
             url : url+'/matriculas/filtrarpersonaporidentificacion',
@@ -446,8 +448,8 @@ function validarIngresoMatricula(f){
 function limpiarFormIngresoMatriculas()
 {
     $('input[id="identificacion"]').val('');
-    $("#botonMatricular").html('');
-    $("#contenedorDatosEstudianteParaMatricular").html('');
+    $("#botonMatricular").html("");
+    $("#contenedorDatosEstudianteParaMatricular").html("");
     
     setTimeout(function() {$("#mensajeFormIngresoMatricula").html('');},1500);
 }
@@ -487,6 +489,94 @@ $(function(){
                 $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
             }else{
                 $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
+
+function obtenerFormularioModificarEstadoMatricula(id,i,j){
+    var url = $("#rutaBase").text();
+    $.ajax({
+        url : url+'/matriculas/obtenerFormularioModificarEstadoMatricula',
+        type: 'post',
+        dataType: 'JSON',
+        data: {id:id, i:i,j:j},
+        beforeSend: function(){
+            $("#mensajeModificarEstadoMatricula").html("");
+            cargandoMatriculas("#contenedorModificarEstadoMatricula");
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+        },
+        success: function(data){  
+     
+            if(data.validar == true){
+                $("#contenedorModificarEstadoMatricula").html(data.tabla);
+               
+            }else{
+                $("#contenedorModificarEstadoMatricula").html("");
+            }
+            $("#mensajeModificarEstadoMatricula").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#contenedorModificarEstadoMatricula").html("");
+            if(xhr.status === 0){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    }); 
+}
+
+
+$(function(){
+    $("#contenedorModificarEstadoMatricula").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeModificarEstadoMatricula").html('');
+            $("#btnModificarEstadoMatricula").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){console.log(data)
+            if(data.validar==true){
+                var table = $('#tablaMatriculas').DataTable();
+                table.row(data.i).data(data.tabla[data.i]).draw();
+                obtenerFormularioModificarEstadoMatricula(data.idMatricula, data.i, data.j);
+            }
+            $("#btnModificarEstadoMatricula").button('reset');
+            $("#mensajeModificarEstadoMatricula").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnModificarEstadoMatricula").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
             }
         }
     });    

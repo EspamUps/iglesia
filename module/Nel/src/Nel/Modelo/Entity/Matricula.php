@@ -48,6 +48,16 @@ class Matricula extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarMatricula($idMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatricula('{$idMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function ModificarEstadoMatricula($idMatricula, $estadoMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoMatricula('{$idMatricula}','{$estadoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
     
 
 

@@ -127,7 +127,7 @@ class MatriculasController extends AbstractActionController
                                                    else if($listaMatricula[0]['aprobado']==0 && $listaMatricula[0]['fechaFin']>$fechaActual)
                                                     $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN ESTE CURSO PERO CON OTRO HORARIO. </div>';
                                                    else {
-                                                       $mensaje = '<div class="alert alert-success text-center" role="alert">POR FAVOR COMPLETE EL FORMULARIO PARA PROCEDER CON LA MATRÍCULA DE LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' . </div>';
+                                                       $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
                                                        $matricular=true;
                                                     }
                                                 else if ($listaMatricula[0]['nivelCurso']>$listaConfigurarCurso[0]['nivelCurso'])
@@ -138,17 +138,17 @@ class MatriculasController extends AbstractActionController
                                                 else 
                                                     if($listaMatricula[0]['aprobado']==0)
                                                         $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA SIDO MATRICULADA EN UN CURSO INFERIOR Y DEBE APROBARLO PRIMERO. </div>';
-                                                    else{
-                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">POR FAVOR COMPLETE EL FORMULARIO PARA PROCEDER CON LA MATRÍCULA DE LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' . </div>';
+                                                    else{                                                        
+                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
                                                         $matricular=true;
-                                                    }
-                                                 
-                                            }
-                                        }                                                    
-                                        else{
+                                                    }                                                 
+                                                }
+                                        }else{
 
                                            $nivelCursoActual ='No tiene cursos registrados en esta iglesia';
                                            $estadoCursoActual='Sin estado';
+                                           $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
+                                           $matricular=true;
                                         }
 
                                         $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
@@ -235,12 +235,13 @@ class MatriculasController extends AbstractActionController
                             
                             if(count($listaConfigurarCurso)==0)
                                 $mensaje = '<div class="alert alert-warning text-center" role="alert">ACTUALMENTE NO EXISTEN HORARIOS HABILITADOS PARA ESTE CURSO</div>';
-                            else{                                
+                            else{      
+                                $contador =1;
                                 $optionHorarios = '<option value="0">SELECCIONE UN HORARIO</option>';
                                 foreach ($listaConfigurarCurso as $valueCC) {
                                     $idConfigurarCursoEncriptado = $objMetodos->encriptar($valueCC['idConfigurarCurso']);
-                                    $optionHorarios = $optionHorarios.'<option value="'.$idConfigurarCursoEncriptado.'">Horario#'.$valueCC['idConfigurarCurso'].'</option>';
-
+                                    $optionHorarios = $optionHorarios.'<option value="'.$idConfigurarCursoEncriptado.'">Horario#'.$contador.'</option>';
+                                    $contador++;
                                 }
 
                                 $div = '<label for="selectConfigurarCurso">HORARIO</label>
@@ -519,7 +520,7 @@ class MatriculasController extends AbstractActionController
             if($value['estadoMatricula']==0)
             $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="HABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             else
-            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatriucla'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['segundoApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
        
             $identificacionEstudiante = $value['identificacion'];
             $nombresEstudiante = $value['primerNombre'].' '.$value['segundoNombre'];
@@ -690,7 +691,7 @@ class MatriculasController extends AbstractActionController
                                         if(count($res)==0)
                                             $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR, NO SE PUDO INGRESAR AL USUARIO</div>';
                                         else{
-                                            $mensaje = '<div class="alert alert-success text-center" role="alert">USUARIO INGRESADO CORRECTAMENTE</div>';
+                                            $mensaje = '<div class="alert alert-success text-center" role="alert">MATRICULA FINALIZADA CON ÉXITO</div>';
                                             $validar = TRUE;
                                         }
                                     }
@@ -701,6 +702,154 @@ class MatriculasController extends AbstractActionController
                 }
             }
         }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+     public function obtenerformulariomodificarestadomatriculaAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else{
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{               
+                    $objMetodos = new Metodos();
+                    $objMatricula = new Matricula($this->dbAdapter);
+                    $post = array_merge_recursive(
+                        $request->getPost()->toArray(),
+                        $request->getFiles()->toArray()
+                    );
+
+                    $idMatriculaEncriptado = $post['id'];
+                    $i = $post['i'];
+                    $j = $post['j'];
+                    if($idMatriculaEncriptado == NULL || $idMatriculaEncriptado == "" ){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA MATRICULA</div>';
+                    }else if(!is_numeric($i)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else if(!is_numeric($j)){
+                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL IDENTIFICADOR DE LA FILA DEBE SER UN NÚMERO</div>';
+                    }else{
+                        $idMatricula = $objMetodos->desencriptar($idMatriculaEncriptado); 
+                        $listaMatricula = $objMatricula->FiltrarMatricula($idMatricula);
+                        if(count($listaMatricula) == 0){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MATRÍCULA SELECCIONADA NO EXISTE EN NUESTRA BASE DE DATOS</div>';
+                        }else{
+                            
+                            
+                            $tabla = '';
+                            if($listaMatricula[0]['estadoMatricula']==1){
+                            $tabla = '<div class="form-group col-lg-12">
+                                    <input type="hidden" value="'.$i.'" id="i" name="i">
+                                    <input type="hidden" value="'.$j.'" id="j" name="j">
+                                    <input type="hidden" value="'.$idMatriculaEncriptado.'" name="idMatriculaEncriptado" id="idMatriculaEncriptado">
+                                    <h4>Usted está a punto de deshabilitar la matrícula del estudiante: '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
+              
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <button data-loading-text="DESHABILITANDO..." id="btnModificarEstadoMatricula" type="submit" class="btn btn-danger pull-right"><i class="fa fa-ban"></i> DESHABILITAR MATRÍCULA</button>
+                                 </div>
+                                ';
+                            }else{                            
+                            
+                                $tabla = '<div class="form-group col-lg-12">
+                                    <input type="hidden" value="'.$i.'" id="i" name="i">
+                                    <input type="hidden" value="'.$j.'" id="j" name="j">
+                                    <input type="hidden" value="'.$idMatriculaEncriptado.'" name="idMatriculaEncriptado" id="idMatriculaEncriptado">
+                                    <h4>Usted está a punto de habilitar la matrícula del estudiante: '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
+              
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <button data-loading-text="HABILITANDO..." id="btnModificarEstadoMatricula" type="submit" class="btn btn-success pull-right"><i class="fa fa-check"></i> HABILITAR MATRÍCULA</button>
+                                 </div>
+                                ';
+                            }
+                            $mensaje = '';
+                            $validar = TRUE;
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                        }
+                    }
+
+                }  
+            }
+        }
+        
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    public function modificarestadomatriculaAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 14, 1);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS PARA MODIFICAR EN ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objMatricula = new Matricula($this->dbAdapter);                        
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idMatriculaEncriptado = $post['idMatriculaEncriptado'];
+                        $i = $post['i'];
+                        $j = $post['j'];
+                            
+                        $idMatricula= $objMetodos->desencriptar($idMatriculaEncriptado);
+                        $listaMatricula = $objMatricula->FiltrarMatricula($idMatricula);
+                        if(count($listaMatricula)>0)
+                        {
+                                $estadoMatricula = 0;
+                                if($listaMatricula[0]['estadoMatricula']==0)
+                                    $estadoMatricula=1;
+                                
+                                $resultado= $objMatricula->ModificarEstadoMatricula($idMatricula, $estadoMatricula);
+                                if(count($resultado) == 0){                                    
+                                   $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ, POR FAVOR INTENTE MÁS TARDE</div>';
+                                }else{
+                                    $tablaMatricula = $this->CargarTablaMatriculasAction($listaMatricula, $i, $j);
+
+                                    $mensaje = '<div class="alert alert-success text-center" role="alert">SE CAMBIÓ EL ESTADO DE LA MATRÍCULA</div>';
+                                    $validar = TRUE;
+
+                                    return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'j'=>$j,'i'=>$i,'mensaje'=>$mensaje,'validar'=>$validar));
+                                }
+                        }
+                    }   
+                }
+            }
+        }
+        
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     

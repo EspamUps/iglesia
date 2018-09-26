@@ -24,7 +24,6 @@ use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
 use Nel\Modelo\Entity\DireccionLugarMisa;
 use Nel\Modelo\Entity\RangoAsistencia;
-use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\Sacerdotes;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
