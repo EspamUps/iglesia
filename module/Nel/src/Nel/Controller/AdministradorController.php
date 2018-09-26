@@ -23,6 +23,7 @@ use Nel\Modelo\Entity\Provincias;
 use Nel\Modelo\Entity\LugaresMisa;
 use Nel\Modelo\Entity\DireccionLugarMisa;
 use Nel\Modelo\Entity\RangoAsistencia;
+use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\Sacerdotes;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
@@ -50,32 +51,12 @@ class AdministradorController extends AbstractActionController
             else{
                 
                 $objMetodosC = new MetodosControladores();
-                $objProvincias = new Provincias($this->dbAdapter);
-                $objSacerdotes = new Sacerdotes($this->dbAdapter);
-                $objPersona = new Persona($this->dbAdapter);
-                $objMetodos = new Metodos();
-                $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
-                $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-                foreach ($listaProvincias as $valueProvincias) {
-                    $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-                    $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
-                }
-                
-                $listaSacerdote = $objSacerdotes->ObtenerSacerdotesEstado(1); 
-                $optionSelectSacerdote = '<option value="0">SELECCIONE UN SACERDOTE</option>';
-                foreach ($listaSacerdote as $valueSacerdote) {
-                    $idSacerdoteEncriptado = $objMetodos->encriptar($valueSacerdote['idSacerdote']);
-                    $listaPersona = $objPersona->FiltrarPersona($valueSacerdote['idPersona']);
-                    $nombres = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].' '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
-                    
-                    $optionSelectSacerdote =$optionSelectSacerdote.'<option value="'.$idSacerdoteEncriptado.'">'.$nombres.'</option>';
-                }
+         
+               
                 
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 15, 3);
                 $array = array(
                     'validacionPrivilegio' =>  $validarprivilegio,
-                    'optionSelectProvincias'=>$optionSelectProvincias,
-                    'optionSelectSacerdote'=>$optionSelectSacerdote
                 );
             }
             
