@@ -84,6 +84,7 @@ return array(
             'Nel\Controller\ConfigurarCurso' => 'Nel\Controller\ConfigurarCursoController',
             'Nel\Controller\Certificados' => 'Nel\Controller\CertificadosController',
             'Nel\Controller\Matriculas' => 'Nel\Controller\MatriculasController',
+            'Nel\Controller\Bautismo' => 'Nel\Controller\BautismoController',
         ),
     ),
     'view_manager' => array(

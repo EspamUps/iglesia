@@ -41,10 +41,10 @@ class Sacerdotes extends TableGateway
         return $resultado;
     }
 //    
-//    public function FiltrarPersonaPorIdentificacion($identificacion){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function ObtenerSacerdotesEstado($estadoSacerdote){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerSacerdotesEstado('{$estadoSacerdote}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function IngresarPersona($array)
 //    {

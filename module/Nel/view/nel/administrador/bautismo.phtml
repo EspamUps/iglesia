@@ -1,0 +1,129 @@
+<?php
+$validacionPrivilegio = $this->validacionPrivilegio;
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/bautismo/obtenerdireccionesselect.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/bautismo/bautismo.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            BAUTISMO
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <?php
+        if($validacionPrivilegio==true)
+        {
+        ?>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarBautismo"> </div>
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" method="post" action="<?php echo $this->basePath()?>/bautismo/ingresarbautismo" id="formIngresarBautismo">
+                        <div class="col-lg-4 form-group">
+                            <label for="primerApellido">PRIMER APELLIDO</label>
+                            <input value="macias" maxlength="80" autocomplete="off" autofocus="" type="text" id="primerApellido" name="primerApellido" class="form-control" >
+                            <label for="segundoApellido">SEGUNDO APELLIDO</label>
+                            <input value="intriago" maxlength="80" autocomplete="off" autofocus="" type="text" id="segundoApellido" name="segundoApellido" class="form-control" >
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label for="primerNombre">PRIMER NOMBRE</label>
+                            <input value="nel" maxlength="80" autocomplete="off" autofocus="" type="text" id="primerNombre" name="primerNombre" class="form-control" >
+                            <label for="segundoNombre">SEGUNDO NOMBRE</label>
+                            <input value="sigifredo" maxlength="80" autocomplete="off" autofocus="" type="text" id="segundoNombre" name="segundoNombre" class="form-control" >
+                        </div>
+                        
+                        <div class="col-lg-4 form-group">
+                            <label for="fechaNacimiento">FECHA DE NACIMIENTO</label>
+                            <input value="2018-08-20" type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" >
+                        </div>
+                        <div class="col-lg-12 form-group">
+                            <button onclick="filtrarPersonaPorNombres();" type="button" id="btnBuscarPersona" data-loading-text="BUSCANDO..." class="btn  btn-primary btn-flat pull-right"><i class="fa fa-search"></i>BUSCAR</button>
+                        </div>
+                        
+                        <div id="contenedorRestoDelFormulario" class="col-lg-12">
+
+                        </div>
+                        
+                        
+<!--                        <div class="form-group col-lg-4">
+                            <h4 class="text-center">DATOS DEL BAUTIZO</h4>
+                            <label for="identificacion">NÚMERO</label>
+                            <input onkeydown="validarNumeros('numero');" maxlength="10" autocomplete="off" autofocus="" type="text" id="numero" name="numero" class="form-control">
+                            <label for="identificacion">IDENTIFICACIÓN</label>
+                            <input onkeyup="filtrarPersonaPorIdentificacion(event);" onkeydown="validarNumeros('identificacion');" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacion" name="identificacion" class="form-control">
+                            <label for="sacerdote">SACERDOTE</label>
+                            <select class="form-control" id="selectSacerdote" name="selectSacerdote">
+                                <?php echo $optionSelectSacerdote;?>
+                            </select>
+                            <label for="fechaBautizo">FECHA BAUTIZO</label>
+                            <input type="date" class="form-control" id="fechaBautizo" name="fechaBautizo">
+                        </div>
+                        <div class="col-lg-4">
+                            <h4 class="text-center">LUGAR DE NACIMIENTO</h4>
+                            <label for="selectProvincias">PROVINCIAS</label>
+                            <select class="form-control" onchange="filtrarCantonesPorProvincia()" id="selectProvincias" name="selectProvincias">
+                                <?php echo $optionSelectProvincias;?>
+                            </select>
+                            <label for="selectCantones">CANTÓN</label>
+                            <select class="form-control" onchange="filtrarParroquiasPorProvinciaCanton()" id="selectCantones" name="selectCantones">
+                                <option value="0">SELECCIONE UN CANTÓN</option>
+                            </select>
+                            <label for="selectParróquia">PARRÓQUIA</label>
+                            <select class="form-control" id="selectParroquias" name="selectParroquias">
+                                <option value="0">SELECCIONE UNA PARRÓQUIA</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-4">
+                            <h4 class="text-center">REGISTRO CIVIL</h4>
+                            <label for="ano">AÑO</label>
+                            <input onkeydown="validarNumeros('ano');" maxlength="10" autocomplete="off" autofocus="" type="text" id="ano" name="ano" class="form-control">
+                            <label for="tomo">TOMO</label>
+                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="tomo" name="tomo" class="form-control">
+                            <label for="folio">FOLIO</label>
+                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="folio" name="folio" class="form-control">
+                            <label for="acta">ACTA</label>
+                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="acta" name="acta" class="form-control">
+                            <label for="fechaInscripcion">FECHA DE INSCRIPCIÓN</label>
+                            <input type="date" class="form-control" id="fechaInscripcion" name="fechaInscripcion">
+                            
+                        </div>-->
+<!--                        <div class="form-group col-lg-4">
+                            <label for="nombreProvincia">NIVEL DEL CURSO</label>
+                            <input autofocus=""  onkeydown="validarNumerosR('nivelCurso')"  type="text" id="nivelCurso" name="nivelCurso" class="form-control">
+                        </div>-->
+<!--                        <div class="form-group col-lg-12">
+                            <button type="submit" name="btnGuardarCurso" id="btnGuardarCurso" data-loading-text="GUARDANDO.." class="btn  btn-primary btn-flat pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                        </div>-->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+       <?php } ?>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaBautismo"> </div>
+                    <div id="contenedorTablaBautismo"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<script type="text/javascript">  
+$(document).ready(function(){
+    cargandoBautismo("#contenedorTablaBautismo");
+   obtenerBautismos(); 
+});
+
+
+</script>
+    
