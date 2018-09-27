@@ -103,15 +103,26 @@ class MatriculasController extends AbstractActionController
                                     else{
                                         
                                         $listaMatricula = $objMatricula->FiltrarMatriculaPorPersona($idPersona);
-
+                                        $listaMatriculadosTotales = $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso, 1); 
+                                        $cuposDisponibles = $listaConfigurarCurso[0]['cupos']-count($listaMatriculadosTotales);
+                                        
+                                        
+                                       if($cuposDisponibles<=0)
+                                           $mensaje = '<div class="alert alert-warning text-center" role="alert">NO HAY CUPOS DISPONIBLES EN ESTE CURSO </div>';
+                                       else {            
+                                        
                                         if(count($listaMatricula)>0)
                                         {
                                             ini_set('date.timezone','America/Bogota'); 
                                             $hoy = getdate();
                                             $mes =date("m");
                                             $fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
+                                            $nombreCursoActual= $listaMatricula[0]['nombreCurso'];
                                             $nivelCursoActual=$listaMatricula[0]['nivelCurso'];
-                                            $estadoCursoActual=$listaMatricula[0]['aprobado'];
+                                            $estadoCursoActual='No aprobado';
+                                            
+                                            if($listaMatricula[0]['aprobado']==1)
+                                                $estadoCursoActual='Aprobado';
                                             
                                             if($idConfigurarCurso==$listaMatricula[0]['idConfigurarCurso'])
                                             {
@@ -125,7 +136,7 @@ class MatriculasController extends AbstractActionController
                                                    if($listaMatricula[0]['aprobado']==1)
                                                     $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA Y HA APROBADO ESTE CURSO CON ANTERIORIDAD. </div>';
                                                    else if($listaMatricula[0]['aprobado']==0 && $listaMatricula[0]['fechaFin']>$fechaActual)
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN ESTE CURSO PERO CON OTRO HORARIO. </div>';
+                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN UN CURSO SIMILAR A ESTE PERO EN OTRO HORARIO. </div>';
                                                    else {
                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
                                                        $matricular=true;
@@ -147,6 +158,7 @@ class MatriculasController extends AbstractActionController
 
                                            $nivelCursoActual ='No tiene cursos registrados en esta iglesia';
                                            $estadoCursoActual='Sin estado';
+                                           $nombreCursoActual = 'Desconocido';
                                            $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
                                            $matricular=true;
                                         }
@@ -167,8 +179,8 @@ class MatriculasController extends AbstractActionController
                                                     </tr>
                                                     <tr>
                                                         <th><label for="curso">CURSO ACTUAL</label></th>
-                                                        <td><span style="background-color:#ffa50070">'.$nivelCursoActual.'</span></td>
-                                                        <td><span style="background-color:#3c8dbc42">ESTADO: '.$estadoCursoActual.'</span></td>
+                                                        <td><span style="background-color:#ffa50070">'.$nombreCursoActual.'</span></td>
+                                                        <td><span style="background-color:#3c8dbc42">ESTADO: '.$estadoCursoActual.'</span>    <span style="background-color:#00a65a42"> Nivel: '.$nivelCursoActual.'</span></td>
                                                     </tr>
                                                 </thead>
                                             </table></div>';
@@ -181,6 +193,7 @@ class MatriculasController extends AbstractActionController
                                                 return new JsonModel(array('tabla'=>$tabla,'mensaje'=>$mensaje,'validar'=>$validar,'idPersonaEncriptado'=>$idPersonaEncriptado, 'btnMatricular'=>$botonGuardar));
                                                 
                                         }
+                                       }
                                     }
                                 }
                             }
@@ -753,8 +766,8 @@ class MatriculasController extends AbstractActionController
                             $tabla = '';
                             if($listaMatricula[0]['estadoMatricula']==1){
                             $tabla = '<div class="form-group col-lg-12">
-                                    <input type="hidden" value="'.$i.'" id="i" name="i">
-                                    <input type="hidden" value="'.$j.'" id="j" name="j">
+                                    <input type="hidden" value="'.$i.'" id="ime" name="ime">
+                                    <input type="hidden" value="'.$j.'" id="jme" name="jme">
                                     <input type="hidden" value="'.$idMatriculaEncriptado.'" name="idMatriculaEncriptado" id="idMatriculaEncriptado">
                                     <h4>Usted está a punto de deshabilitar la matrícula del estudiante: '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
               
@@ -766,8 +779,8 @@ class MatriculasController extends AbstractActionController
                             }else{                            
                             
                                 $tabla = '<div class="form-group col-lg-12">
-                                    <input type="hidden" value="'.$i.'" id="i" name="i">
-                                    <input type="hidden" value="'.$j.'" id="j" name="j">
+                                    <input type="hidden" value="'.$i.'" id="ime" name="ime">
+                                    <input type="hidden" value="'.$j.'" id="jme" name="jme">
                                     <input type="hidden" value="'.$idMatriculaEncriptado.'" name="idMatriculaEncriptado" id="idMatriculaEncriptado">
                                     <h4>Usted está a punto de habilitar la matrícula del estudiante: '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
               
@@ -822,8 +835,8 @@ class MatriculasController extends AbstractActionController
                             $request->getFiles()->toArray()
                         );
                         $idMatriculaEncriptado = $post['idMatriculaEncriptado'];
-                        $i = $post['i'];
-                        $j = $post['j'];
+                        $im = $post['ime'];
+                        $jm = $post['jme'];
                             
                         $idMatricula= $objMetodos->desencriptar($idMatriculaEncriptado);
                         $listaMatricula = $objMatricula->FiltrarMatricula($idMatricula);
@@ -837,12 +850,12 @@ class MatriculasController extends AbstractActionController
                                 if(count($resultado) == 0){                                    
                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ, POR FAVOR INTENTE MÁS TARDE</div>';
                                 }else{
-                                    $tablaMatricula = $this->CargarTablaMatriculasAction($listaMatricula, $i, $j);
+                                    $tablaMatricula = $this->CargarTablaMatriculasAction($listaMatricula, $im, $jm);
 
                                     $mensaje = '<div class="alert alert-success text-center" role="alert">SE CAMBIÓ EL ESTADO DE LA MATRÍCULA</div>';
                                     $validar = TRUE;
 
-                                    return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'j'=>$j,'i'=>$i,'mensaje'=>$mensaje,'validar'=>$validar));
+                                    return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar));
                                 }
                         }
                     }   

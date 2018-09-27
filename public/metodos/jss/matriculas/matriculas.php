@@ -550,11 +550,11 @@ $(function(){
         uploadProgress: function(event,position,total,percentComplete){
 
         },
-        success: function(data){console.log(data)
+        success: function(data){ 
             if(data.validar==true){
                 var table = $('#tablaMatriculas').DataTable();
-                table.row(data.i).data(data.tabla[data.i]).draw();
-                obtenerFormularioModificarEstadoMatricula(data.idMatricula, data.i, data.j);
+                table.row(data.im).data(data.tabla[data.im]).draw();
+                obtenerFormularioModificarEstadoMatricula(data.idMatricula, data.im, data.jm);
             }
             $("#btnModificarEstadoMatricula").button('reset');
             $("#mensajeModificarEstadoMatricula").html(data.mensaje);
