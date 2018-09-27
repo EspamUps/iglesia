@@ -90,6 +90,7 @@ class MatriculasController extends AbstractActionController
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE UNA PERSONA CON LA IDENTIFICACIÓN '.$identificacion.'. PRIMERO DEBE REGISTRARLA EN EL MÓDULO PERSONAS.</div>';
                                 }else
                                 {
+                                    $inputIdPersona = '';
                                     $matricular=false;
                                     $idPersona= $listaPersona[0]['idPersona'];
                                     $idPersonaEncriptado = $objMetodos->encriptar($idPersona);
@@ -161,6 +162,7 @@ class MatriculasController extends AbstractActionController
                                            $nombreCursoActual = 'Desconocido';
                                            $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
                                            $matricular=true;
+                                           $inputIdPersona = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">';
                                         }
 
                                         $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
@@ -169,7 +171,7 @@ class MatriculasController extends AbstractActionController
 
 
                                         $tabla = '<div><h3>INFORMACIÓN ACTUAL DEL ESTUDIANTE</h3><br></div>
-                                                <input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">
+                                                '.$inputIdPersona.'
                                                 <div class="table-responsive"><table class="table">
                                                 <thead> 
                                                     <tr>
@@ -530,15 +532,36 @@ class MatriculasController extends AbstractActionController
             
             $botonCambiarEstadoMatricula = '';
                         
-            if($value['estadoMatricula']==0)
-            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="HABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+            if($value['estadoMatricula']==1)
+            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
             else
-            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+            $botonCambiarEstadoMatricula = '<button  id="btnDescargarComprobante'.$i.'" title="DESCARGAR COMPROBANTE DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="" class="btn btn-default btn-sm btn-flat"><i class="fa fa-download"></i></button>';
        
             $identificacionEstudiante = $value['identificacion'];
             $nombresEstudiante = $value['primerNombre'].' '.$value['segundoNombre'];
             $apellidosEstudiante = $value['primerApellido'].' '.$value['segundoApellido'];
-            $fechaMatricula = $value['fechaMatricula'];
+            $fechaMatricula=$value['fechaMatricula'];
+            $estadoMatricula = $value['estadoMatricula'];
+            if($estadoMatricula==0)
+            $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
+            else
+            $labelEstadoMatricula= '<label style="background-color:#b1ffa1" class="form-control" >Habilitada</label>';   
+                
+            
+            ini_set('date.timezone','America/Bogota'); 
+            $hoy = getdate();
+            $mes =date("m");
+            $fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
+            if($fechaActual>=$value['fechaInicioMatricula'] && $fechaActual<=$value['fechaFinMatricula'])
+            $estadoCurso= 'Periodo de matrículas';
+            else if($fechaActual>=$value['fechaInicio']&& $fechaActual<=$value['fechaFin'])
+                $estadoCurso='En clases';
+            else{
+                if($value['aprobado']==0)
+                    $estadoCurso='Reprobado';
+                else
+                    $estadoCurso='Aprobado';
+            } 
             
             
             $botones = $botonCambiarEstadoMatricula;
@@ -550,6 +573,8 @@ class MatriculasController extends AbstractActionController
                 'identificacion'=>$identificacionEstudiante,
                 'nombres'=>$nombresEstudiante,
                 'apellidos'=>$apellidosEstudiante,
+                'labelestadoMatricula' =>$labelEstadoMatricula,
+                'estadoCurso'=>$estadoCurso,
                 'fechaMatricula'=>$fechaMatricula,
                 'opciones1'=>$botones
             );
@@ -769,25 +794,25 @@ class MatriculasController extends AbstractActionController
                                     <input type="hidden" value="'.$i.'" id="ime" name="ime">
                                     <input type="hidden" value="'.$j.'" id="jme" name="jme">
                                     <input type="hidden" value="'.$idMatriculaEncriptado.'" name="idMatriculaEncriptado" id="idMatriculaEncriptado">
-                                    <h4>Usted está a punto de deshabilitar la matrícula del estudiante: '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
-              
-                                </div>
-                                <div class="form-group col-lg-12">
-                                    <button data-loading-text="DESHABILITANDO..." id="btnModificarEstadoMatricula" type="submit" class="btn btn-danger pull-right"><i class="fa fa-ban"></i> DESHABILITAR MATRÍCULA</button>
-                                 </div>
-                                ';
-                            }else{                            
-                            
-                                $tabla = '<div class="form-group col-lg-12">
-                                    <input type="hidden" value="'.$i.'" id="ime" name="ime">
-                                    <input type="hidden" value="'.$j.'" id="jme" name="jme">
-                                    <input type="hidden" value="'.$idMatriculaEncriptado.'" name="idMatriculaEncriptado" id="idMatriculaEncriptado">
-                                    <h4>Usted está a punto de habilitar la matrícula del estudiante: '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
-              
-                                </div>
-                                <div class="form-group col-lg-12">
-                                    <button data-loading-text="HABILITANDO..." id="btnModificarEstadoMatricula" type="submit" class="btn btn-success pull-right"><i class="fa fa-check"></i> HABILITAR MATRÍCULA</button>
-                                 </div>
+                                    
+                                    <h4><b>ESTUDIANTE:</b> '.$listaMatricula[0]['primerNombre'].' '.$listaMatricula[0]['segundoNombre'].' '.$listaMatricula[0]['primerApellido'].' '.$listaMatricula[0]['segundoApellido'].'</h4>
+                                    <p><span style="background-color: #dd4b3954">Una vez que se cancele la matrícula no se podrá revertir el proceso.</span> </p>                                          
+                                    <p><span style="background-color: #f39c124a">Es necesario subir un documento de respaldo para poder continuar.</span> </p>       
+                                    </div>
+                                    <div class="form-group col-lg-12">
+                                    DOCUMENTO DE RESPALDO:
+                                    <div class="fileUpload btn btn-success" id="contenedorArchivoPdfDocDeshabilitarMat">
+                                    <span>SUBIR ARCHIVO</span>
+                                    <input type="file" id="documentoDeshabilitarMatModal" name="documentoDeshabilitarMatModal" class="upload" onchange="vistaPreviaMatricula();" accept="application/pdf">
+                                    </div>
+                                    <br />
+                                    <output id="contenedorVistaPreviaDeshabilitarMat" style="background-color: #f4f4f4ba;border-radius: 10px;border-color: #f4f4f4ba; margin-bottom: inherit;" class="col-lg-12"></output>
+                                  
+                                    <div id="contenedorBtnCancelarDeshabilitarMat"></div>
+                                    <div id="contenedorBtnAplicarDeshabilitarMat">
+                                    
+                                        </div>
+                                    </div>
                                 ';
                             }
                             $mensaje = '';
@@ -801,6 +826,26 @@ class MatriculasController extends AbstractActionController
         }
         
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    public function nombredocumentoAction($length,$uc,$n,$sc)
+    {
+        $source = 'abcdefghijklmnopqrstuvwxyz';
+        if($uc==1) $source .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
+        if($n==1) $source .= '1234567890'; 
+        if($sc==1) $source .= '|@#~$%()=^*+[]{}-_'; 
+        if($length>0)
+        { 
+            $rstr = ""; 
+            $source = str_split($source,1);
+            for($i=1; $i<=$length; $i++)
+            { 
+                mt_srand((double)microtime() * 1000000); 
+                $num = mt_rand(1,count($source)); 
+                $rstr .= $source[$num-1];  
+            }   
+        } 
+        return $rstr;
     }
     
     public function modificarestadomatriculaAction()
@@ -837,32 +882,71 @@ class MatriculasController extends AbstractActionController
                         $idMatriculaEncriptado = $post['idMatriculaEncriptado'];
                         $im = $post['ime'];
                         $jm = $post['jme'];
-                            
-                        $idMatricula= $objMetodos->desencriptar($idMatriculaEncriptado);
-                        $listaMatricula = $objMatricula->FiltrarMatricula($idMatricula);
-                        if(count($listaMatricula)>0)
+                        
+                        $documento = $post['documentoDeshabilitarMatModal'];
+                                    
+                        
+                        if(empty($documento)){
+                            $mensaje='<div class="alert alert-danger text-center" role="alert">POR FAVOR SELECCIONE UNA FOTO</div>';
+                        }else
                         {
-                                $estadoMatricula = 0;
-                                if($listaMatricula[0]['estadoMatricula']==0)
-                                    $estadoMatricula=1;
-                                
-                                $resultado= $objMatricula->ModificarEstadoMatricula($idMatricula, $estadoMatricula);
-                                if(count($resultado) == 0){                                    
-                                   $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ, POR FAVOR INTENTE MÁS TARDE</div>';
-                                }else{
-                                    $tablaMatricula = $this->CargarTablaMatriculasAction($listaMatricula, $im, $jm);
+                            $idMatricula= $objMetodos->desencriptar($idMatriculaEncriptado);
+                            $listaMatricula = $objMatricula->FiltrarMatricula($idMatricula);
+                            if(count($listaMatricula)>0)
+                            {
+                                ini_set('date.timezone','America/Bogota'); 
+                                    $hoy = getdate();
+                                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                                    
+                                    if($documento['type'] != 'application/pdf'){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL DOCUMENTO DEBE SER EN FORMATO PDF</div>';
+                                    }else{
+                                        
+                                        
+                                        $nombreFechaDocumento = $hoy['year'].$hoy['mon'].$hoy['mday'].$hoy['hours'].$hoy['minutes'].$hoy['seconds'];
+                                        $name = $documento['name'];
+                                        $nombreTemporal = $documento['tmp_name'];
+                                        $trozos = explode('.',$name);
+                                        $ext = end($trozos);
+                                        $nombreFinalImagen = $this->nombredocumentoAction(10, TRUE, TRUE, FALSE).$nombreFechaDocumento.'.'.$ext;
+                                        $destino = '/public/evidenciasmatriculas/'.$nombreFinalImagen;
+                                        $src = $_SERVER['DOCUMENT_ROOT'].$this->getRequest()->getBaseUrl().$destino;
+            ////                                           
+            //                                             GUARDAR IMAGEN
+                                        if(move_uploaded_file($nombreTemporal,$src))
+                                        {
 
-                                    $mensaje = '<div class="alert alert-success text-center" role="alert">SE CAMBIÓ EL ESTADO DE LA MATRÍCULA</div>';
-                                    $validar = TRUE;
+            //                                                $idFoto = $objFotosProducto->ingresarFotoProducto($arrayFotoProducto);
+            //                                                if($idFoto == 0){
+            //                                                    unlink($src);
+            //                                                }
+                                            
+                                            $estadoMatricula = 0;
+                                            if($listaMatricula[0]['estadoMatricula']==0)
+                                                $estadoMatricula=1;
 
-                                    return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar));
-                                }
+                                            $resultado= $objMatricula->ModificarEstadoMatricula($idMatricula, $estadoMatricula);
+                                            if(count($resultado) == 0){ 
+                                                unlink($src);
+                                               $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ, POR FAVOR INTENTE MÁS TARDE</div>';
+                                            }else{
+                                                $tablaMatricula = $this->CargarTablaMatriculasAction($resultado, $im, $jm);
+//
+                                                $mensaje = '<div class="alert alert-success text-center" role="alert">SE CAMBIÓ EL ESTADO DE LA MATRÍCULA</div>';
+                                                $validar = TRUE;
+//
+                                                return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar));
+                                            }
+                                        }
+                                    }
+                                    
+                                }                 
+                                    
+                            }
                         }
                     }   
                 }
             }
-        }
-        
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     

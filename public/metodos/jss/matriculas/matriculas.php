@@ -77,7 +77,6 @@ function cargarFormularioIngresarMatricula()
 
     if(idConfCurso == 0){
         $("#contenedorHorarioSeleccionado").html('');
-        $("#contenedorlistahorarios").html('');
         $("#contenedorInfoGeneralHorarioSeleccionado").html("");
     }else{
         $.ajax({
@@ -159,6 +158,7 @@ function obtenerMatriculas(){
                         } else {
                             $(row).attr('style', 'background-color: #CFCFCF;text-align: center;font-weight: bold;');
                         }
+                        
                         $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
                         $(row).attr('id', 'filaTablaMatriculas' + dataIndex);
                     },
@@ -167,6 +167,12 @@ function obtenerMatriculas(){
                            'targets': 2,
                            'createdCell':  function (td, cellData, rowData, row, col) {
                                 $(td).attr('id','identificacion'+row); 
+                           }
+                        },
+                        {
+                           'targets': 6,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('style','background-color:green'); 
                            }
                         }
                      ],
@@ -190,6 +196,14 @@ function obtenerMatriculas(){
                         {
                             title: 'FECHA DE MATRICULA',
                             data: 'fechaMatricula'
+                        },   
+                        {
+                            title: 'ESTADO CURSO',
+                            data: 'estadoCurso'
+                        },
+                        {
+                            title: 'MATRÍCULA',
+                            data: 'labelestadoMatricula'
                         },
                         {
                             title: 'OPC.',
@@ -379,7 +393,6 @@ function filtrarHorarioCursoSeleccionado(){
     var idConfCurso = $("#selectConfigurarCurso").val();
     if(idConfCurso == 0){
         $("#mensajeContenedorHorario").html("");
-        $("#contenedorHorarioSeleccionado").html("");
         $("#mensajeFormIngresoMatricula").html("");
         $("#contenedorFormIngresoMatricula").html("");
         $("#contenedorDatosEstudianteParaMatricular").html("");
@@ -541,45 +554,6 @@ function obtenerFormularioModificarEstadoMatricula(id,i,j){
 }
 
 
-$(function(){
-    $("#contenedorModificarEstadoMatricula").ajaxForm({
-        beforeSend: function(){
-            $("#mensajeModificarEstadoMatricula").html('');
-            $("#btnModificarEstadoMatricula").button('loading');
-        },
-        uploadProgress: function(event,position,total,percentComplete){
 
-        },
-        success: function(data){ 
-            if(data.validar==true){
-                var table = $('#tablaMatriculas').DataTable();
-                table.row(data.im).data(data.tabla[data.im]).draw();
-                obtenerFormularioModificarEstadoMatricula(data.idMatricula, data.im, data.jm);
-            }
-            $("#btnModificarEstadoMatricula").button('reset');
-            $("#mensajeModificarEstadoMatricula").html(data.mensaje);
-        },
-        complete: function(){
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            $("#btnModificarEstadoMatricula").button('reset');
-            if(xhr.status === 0){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-            }else if(xhr.status == 404){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-            }else if(xhr.status == 500){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-            }else if(errorThrown === 'parsererror'){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-            }else if(errorThrown === 'timeout'){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-            }else if(errorThrown === 'abort'){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-            }else{
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-            }
-        }
-    });    
-}); 
 
 </script>
