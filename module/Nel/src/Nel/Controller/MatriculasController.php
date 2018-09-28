@@ -138,7 +138,7 @@ class MatriculasController extends AbstractActionController
                                                 if($listaMatricula[0]['nivelCurso']==$listaConfigurarCurso[0]['nivelCurso'])
                                                    if($listaMatricula[0]['aprobado']==1)
                                                     $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA Y HA APROBADO ESTE CURSO CON ANTERIORIDAD. </div>';
-                                                   else if($listaMatricula[0]['aprobado']==0 && $listaMatricula[0]['fechaFin']>$fechaActual)
+                                                   else if($listaMatricula[0]['aprobado']==0 && $listaMatricula[0]['fechaFin']>$fechaActual && $listaMatricula[0]['estadoMatricula']==1)
                                                     $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN UN CURSO SIMILAR A ESTE PERO EN OTRO HORARIO. </div>';
                                                    else {
                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
