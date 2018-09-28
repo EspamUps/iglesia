@@ -8,7 +8,7 @@ $(function(){
             $("#btnModificarEstadoMatricula").button('loading');
             $("#progressDocDeshabilitarMat").show();
             $("#mensajeModificarEstadoMatricula").html('<h4 class="text-center">ESPERE...</h4>');
-            $("#btnGuardarProducto").button('loading');
+           
         },
         uploadProgress: function(event,position,total,percentComplete){
             $("#progress-bar-DocDeshabilitarMat").width(percentComplete+'%');
@@ -21,13 +21,17 @@ $(function(){
         },
         success: function(data){ 
             if(data.validar==true){
+                filtrarHorarioCursoSeleccionado();
                 var table = $('#tablaMatriculas').DataTable();
                 table.row(data.im).data(data.tabla[data.im]).draw();
-                limpiarProgress();
                 obtenerFormularioModificarEstadoMatricula(data.idMatricula, data.im, data.jm);
+                 limpiarProgress();
             }
             $("#btnModificarEstadoMatricula").button('reset');
-            $("#mensajeModificarEstadoMatricula").html(data.mensaje);
+            $('#modalModificarEstadoMatricula').modal('hide');
+            $("#mensajeTablaMatriculasActuales").html(data.mensaje);
+            setTimeout(function() {$("#mensajeTablaMatriculasActuales").html('');},1500);
+            
         },
         complete: function(){
         },
@@ -139,7 +143,7 @@ $(function(){
             limpiarInputFile();
             $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">SELECCIONE SOLO 1 DOCUMENTO PDF</div>');
         }else{
-
+        $("#mensajeModificarEstadoMatricula").html("");
             for(x=0;x<archivos.length; x++){
                 if (!archivos[x].type.match('application/pdf')) {
                     limpiarInputFile();

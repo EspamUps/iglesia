@@ -23,6 +23,8 @@ use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\HoraHorario;
 use Nel\Modelo\Entity\Horario;
 use Nel\Modelo\Entity\Periodos;
+use Nel\Modelo\Entity\Adjunto;
+use Nel\Modelo\Entity\AdjuntoMatricula;
 use Nel\Modelo\Entity\HorarioCurso;
 use Nel\Modelo\Entity\ConfigurarCurso;
 use Zend\Session\Container;
@@ -99,7 +101,7 @@ class MatriculasController extends AbstractActionController
                                     $EsDocente=count($objDocente->FiltrarDocentePorPersona($idPersona));
                                     if($EsDocente>0)
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' ESTÁ REGISTRADA COMO DOCENTE, POR LO TANTO NO PUEDE SER MATRICULADA COMO ESTUDIANTE</div>';
-                                    if ($EsSacerdote>0)
+                                    else if ($EsSacerdote>0)
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' ESTÁ REGISTRADA COMO SACERDOTE, POR LO TANTO NO PUEDE SER MATRICULADA COMO ESTUDIANTE</div>';
                                     else{
                                         
@@ -128,7 +130,7 @@ class MatriculasController extends AbstractActionController
                                             if($idConfigurarCurso==$listaMatricula[0]['idConfigurarCurso'])
                                             {
                                                 if($listaMatricula[0]['estadoMatricula']==0)
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' SE ENCUENTRA MATRICULADA EN ESTE CURSO. DEBE HABILITAR SU MATRÍCULA EN LA TABLA DE ABAJO. </div>';
+                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA FUE MATRICULADA EN ESTE CURSO Y HORARIO PERO CANCELÓ SU MATRÍCULA. </div>';
                                                 else                                                 
                                                     $mensaje = '<div class="alert alert-success text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN ESTE CURSO. </div>';
                                             }
@@ -508,8 +510,6 @@ class MatriculasController extends AbstractActionController
                                 }
                                 
                                 $select = '<label for="selectCurso">CURSO</label><select onchange="filtrarlistaHorariosCursoSeleccionado();"  id="selectCurso" name="selectCurso" class="form-control">'.$optionCurso.'</select>';
-                                                
-                                
                                 $mensaje = '';
                                 $validar = TRUE;
                                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'select'=>$select));
@@ -803,7 +803,7 @@ class MatriculasController extends AbstractActionController
                                     DOCUMENTO DE RESPALDO:
                                     <div class="fileUpload btn btn-success" id="contenedorArchivoPdfDocDeshabilitarMat">
                                     <span>SUBIR ARCHIVO</span>
-                                    <input type="file" id="documentoDeshabilitarMatModal" name="documentoDeshabilitarMatModal" class="upload" onchange="vistaPreviaMatricula();" accept="application/pdf">
+                                    <input type="file" id="documentoDeshabilitarMatModal" name="documentoDeshabilitarMatModal" class="upload" onchange="vistaPreviaMatricula();" accept="application/pdf$">
                                     </div>
                                     <br />
                                     <output id="contenedorVistaPreviaDeshabilitarMat" style="background-color: #f4f4f4ba;border-radius: 10px;border-color: #f4f4f4ba; margin-bottom: inherit;" class="col-lg-12"></output>
@@ -874,7 +874,9 @@ class MatriculasController extends AbstractActionController
                         $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
                     }else{               
                         $objMetodos = new Metodos();
-                        $objMatricula = new Matricula($this->dbAdapter);                        
+                        $objMatricula = new Matricula($this->dbAdapter);     
+                        $objAdjunto = new Adjunto($this->dbAdapter);
+                        $objAdjuntoMatricula = new AdjuntoMatricula($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -900,43 +902,52 @@ class MatriculasController extends AbstractActionController
                                     
                                     if($documento['type'] != 'application/pdf'){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">EL DOCUMENTO DEBE SER EN FORMATO PDF</div>';
-                                    }else{
-                                        
-                                        
+                                    }else
+                                        {
                                         $nombreFechaDocumento = $hoy['year'].$hoy['mon'].$hoy['mday'].$hoy['hours'].$hoy['minutes'].$hoy['seconds'];
                                         $name = $documento['name'];
                                         $nombreTemporal = $documento['tmp_name'];
                                         $trozos = explode('.',$name);
                                         $ext = end($trozos);
                                         $nombreFinalImagen = $this->nombredocumentoAction(10, TRUE, TRUE, FALSE).$nombreFechaDocumento.'.'.$ext;
+                                        
                                         $destino = '/public/evidenciasmatriculas/'.$nombreFinalImagen;
                                         $src = $_SERVER['DOCUMENT_ROOT'].$this->getRequest()->getBaseUrl().$destino;
-            ////                                           
+                                                     
             //                                             GUARDAR IMAGEN
                                         if(move_uploaded_file($nombreTemporal,$src))
                                         {
-
-            //                                                $idFoto = $objFotosProducto->ingresarFotoProducto($arrayFotoProducto);
-            //                                                if($idFoto == 0){
-            //                                                    unlink($src);
-            //                                                }
-                                            
-                                            $estadoMatricula = 0;
-                                            if($listaMatricula[0]['estadoMatricula']==0)
-                                                $estadoMatricula=1;
-
-                                            $resultado= $objMatricula->ModificarEstadoMatricula($idMatricula, $estadoMatricula);
-                                            if(count($resultado) == 0){ 
+                                           $resultado= $objAdjunto->IngresarAdjunto($name, $src, $fechaSubida, 1);
+                                           $idAdjunto=$resultado[0]['idAdjunto'];
+                                           if(count($resultado)==0)
+                                           {
                                                 unlink($src);
-                                               $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ, POR FAVOR INTENTE MÁS TARDE</div>';
-                                            }else{
-                                                $tablaMatricula = $this->CargarTablaMatriculasAction($resultado, $im, $jm);
-//
-                                                $mensaje = '<div class="alert alert-success text-center" role="alert">SE CAMBIÓ EL ESTADO DE LA MATRÍCULA</div>';
-                                                $validar = TRUE;
-//
-                                                return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar));
-                                            }
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE PUDO SUBIR EL DOCUMENTO, POR FAVOR INTENTE MÁS TARDE</div>';
+                                           }                                               
+                                           else{       
+                                                $resultado2= $objMatricula->ModificarEstadoMatricula($idMatricula, 0);
+                                                if(count($resultado2) == 0){ 
+                                                    unlink($src);
+                                                    $resultado3 =$objAdjunto->ModificarEstadoAdjunto($resultado[0]['idAdjunto'], 0);
+                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO, POR FAVOR INTENTE MÁS TARDE</div>';
+                                                }else{
+                                                    $resAdjuntoMatricula = $objAdjuntoMatricula->IngresarAdjuntoMatricula($idAdjunto, $idMatricula, 1);
+                                                    if(count($resAdjuntoMatricula)==0)
+                                                    {
+                                                        unlink($src);
+                                                        $resultado4 =$objAdjunto->ModificarEstadoAdjunto($resultado[0]['idAdjunto'], 0);
+                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO, POR FAVOR INTENTE MÁS TARDE</div>';
+                                                    }else{
+                                                        $tablaMatricula = $this->CargarTablaMatriculasAction($resultado2, $im, $jm);
+    
+                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">SE CANCELÓ LA MATRÍCULA DE '.$resultado2[0]['primerNombre'].' '.$resultado2[0]['primerApellido'].' CON IDENTIFICACIÓN '.$resultado2[0]['identificacion'].'</div>';
+                                                        $validar = TRUE;
+
+                                                        return new JsonModel(array( 'tabla'=>$tablaMatricula,'idMatricula'=>$idMatriculaEncriptado,'jm'=>$jm,'im'=>$im,'mensaje'=>$mensaje,'validar'=>$validar,'idadjnt'=>$idAdjunto));
+                                                
+                                                    }
+                                                }
+                                            } 
                                         }
                                     }
                                     

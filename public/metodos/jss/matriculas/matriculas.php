@@ -403,8 +403,8 @@ function filtrarHorarioCursoSeleccionado(){
             dataType: 'JSON',
             data: {id:idConfCurso},
             beforeSend: function(){
-                cargandoMatriculas("#contenedorHorarioSeleccionado");
                 cargandoMatriculas("#contenedorInfoGeneralHorarioSeleccionado");
+                cargandoMatriculas("#contenedorHorarioSeleccionado");                
                 $("#mensajeContenedorHorario").html("");
                 $("#mensajeFormIngresoMatricula").html("");
                 $("#contenedorFormIngresoMatricula").html("");
@@ -420,7 +420,7 @@ function filtrarHorarioCursoSeleccionado(){
                 if(data.validar == true)
                 {
                   $("#contenedorInfoGeneralHorarioSeleccionado").html(data.datosGenerales);
-                     $("#contenedorHorarioSeleccionado").html(data.tabla);
+                   $("#contenedorHorarioSeleccionado").html(data.tabla);
                 }else{
                      $("#contenedorHorarioSeleccionado").html('');
                 }
@@ -479,6 +479,7 @@ $(function(){
         success: function(data){
             if(data.validar==true){
                 limpiarFormIngresoMatriculas();
+                filtrarHorarioCursoSeleccionado();
                 obtenerMatriculas();
             }
             $("#btnGuardarMatricula").button('reset');
@@ -516,7 +517,7 @@ function obtenerFormularioModificarEstadoMatricula(id,i,j){
         data: {id:id, i:i,j:j},
         beforeSend: function(){
             $("#mensajeModificarEstadoMatricula").html("");
-            cargandoMatriculas("#contenedorModificarEstadoMatricula");
+            
         },
         uploadProgress: function(event,position,total,percentComplete){
         },
