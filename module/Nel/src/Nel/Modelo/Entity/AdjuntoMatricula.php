@@ -19,8 +19,13 @@ class AdjuntoMatricula extends TableGateway
         return parent::__construct('adjuntomatricula', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
-    public function IngresarAdjuntoMatricula($idAdjunto, $idMatricula, $estadoAdjuntoMatricula){
-        $resultado = $this->getAdapter()->query("CALL Sp_IngresarAdjuntoMatricula('{$idAdjunto}','{$idMatricula}','{$estadoAdjuntoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function IngresarAdjuntoMatricula($idAdjunto, $idMatricula, $idTipoAdjunto, $estadoAdjuntoMatricula){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarAdjuntoMatricula('{$idAdjunto}','{$idMatricula}','{$idTipoAdjunto}','{$estadoAdjuntoMatricula}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarAdjuntoPorIdMatriculaYTipoAdjunto($idMatricula, $identificadorTipoAdjunto){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAdjuntoPorIdMatriculaYTipoAdjunto('{$idMatricula}','{$identificadorTipoAdjunto}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

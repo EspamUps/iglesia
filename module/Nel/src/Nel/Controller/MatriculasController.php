@@ -525,28 +525,37 @@ class MatriculasController extends AbstractActionController
     
      function CargarTablaMatriculasAction($listaMatriculas, $i, $j)
     {
+        $objAdjuntoMat = new AdjuntoMatricula($this->dbAdapter);
         $objMetodos = new Metodos();
         $array1 = array();
         foreach ($listaMatriculas as $value) {
-            $idMatriculaEncriptado = $objMetodos->encriptar($value['idMatricula']);
+            $idMatricula=$value['idMatricula'];
+            $idMatriculaEncriptado = $objMetodos->encriptar($idMatricula);
             
             $botonCambiarEstadoMatricula = '';
                         
-            if($value['estadoMatricula']==1)
-            $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
-            else
-            $botonCambiarEstadoMatricula = '<button  id="btnDescargarComprobante'.$i.'" title="DESCARGAR COMPROBANTE DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="" class="btn btn-default btn-sm btn-flat"><i class="fa fa-download"></i></button>';
-       
+            
             $identificacionEstudiante = $value['identificacion'];
             $nombresEstudiante = $value['primerNombre'].' '.$value['segundoNombre'];
             $apellidosEstudiante = $value['primerApellido'].' '.$value['segundoApellido'];
             $fechaMatricula=$value['fechaMatricula'];
             $estadoMatricula = $value['estadoMatricula'];
-            if($estadoMatricula==0)
-            $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
+            
+            if($estadoMatricula==1)
+            {
+                $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                $labelEstadoMatricula= '<label style="background-color:#b1ffa1" class="form-control" >Habilitada</label>';   
+
+            }
             else
-            $labelEstadoMatricula= '<label style="background-color:#b1ffa1" class="form-control" >Habilitada</label>';   
-                
+            {
+               $docAdjunto = $objAdjuntoMat->FiltrarAdjuntoPorIdMatriculaYTipoAdjunto($idMatricula, 2);
+               
+               $botonCambiarEstadoMatricula = '<a href=" '.$this->getRequest()->getBaseUrl().$docAdjunto[0]['rutaAdjunto'].'"  download="'.$docAdjunto[0]['nombreAdjunto'].'"><i class="fa fa-download"></i></a>';
+               $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
+
+            }
+       
             
             ini_set('date.timezone','America/Bogota'); 
             $hoy = getdate();
@@ -917,7 +926,7 @@ class MatriculasController extends AbstractActionController
             //                                             GUARDAR IMAGEN
                                         if(move_uploaded_file($nombreTemporal,$src))
                                         {
-                                           $resultado= $objAdjunto->IngresarAdjunto($name, $src, $fechaSubida, 1);
+                                           $resultado= $objAdjunto->IngresarAdjunto($name, $destino, $fechaSubida, 1);
                                            $idAdjunto=$resultado[0]['idAdjunto'];
                                            if(count($resultado)==0)
                                            {
@@ -931,7 +940,7 @@ class MatriculasController extends AbstractActionController
                                                     $resultado3 =$objAdjunto->ModificarEstadoAdjunto($resultado[0]['idAdjunto'], 0);
                                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO, POR FAVOR INTENTE MÁS TARDE</div>';
                                                 }else{
-                                                    $resAdjuntoMatricula = $objAdjuntoMatricula->IngresarAdjuntoMatricula($idAdjunto, $idMatricula, 1);
+                                                    $resAdjuntoMatricula = $objAdjuntoMatricula->IngresarAdjuntoMatricula($idAdjunto, $idMatricula, 2, 1);
                                                     if(count($resAdjuntoMatricula)==0)
                                                     {
                                                         unlink($src);
