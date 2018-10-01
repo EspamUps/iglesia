@@ -26,6 +26,9 @@ use Nel\Modelo\Entity\DireccionPersona;
 use Nel\Modelo\Entity\Parroquias;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
+use Nel\Modelo\Entity\Sacerdotes;
+use Nel\Modelo\Entity\Docentes;
+use Nel\Modelo\Entity\Bautismo;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -252,6 +255,7 @@ class PersonaController extends AbstractActionController
                         $direccion = trim(strtoupper($post['direccion']));
                         $referencia = trim(strtoupper($post['referencia']));
                         $fechaNacimiento = $post['fechaNacimiento'];
+                        $idSexoEncriptado = $post['sexo'];
                         $validarIngresoCedula = FALSE;
                         if(strlen($identificacion) > 0){
                             $validarIngresoCedula = true;
@@ -274,6 +278,8 @@ class PersonaController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL NÚMERO DE TELÉFONO MÁXIMO 20 CARACTERES</div>';
                         }else if(empty ($fechaNacimiento)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA DE NACIMIENTO</div>';
+                        }else if($idSexoEncriptado == NULL || $idSexoEncriptado == "" || $idSexoEncriptado == "0"){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UN SEXO</div>';
                         }else if($idProvinciaEncriptado == NULL || $idProvinciaEncriptado == "" || $idProvinciaEncriptado == "0"){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UNA PROVINCIA</div>';
                         }else if($idCantonEncriptado == NULL || $idCantonEncriptado == "" || $idCantonEncriptado == "0"){
@@ -285,6 +291,8 @@ class PersonaController extends AbstractActionController
                         }else if(empty ($referencia) || strlen($referencia) > 200){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA REFERENCIA MÁXIMO 200 CARACTERES</div>';
                         }else{
+                            $idSexo = $objMetodos->desencriptar($idSexoEncriptado);
+                            
                             $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado); 
                             $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
                             if(count($listaConfigurarParroquiaCanton) == 0){
@@ -301,6 +309,7 @@ class PersonaController extends AbstractActionController
                                     'primerApellido' => $primerApellido,
                                     'segundoApellido' => $segundoApellido,
                                     'fechaNacimiento'=>$fechaNacimiento,
+                                    'idSexo'=>$idSexo,
                                     'fechaRegistro' => $fechaSubida,
                                     'estadoPersona' => 1);
                                 $resultado =  $objPersona->IngresarPersona($arrayPersona);
@@ -556,6 +565,10 @@ class PersonaController extends AbstractActionController
         $objDireccionPersona = new DireccionPersona($adaptador);
         $objMetodosControler = new MetodosControladores();
         $objHistorialPersona = new HistorialPersona($adaptador);
+        $objSacerdote = new Sacerdotes($adaptador);
+        $objDocente = new Docentes($adaptador);
+        $objBautismo = new Bautismo($adaptador);
+        
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
         $array1 = array();
@@ -577,9 +590,19 @@ class PersonaController extends AbstractActionController
                 $botonDireccion = '<button data-target="#modalVerDireccionPersona" data-toggle="modal" id="btnFiltrarDireccion'.$i.'" title="VER DIRECCIÓN" onclick="FiltrarDireccionPorPersona(\''.$idPersonaEncriptado.'\','.$i.','.$j.')" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-home"></i></button>';
             }
             $botonEliminarPersona = '';
+            
+            $listaSacerdote = $objSacerdote->FiltrarSacerdotePorPersona($value['idPersona']);
+            $listaDocente = $objDocente->FiltrarDocentePorPersona($value['idPersona']);
+            $listaBautismo = $objBautismo->FiltrarBautismoPorPersona($value['idPersona']);
+            
             if($validarPrivilegioEliminar == true){
                if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0 && count($objUsuario->FiltrarUnUsuarioPorPersona($value['idPersona']))==0)
-                $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+               {
+                   if(count($listaDocente) == 0 && count($listaBautismo) == 0 && count($listaSacerdote) == 0){
+                        $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                   }
+                   
+               }
             }
             $botonModificar ='';
             if($validarPrivilegioModificar == true)

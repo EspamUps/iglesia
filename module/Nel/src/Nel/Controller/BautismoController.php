@@ -24,6 +24,7 @@ use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Bautismo;
+use Nel\Modelo\Entity\PadresBautismo;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -32,6 +33,89 @@ class BautismoController extends AbstractActionController
 {
 
     public $dbAdapter;
+    
+    public function obtenerbautismosAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 15);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objBautismo = new Bautismo($this->dbAdapter);
+                    ini_set('date.timezone','America/Bogota'); 
+                    $listaBautismos = $objBautismo->ObtenerBautismos();
+                    $tabla = $this->CargarTablaBautismos($idUsuario, $this->dbAdapter, $listaBautismos, 0, count($listaBautismos));
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                }
+            
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+     function CargarTablaBautismos($idUsuario,$adaptador,$listaBautismo, $i, $j)
+    {
+//        $objConfigurarCurso = new ConfigurarCurso($adaptador);
+        $objMetodos = new Metodos();
+        ini_set('date.timezone','America/Bogota'); 
+        $objMetodosC = new MetodosControladores();
+        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 15, 1);
+//        $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 15, 2);
+        $array1 = array();
+        foreach ($listaBautismo as $value) {
+            $idBautismoEncriptado = $objMetodos->encriptar($value['idBautismo']);
+            $nombres = $value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'];
+            $nombresPersona = '<input type="hidden" id="estadoBautismoA'.$i.'" name="estadoBautismoA'.$i.'" value="'.$value['estadoBautismo'].'">'.$nombres;
+            $fechaIngreso = $objMetodos->obtenerFechaEnLetra($value['fechaRegistro']);
+
+            $botonEliminarBautismo = '';
+            $botonDeshabilitarBautismo = '';
+            if($validarprivilegioEliminar == TRUE){
+//                if(count($objConfigurarCurso->FiltrarConfigurarCursoPorCursoLimit1($value['idCurso'])) == 0)
+                if($value['estadoBautismo'] == 0){    
+                    $botonEliminarBautismo = '<button id="btnEliminarBautismo'.$i.'" title="ELIMINAR '.$nombres.'" onclick="eliminarBautismo(\''.$idBautismoEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                    $botonDeshabilitarBautismo = '<button id="btnHabilitarBautismo'.$i.'" title="HABILITAR '.$nombres.'" onclick="habilitarBautismo(\''.$idBautismoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
+                }
+                
+            }
+
+//            if($validarprivilegioModificar == TRUE){
+//                if($value['estadoCurso'] == TRUE)
+//                    $botonDeshabilitarCurso = '<button id="btnDeshabilitarCurso'.$i.'" title="DESHABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarCurso(\''.$idCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
+//                else
+//                    $botonDeshabilitarCurso = '<button id="btnDeshabilitarCurso'.$i.'" title="HABILITAR '.$value['nombreCurso'].'" onclick="deshabilitarCurso(\''.$idCursoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-minus-square"></i></button>';
+//            }
+            $botones =  $botonDeshabilitarBautismo.' '.$botonEliminarBautismo;     
+            $array1[$i] = array(
+                '_j'=>$j,
+                'nombresPersona'=>$nombresPersona,
+                'fechaIngreso'=>$fechaIngreso,
+                'opciones'=>$botones,
+            );
+            $j--;
+            $i++;
+        }
+        
+        return $array1;
+    }
+    
+    
     
     public function ingresarbautismoAction()
     {
@@ -63,9 +147,6 @@ class BautismoController extends AbstractActionController
                         $objPersona = new Persona($this->dbAdapter);
                         $objSacerdote = new Sacerdotes($this->dbAdapter);
                         $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
-//                       $objCurso = new Cursos($this->dbAdapter);
-//                       $objDias = new Dias($this->dbAdapter);
-//                       $objHorario = new Horario($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -189,6 +270,7 @@ class BautismoController extends AbstractActionController
                         $objSacerdotes = new Sacerdotes($this->dbAdapter);
                         $objProvincias = new Provincias($this->dbAdapter);
                         $objBautismo = new Bautismo($this->dbAdapter);
+                        $objPadresBautismo = new PadresBautismo($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -227,22 +309,6 @@ class BautismoController extends AbstractActionController
                                     $idPersonaEncriptado = $objMetodos->encriptar($listaPersona[0]['idPersona']);
                                     $botonGuardar = '<button data-loading-text="GUARDANDO..." id="btnGuardarBautismo" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>';
                                     $botonCancelar = '<button id="btnCancelar" onclick="limpiarFormularioBautismo();" type="button" class="btn btn-danger pull-right"><i class="fa fa-times"></i>CANCELAR</button>';
-    //                                $tabla = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">
-    //                                    <div class="table-responsive"><table class="table">
-    //                                    <thead> 
-    //                                        <tr>
-    //                                            <th>FECHA DE NACIMIENTO</th>
-    //                                            <td>'.$listaPersona[0]['fechaNacimiento'].'</td>
-    //                                        </tr>
-    //                                        <tr>
-    //                                            <th>IDENTIFICACIÓN</th>
-    //                                            <td>'.$identificacion.'</td>
-    //                                        </tr>
-    //                                        <tr>
-    //                                            <td colspan="2">'.$botonCancelar.' '.$botonGuardar.'</td>
-    //                                        </tr>
-    //                                    </thead>
-    //                                </table></div>';
 
                                     $listaSacerdote = $objSacerdotes->ObtenerSacerdotesEstado(1); 
                                     $optionSelectSacerdote = '<option value="0">SELECCIONE UN SACERDOTE</option>';
@@ -307,7 +373,40 @@ class BautismoController extends AbstractActionController
                                     $mensaje = '';
                                     $validar = TRUE;
                                 }else{
+                                    $nombres = $listaBautismo[0]['primerApellido'].' '.$listaBautismo[0]['segundoApellido'].' '.$listaBautismo[0]['primerNombre'].' '.$listaBautismo[0]['segundoNombre'];
+                                    $tablaIzquierda = '<div class="table-responsive">
+                                            <table class="table"> 
+                                                <tbody>
+                                                    <tr> 
+                                                        <th>N°</th>
+                                                        <td>'.$listaBautismo[0]['numero'].'</td>
+                                                    </tr> 
+                                                    <tr> 
+                                                        <th colspan="2">NOMBRE</th>
+                                                    </tr>
+                                                    <tr> 
+                                                        <td colspan="2">'.$nombres.'</td>
+                                                    </tr>
+                                                    <tr> 
+                                                        <th colspan="2">REGISTRO CIVIL</th>
+                                                    </tr>
+                                                    <tr> 
+                                                        <td><b>AÑO</b> '.$listaBautismo[0]['anoRegistroCivil'].'</td>
+                                                        <td><b>TOMO</b> '.$listaBautismo[0]['tomo'].'</td>
+                                                    </tr>
+                                                     <tr> 
+                                                        <td><b>FOLIO</b> '.$listaBautismo[0]['folio'].'</td>
+                                                        <td><b>ACTA</b> '.$listaBautismo[0]['acta'].'</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>';
+                                            
+                                    $tabla = '<div class="col-lg-4">'.$tablaIzquierda.'</div>';
+                                    
                                     $mensaje = '';
+
+//                                    $tabla = '<div class="alert alert-warning text-center" role="alert">ESTA PERSONA YA TIENE UN BAUTIZO AGREGADO POR FAVOR BÚSCALO(A) EN LA TABLA DE ABAJO</div>';
                                     $validar = TRUE;
                                 }
                                 

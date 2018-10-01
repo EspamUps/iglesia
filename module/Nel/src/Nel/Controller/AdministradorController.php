@@ -24,7 +24,7 @@ use Nel\Modelo\Entity\LugaresMisa;
 use Nel\Modelo\Entity\DireccionLugarMisa;
 use Nel\Modelo\Entity\RangoAsistencia;
 use Nel\Modelo\Entity\Cursos;
-use Nel\Modelo\Entity\Sacerdotes;
+use Nel\Modelo\Entity\Sexo;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -461,8 +461,17 @@ class AdministradorController extends AbstractActionController
                 $objMetodosC = new MetodosControladores();
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 1, 3);
                 $objProvincias = new Provincias($this->dbAdapter);
+                $objSexo = new Sexo($this->dbAdapter);
                 $objMetodos = new Metodos();
 
+                $listaSexo = $objSexo->ObtenerSexoActivo();
+                $optionSelectSexo = '<option value="0">SELECCIONE UN SEXO</option>'; 
+                foreach ($listaSexo as $valueSexo) {
+                    $idSexoEncriptado = $objMetodos->encriptar($valueSexo['idSexo']);
+                    $optionSelectSexo = $optionSelectSexo.'<option value="'.$idSexoEncriptado.'">'.$valueSexo['descripcionSexo'].'</option>';
+                }
+                
+                
                 $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
                 $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
                 foreach ($listaProvincias as $valueProvincias) {
@@ -471,7 +480,8 @@ class AdministradorController extends AbstractActionController
                 }
                 $array = array(
                     'optionSelectProvincias'=>$optionSelectProvincias,
-                    'validacionPrivilegio' =>  $validarprivilegio
+                    'validacionPrivilegio' =>  $validarprivilegio,
+                    'optionSelectSexo'=>$optionSelectSexo
                 );
             }
         }
