@@ -216,7 +216,7 @@ class MatriculasController extends AbstractActionController
                                                         <tr>
                                                             <th><label for="curso">INFORMACIÓN ÚLTIMO CURSO EN EL QUE FUE MATRICULADO/A</label></th>
                                                             <td>CURSO:<span style="background-color:#ffa50070">'.$nombreCursoActual.'</span></td>
-                                                            <td><span style="background-color:#3c8dbc42">ESTADO: '.$estadoCursoActual.'</span> <span style="background-color:#00a65a42"> NIVEL: '.$nivelCursoActual.'</span><span style="background-color:#00a65a42"> ESTADO MATRÍCULA: '.$estadoMatricula.'</span></td>
+                                                            <td><span style="background-color:#3c8dbc42">ESTADO: '.$estadoCursoActual.'</span> <span style="background-color:#00a65a42"> NIVEL: '.$nivelCursoActual.'</span>  <span style="background-color:#a6520042"> ESTADO MATRÍCULA: '.$estadoMatricula.'</span></td>
                                                         </tr>
                                                     </thead>
                                                 </table></div>';
@@ -481,7 +481,7 @@ class MatriculasController extends AbstractActionController
                             {
                                $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO TIENE ESTUDIANTES MATRICULADOS</div>';
                             }else{
-                                $tabla = $this->CargarTablaMatriculasAction($listaMatricula, 0, count($listaMatricula));
+                                $tabla = $this->CargarTablaMatriculasAction($listaConfCurso,$listaMatricula, 0, count($listaMatricula));
                                 $mensaje = '';
                                 $validar = TRUE;
                                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
@@ -558,11 +558,16 @@ class MatriculasController extends AbstractActionController
     }
     
     
-     function CargarTablaMatriculasAction($listaMatriculas, $i, $j)
+     function CargarTablaMatriculasAction($listaConfigurarCurso,$listaMatriculas, $i, $j)
     {
         $objAdjuntoMat = new AdjuntoMatricula($this->dbAdapter);
         $objMetodos = new Metodos();
         $array1 = array();
+        ini_set('date.timezone','America/Bogota'); 
+        $hoy = getdate();
+        $fechaActual = strtotime(date("d-m-Y"));
+        $fechaInicioMat = strtotime($listaConfigurarCurso[0]['fechaInicioMatricula']);
+        $fechaFinMat = strtotime($listaConfigurarCurso[0]['fechaFinMatricula']); 
         foreach ($listaMatriculas as $value) {
             $idMatricula=$value['idMatricula'];
             $idMatriculaEncriptado = $objMetodos->encriptar($idMatricula);
@@ -576,37 +581,37 @@ class MatriculasController extends AbstractActionController
             $fechaMatricula=$value['fechaMatricula'];
             $estadoMatricula = $value['estadoMatricula'];
             
+            
             if($estadoMatricula==1)
-            {
-                $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="DESHABILITAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+            {                    
                 $labelEstadoMatricula= '<label style="background-color:#b1ffa1" class="form-control" >Habilitada</label>';   
-
+                if(($fechaActual>=$fechaInicioMat)&&($fechaActual<$fechaFinMat))
+                {
+                    $botonCambiarEstadoMatricula = '<button data-target="#modalModificarEstadoMatricula" data-toggle="modal"  id="btnModificarEstadoMatricula'.$i.'" title="CANCELAR MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                }
+                else
+                    $botonCambiarEstadoMatricula = '<label title="ESTUDIANTE '.$value['primerNombre'].' '.$value['primerApellido'].' MATRICULADO CORRECTAMENTE"  class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></label>';
             }
             else
             {
                $docAdjunto = $objAdjuntoMat->FiltrarAdjuntoPorIdMatriculaYTipoAdjunto($idMatricula, 2);
                
-               $botonCambiarEstadoMatricula = '<a href=" '.$this->getRequest()->getBaseUrl().$docAdjunto[0]['rutaAdjunto'].'"  download="'.$docAdjunto[0]['nombreAdjunto'].'"><i class="fa fa-download"></i></a>';
+               $botonCambiarEstadoMatricula = '<a class="btn btn-primary btn-sm btn-flat" href=" '.$this->getRequest()->getBaseUrl().$docAdjunto[0]['rutaAdjunto'].'"  download="'.$docAdjunto[0]['nombreAdjunto'].'"><i class="fa fa-download"></i></a>';
                $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
 
             }
        
-            
-            ini_set('date.timezone','America/Bogota'); 
-            $hoy = getdate();
-            $mes =date("m");
-            $fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
-            if($fechaActual>=$value['fechaInicioMatricula'] && $fechaActual<=$value['fechaFinMatricula'])
+            $fechaInicioClases = strtotime($value['fechaInicio']);
+            $fechaFinClases =strtotime($value['fechaFin']);
+            if($fechaActual>=$fechaInicioMat && $fechaActual<=$fechaFinMat)
             $estadoCurso= 'Periodo de matrículas';
-            else if($fechaActual>=$value['fechaInicio']&& $fechaActual<=$value['fechaFin'])
+            else if($fechaActual>= $fechaInicioClases && $fechaActual<=$fechaFinClases)
+            {   
                 $estadoCurso='En clases';
-            else{
                 if($value['aprobado']==0)
                     $estadoCurso='Reprobado';
-                else
-                    $estadoCurso='Aprobado';
-            } 
-            
+            } else
+            $estadoCurso='Esperando inicio clases';
             
             $botones = $botonCambiarEstadoMatricula;
 
@@ -911,6 +916,7 @@ class MatriculasController extends AbstractActionController
                         $objMatricula = new Matricula($this->dbAdapter);     
                         $objAdjunto = new Adjunto($this->dbAdapter);
                         $objAdjuntoMatricula = new AdjuntoMatricula($this->dbAdapter);
+                        $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -972,7 +978,8 @@ class MatriculasController extends AbstractActionController
                                                         $resultado4 =$objAdjunto->ModificarEstadoAdjunto($resultado[0]['idAdjunto'], 0);
                                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO, POR FAVOR INTENTE MÁS TARDE</div>';
                                                     }else{
-                                                        $tablaMatricula = $this->CargarTablaMatriculasAction($resultado2, $im, $jm);
+                                                        $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($resultado2[0]['idConfigurarCurso']);
+                                                        $tablaMatricula = $this->CargarTablaMatriculasAction($listaConfigurarCurso, $resultado2, $im, $jm);
     
                                                         $mensaje = '<div class="alert alert-success text-center" role="alert">SE CANCELÓ LA MATRÍCULA DE '.$resultado2[0]['primerNombre'].' '.$resultado2[0]['primerApellido'].' CON IDENTIFICACIÓN '.$resultado2[0]['identificacion'].'</div>';
                                                         $validar = TRUE;
