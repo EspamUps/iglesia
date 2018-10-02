@@ -244,6 +244,7 @@ function obtenerMatriculas(){
 function filtrarlistaHorariosCursoSeleccionado(){
     var url = $("#rutaBase").text();
     var idCurso = $("#selectCurso").val();
+    var idPeriodo = $("#selectPeriodo").val();
 
     if(idCurso == 0){
         $("#contenedorHorarioSeleccionado").html("");
@@ -259,7 +260,7 @@ function filtrarlistaHorariosCursoSeleccionado(){
             url : url+'/matriculas/obtenerhorarios',
             type: 'post',
             dataType: 'JSON',
-            data: {id:idCurso},
+            data: {id:idCurso, idPeriodo:idPeriodo},
             beforeSend: function(){
                 cargandoMatriculas("#contenedorlistahorarios");
                 $("#mensajeContenedorHorario").html("");
@@ -480,6 +481,7 @@ $(function(){
             if(data.validar==true){
                 limpiarFormIngresoMatriculas();
                 filtrarHorarioCursoSeleccionado();
+                cargarFormularioIngresarMatricula();
                 obtenerMatriculas();
             }
             $("#btnGuardarMatricula").button('reset');

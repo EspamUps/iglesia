@@ -114,89 +114,121 @@ class MatriculasController extends AbstractActionController
                                            $mensaje = '<div class="alert alert-warning text-center" role="alert">NO HAY CUPOS DISPONIBLES EN ESTE CURSO </div>';
                                        else {            
                                         
-                                        if(count($listaMatricula)>0)
-                                        {
-                                            ini_set('date.timezone','America/Bogota'); 
-                                            $hoy = getdate();
-                                            $mes =date("m");
-                                            $fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
-                                            $nombreCursoActual= $listaMatricula[0]['nombreCurso'];
-                                            $nivelCursoActual=$listaMatricula[0]['nivelCurso'];
-                                            $estadoCursoActual='No aprobado';
-                                            
-                                            if($listaMatricula[0]['aprobado']==1)
-                                                $estadoCursoActual='Aprobado';
-                                            
-                                            if($idConfigurarCurso==$listaMatricula[0]['idConfigurarCurso'])
+                                            if(count($listaMatricula)>0)
                                             {
-                                                if($listaMatricula[0]['estadoMatricula']==0)
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA FUE MATRICULADA EN ESTE CURSO Y HORARIO PERO CANCELÓ SU MATRÍCULA. </div>';
-                                                else                                                 
-                                                    $mensaje = '<div class="alert alert-success text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN ESTE CURSO. </div>';
-                                            }
-                                            else{
-                                                if($listaMatricula[0]['nivelCurso']==$listaConfigurarCurso[0]['nivelCurso'])
-                                                   if($listaMatricula[0]['aprobado']==1)
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA Y HA APROBADO ESTE CURSO CON ANTERIORIDAD. </div>';
-                                                   else if($listaMatricula[0]['aprobado']==0 && $listaMatricula[0]['fechaFin']>$fechaActual && $listaMatricula[0]['estadoMatricula']==1)
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN UN CURSO SIMILAR A ESTE PERO EN OTRO HORARIO. </div>';
-                                                   else {
-                                                       $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
-                                                       $matricular=true;
+                                                ini_set('date.timezone','America/Bogota'); 
+                                                $hoy = getdate();
+                                                $mes =date("m");
+                                                $fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
+                                                $nombreCursoActual= $listaMatricula[0]['nombreCurso'];
+                                                $nivelCursoActual=$listaMatricula[0]['nivelCurso'];
+                                                $estadoCursoActual='No aprobado';
+                                                $estadoMatricula='Cancelada';
+
+                                                if($listaMatricula[0]['aprobado']==1)
+                                                    $estadoCursoActual='Aprobado';
+
+                                                if($idConfigurarCurso==$listaMatricula[0]['idConfigurarCurso'])
+                                                {
+                                                    if($listaMatricula[0]['estadoMatricula']==0){
+                                                        $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA FUE MATRICULADA EN ESTE CURSO Y HORARIO PERO CANCELÓ SU MATRÍCULA. </div>';
+
                                                     }
-                                                else if ($listaMatricula[0]['nivelCurso']>$listaConfigurarCurso[0]['nivelCurso'])
-                                                    if($listaMatricula[0]['aprobado']==1)
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA SIDO MATRICULADA Y HA APROBADO UN CURSO SUPERIOR A ESTE. </div>';
-                                                    else
-                                                    $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA SIDO MATRICULADA EN UN CURSO SUPERIOR Y AÚN NO LO HA APROBADO. </div>';
-                                                else 
-                                                    if($listaMatricula[0]['aprobado']==0)
-                                                        $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA SIDO MATRICULADA EN UN CURSO INFERIOR Y DEBE APROBARLO PRIMERO. </div>';
-                                                    else{                                                        
-                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
-                                                        $matricular=true;
-                                                    }                                                 
+                                                    else{
+                                                        $estadoMatricula='Activa';
+                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN ESTE CURSO. </div>';
+                                                    }                                             
                                                 }
-                                        }else{
+                                                else{
+                                                    if($listaMatricula[0]['nivelCurso']==$listaConfigurarCurso[0]['nivelCurso'])
+                                                       if($listaMatricula[0]['aprobado']==1)
+                                                       {
+                                                           $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA Y HA APROBADO ESTE CURSO CON ANTERIORIDAD. </div>';
+                                                           $estadoMatricula='Activa';                                                       
+                                                       }
+                                                       else if($listaMatricula[0]['aprobado']==0 && $listaMatricula[0]['fechaFin']>$fechaActual && $listaMatricula[0]['estadoMatricula']==1)
+                                                       {
+                                                            $estadoMatricula='Activa';
+                                                            $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA HA SIDO MATRICULADA EN UN CURSO SIMILAR A ESTE PERO EN OTRO HORARIO. </div>';
+                                                       }else {
+                                                            $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
+                                                            $inputIdPersona = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">';                                                           
+                                                            $matricular=true;
+                                                        }
+                                                    else if ($listaMatricula[0]['nivelCurso']>$listaConfigurarCurso[0]['nivelCurso'])
+                                                        if($listaMatricula[0]['aprobado']==1 )
+                                                        {
+                                                            $estadoMatricula='Activa';
+                                                            $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA SIDO MATRICULADA Y HA APROBADO UN CURSO SUPERIOR A ESTE. </div>';
+                                                        }
+                                                        else{
+                                                            if($listaMatricula[0]['estadoMatricula']==1)
+                                                            {
+                                                                $estadoMatricula='Activa';
+                                                                $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA APROBÓ ESTE NIVEL Y TIENE UNA MATRÍCULA ACTIVA EN UN CURSO DE NIVEL SUPERIOR. </div>';                            
+                                                            }else{
+                                                                $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA APROBÓ ESTE NIVEL Y DEBE VOLVER A MATRICULARSE EN UN CURSO DE NIVEL SUPERIOR PORQUE TIENE UNA MATRÍCULA CANCELADA.</div>';                            
+                                                            }
+                                                        }
+                                                    else 
+                                                        if($listaMatricula[0]['aprobado']==0 &&  $listaMatricula[0]['fechaFin']>$fechaActual && $listaMatricula[0]['estadoMatricula']==1){
+                                                             $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA SIDO MATRICULADA EN UN CURSO INFERIOR Y DEBE APROBARLO PRIMERO. </div>';
+                                                             $estadoMatricula='Activa';
+                                                            }
+                                                        else{  
+                                                            if($listaMatricula[0]['estadoMatricula']==1)
+                                                            {
+                                                                $estadoMatricula='Activa';
+                                                                $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';                            
+                                                                $matricular=true;
+                                                                $inputIdPersona = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">';
+                                                            }else
+                                                            {
+                                                                $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' HA REGISTRADO UNA MATRÍCULA CANCELADA, POR LO TANTO DEBE VOLVER A SER MATRICULADA Y APROBAR UN NIVEL INFERIOR A ESTE. </div>';
+                                                            }
 
-                                           $nivelCursoActual ='No tiene cursos registrados en esta iglesia';
-                                           $estadoCursoActual='Sin estado';
-                                           $nombreCursoActual = 'Desconocido';
-                                           $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
-                                           $matricular=true;
-                                           $inputIdPersona = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">';
-                                        }
+                                                        }                                                 
+                                                    }
+                                            }else{
 
-                                        $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
-                                        $apellidos = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'];
-                                       
+                                               $nivelCursoActual ='No tiene cursos registrados en esta iglesia';
+                                               $estadoCursoActual='Sin estado';
+                                               $nombreCursoActual = 'Desconocido';
+                                               $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
+                                               $matricular=true;
+                                               $inputIdPersona = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">';
+                                            }
+
+                                            $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
+                                            $apellidos = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'];
 
 
-                                        $tabla = '<div><h3>INFORMACIÓN ACTUAL DEL ESTUDIANTE</h3><br></div>
-                                                '.$inputIdPersona.'
-                                                <div class="table-responsive"><table class="table">
-                                                <thead> 
-                                                    <tr>
-                                                        <th><label for="nombres">NOMBRES Y APELLIDOS</label></th>
-                                                        <td>'.$nombres.'</td>
-                                                        <td>'.$apellidos.'</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th><label for="curso">CURSO ACTUAL</label></th>
-                                                        <td><span style="background-color:#ffa50070">'.$nombreCursoActual.'</span></td>
-                                                        <td><span style="background-color:#3c8dbc42">ESTADO: '.$estadoCursoActual.'</span>    <span style="background-color:#00a65a42"> Nivel: '.$nivelCursoActual.'</span></td>
-                                                    </tr>
-                                                </thead>
-                                            </table></div>';
-                                        
-                                        $validar = TRUE;
-                                        if($matricular==false){                                               
-                                                return new JsonModel(array('tabla'=>$tabla,'mensaje'=>$mensaje,'validar'=>$validar));
-                                        }else{
-                                                $botonGuardar = '<button data-loading-text="GUARDANDO..." id="btnGuardarMatricula" type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i>MATRICULAR</button>';
-                                                return new JsonModel(array('tabla'=>$tabla,'mensaje'=>$mensaje,'validar'=>$validar,'idPersonaEncriptado'=>$idPersonaEncriptado, 'btnMatricular'=>$botonGuardar));
-                                                
-                                        }
+
+                                            $tabla = '<div><h3>INFORMACIÓN ACTUAL DEL ESTUDIANTE</h3><br></div>
+                                                    '.$inputIdPersona.'
+                                                    <div class="table-responsive"><table class="table">
+                                                    <thead> 
+                                                        <tr>
+                                                            <th><label for="nombres">NOMBRES Y APELLIDOS</label></th>
+                                                            <td>'.$nombres.'</td>
+                                                            <td>'.$apellidos.'</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th><label for="curso">INFORMACIÓN ÚLTIMO CURSO EN EL QUE FUE MATRICULADO/A</label></th>
+                                                            <td>CURSO:<span style="background-color:#ffa50070">'.$nombreCursoActual.'</span></td>
+                                                            <td><span style="background-color:#3c8dbc42">ESTADO: '.$estadoCursoActual.'</span> <span style="background-color:#00a65a42"> NIVEL: '.$nivelCursoActual.'</span><span style="background-color:#00a65a42"> ESTADO MATRÍCULA: '.$estadoMatricula.'</span></td>
+                                                        </tr>
+                                                    </thead>
+                                                </table></div>';
+
+                                            $validar = TRUE;
+                                            if($matricular==false){                                               
+                                                    return new JsonModel(array('tabla'=>$tabla,'mensaje'=>$mensaje,'validar'=>$validar));
+                                            }else{
+                                                    $botonGuardar = '<button data-loading-text="GUARDANDO..." id="btnGuardarMatricula" type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i>MATRICULAR</button>';
+                                                    return new JsonModel(array('tabla'=>$tabla,'mensaje'=>$mensaje,'validar'=>$validar,'idPersonaEncriptado'=>$idPersonaEncriptado, 'btnMatricular'=>$botonGuardar));
+
+                                            }
                                        }
                                     }
                                 }
@@ -243,12 +275,15 @@ class MatriculasController extends AbstractActionController
                             $request->getFiles()->toArray()
                         );
                         $idCursoEncriptado = $post['id'];
-                         if(empty($idCursoEncriptado)){
+                        $idPeriodoEncriptado = $post['idPeriodo'];
+                        if(empty($idPeriodoEncriptado)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL PERIODO</div>';
+                        }else if(empty($idCursoEncriptado)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
                         }else{
                             $idCurso=$objMetodos->desencriptar($idCursoEncriptado);
-                            
-                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarListaHorariosPorCurso($idCurso, 1);
+                            $idPeriodo = $objMetodos->desencriptar($idPeriodoEncriptado);
+                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarListaHorariosPorCursoPorPeriodo($idPeriodo, $idCurso, 1);
                             
                             if(count($listaConfigurarCurso)==0)
                                 $mensaje = '<div class="alert alert-warning text-center" role="alert">ACTUALMENTE NO EXISTEN HORARIOS HABILITADOS PARA ESTE CURSO</div>';
@@ -639,10 +674,10 @@ class MatriculasController extends AbstractActionController
                             else{
                                 ini_set('date.timezone','America/Bogota'); 
                                 $hoy = getdate();
-                                $mes =date("m");
-                                $fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
-                                $fechaInicio =  $listaConfCurso[0]['fechaFinMatricula'];                                        
-                                if(($fechaActual< $listaConfCurso[0]['fechaInicioMatricula'])||($fechaActual>$listaConfCurso[0]['fechaFinMatricula']))
+                                $fechaActual = strtotime(date("d-m-Y"));
+                                $fechaInicioMat = strtotime($listaConfCurso[0]['fechaInicioMatricula']);
+                                 $fechaFinMat = strtotime($listaConfCurso[0]['fechaFinMatricula']);                                    
+                                if(($fechaActual<$fechaInicioMat)||($fechaActual>=$fechaFinMat))
                                     $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO ESTÁ HABILITADO PARA MATRICULAR EN ESTA FECHA</div>';
                                 else{
                                     $div = '<h4>FORMULARIO DE MATRÍCULA</h4><hr>
@@ -652,15 +687,14 @@ class MatriculasController extends AbstractActionController
                                     $mensaje = '';
                                     $validar = TRUE;
                                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'div'=>$div));
-                                }   
-                            
+                                    }
+                                }
                             }
-                        }
-                    }                   
-                }                    
+                        }                   
+                    }                    
+                }
             }
-        }
-        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar, 'i'=>$fechaActual));
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
     
@@ -699,14 +733,11 @@ class MatriculasController extends AbstractActionController
                             $request->getFiles()->toArray()
                         );
                         $idPersonaEncriptado = $post['idPersonaEncriptado']; 
-                        $idCursoEncriptado = $post['selectCurso'];  
                         $idConfigurarCursoEncriptado = $post['selectConfigurarCurso'];
                                                  
 
                         if(empty($idPersonaEncriptado) || $idPersonaEncriptado == NULL){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
-                        }else if(empty ($idCursoEncriptado) || $idCursoEncriptado == NULL){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">POR FAVOR, SELECCIONE UN CURSO</div>';
                         }else if(empty ($idConfigurarCursoEncriptado)|| $idConfigurarCursoEncriptado == NULL ){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">POR FAVOR, SELECCIONE UN HORARIO DE CLASES</div>';
                         }else 
@@ -718,12 +749,6 @@ class MatriculasController extends AbstractActionController
                             }else if($listaPersona[0]['estadoPersona'] == FALSE){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA HA SIDO DESHABILITADA POR LO TANTO NO PUEDE SER MATRICULADA</div>';
                             }else{
-                                $idCurso = $objMetodos->desencriptar($idCursoEncriptado);
-                                $listaCurso = $objCurso->FiltrarCurso($idCurso);
-                                
-                                if(count($listaCurso) == 0){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE EL CURSO</div>';
-                                }else{
                                     $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
                                     $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
                                     if(count($listaConfigurarCurso) == 0){
@@ -736,13 +761,13 @@ class MatriculasController extends AbstractActionController
                                         $res = $objMatricula->IngresarMatricula($idPersona, $idConfigurarCurso, $fechaMatricula);
                                         
                                         if(count($res)==0)
-                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR, NO SE PUDO INGRESAR AL USUARIO</div>';
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR, NO SE PUDO LA MATRÍCULA</div>';
                                         else{
                                             $mensaje = '<div class="alert alert-success text-center" role="alert">MATRICULA FINALIZADA CON ÉXITO</div>';
                                             $validar = TRUE;
                                         }
                                     }
-                                }
+//                                }
                             }
                         }
                     }

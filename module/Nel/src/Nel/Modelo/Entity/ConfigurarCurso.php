@@ -94,6 +94,11 @@ class ConfigurarCurso extends TableGateway
         return $resultado;
     }
     
+     public function FiltrarListaHorariosPorCursoPorPeriodo($idPeriodo, $idCurso, $estadoConfigurarCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarListaHorariosPorCursoPorPerido('{$idPeriodo}','{$idCurso}','{$estadoConfigurarCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
 //    
 //    
 //    
