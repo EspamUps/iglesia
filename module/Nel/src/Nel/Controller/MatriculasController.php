@@ -197,6 +197,8 @@ class MatriculasController extends AbstractActionController
                                                $mensaje = '<div class="alert alert-success text-center" role="alert">PARA FINALIZAR EL PROCESO, DE CLIC EN EL BOTÓN MATRICULAR</div>';
                                                $matricular=true;
                                                $inputIdPersona = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">';
+                                               $estadoMatricula='No registrado';
+                                               
                                             }
 
                                             $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
@@ -603,6 +605,7 @@ class MatriculasController extends AbstractActionController
        
             $fechaInicioClases = strtotime($value['fechaInicio']);
             $fechaFinClases =strtotime($value['fechaFin']);
+            
             if($fechaActual>=$fechaInicioMat && $fechaActual<=$fechaFinMat)
             $estadoCurso= 'Periodo de matrículas';
             else if($fechaActual>= $fechaInicioClases && $fechaActual<=$fechaFinClases)
@@ -611,7 +614,7 @@ class MatriculasController extends AbstractActionController
                 if($value['aprobado']==0)
                     $estadoCurso='Reprobado';
             } else
-            $estadoCurso='Esperando inicio clases';
+                $estadoCurso='Esperando inicio clases';
             
             $botones = $botonCambiarEstadoMatricula;
 
