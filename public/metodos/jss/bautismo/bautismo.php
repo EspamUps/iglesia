@@ -218,16 +218,8 @@ function obtenerBautismos(){
                             data: '_j'
                         },
                         {
-                            title: 'IDENTIFICACIÓN',
-                            data: 'nombres'
-                        },
-                        {
                             title: 'NOMBRES',
-                            data: 'nombres'
-                        },
-                        {
-                            title: 'FECHA DE NACIMIENTO',
-                            data: 'fechaNacimiento'
+                            data: 'nombresPersona'
                         },
                         {
                             title: 'FECHA DE REGISTRO',

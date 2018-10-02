@@ -59,9 +59,10 @@ public function ModificarPersona(
         $primerApellido = $array['primerApellido'];
         $segundoApellido = $array['segundoApellido'];
         $fechaNacimiento = $array['fechaNacimiento'];
+        $idSexo = $array['idSexo'];
         $fechaRegistro = $array['fechaRegistro'];
         $estadoPersona = $array['estadoPersona'];
-        $resultado =  $this->getAdapter()->query("CALL Sp_IngresarPersona('{$idIglesia}','{$identificacion}','{$primerNombre}','{$segundoNombre}','{$primerApellido}','{$segundoApellido}','{$fechaNacimiento}','{$fechaRegistro}','{$estadoPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        $resultado =  $this->getAdapter()->query("CALL Sp_IngresarPersona('{$idIglesia}','{$identificacion}','{$primerNombre}','{$segundoNombre}','{$primerApellido}','{$segundoApellido}','{$fechaNacimiento}','{$idSexo}','{$fechaRegistro}','{$estadoPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     

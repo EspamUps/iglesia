@@ -11,42 +11,37 @@ namespace Nel\Modelo\Entity;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 
-class Bautismo extends TableGateway
+class PadresBautismo extends TableGateway
 {
     public function __construct(Adapter $adapter = null, $databaseSchema = null, ResultSet $selectResultPrototype = null)
     {
-        return parent::__construct('bautismo', $adapter, $databaseSchema, $selectResultPrototype);
+        return parent::__construct('padresbautismo', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
 //    
-    public function ObtenerBautismos(){
-        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerBautismos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function ObtenerPadreBautismoActivo(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerPadreBautismoActivo()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
 //    
-//    public function ObtenerCursosEstado($estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function FiltrarPadreBautismoPorBautismo($idBautismo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPadreBautismoPorBautismo('{$idBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+//    public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
+//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-    public function IngresarBautismo($idPersona, $idSacerdote,
-    $idConfigurarParroquiaCanton,$idIglesia,$numero,$fechaBautizo,
-    $anoRegistroCivil,$tomo,$folio,$acta,$fechaInscripcion,$fechaRegistro,$estadoBautismo){
-        
-        $resultado = $this->getAdapter()->query("CALL Sp_IngresarBautismo('{$idPersona}','{$idSacerdote}',
-        '{$idConfigurarParroquiaCanton}','{$idIglesia}','{$numero}','{$fechaBautizo}','{$anoRegistroCivil}','{$tomo}',
-        '{$folio}','{$acta}','{$fechaInscripcion}','{$fechaRegistro}','{$estadoBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
-    public function FiltrarBautismoPorPersona($idPersona){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarBautismoPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+//    public function FiltrarCursoPorNombre($nombreCurso){
+//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
 ////    
 //    
-    public function FiltrarBautismoPorNumero($numero){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarBautismoPorNumero('{$numero}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+//    public function FiltrarCursoEstado($idCurso,$estado){
+//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoEstado('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
 //    
 ////    
 //    public function EliminarCurso($idCurso){
