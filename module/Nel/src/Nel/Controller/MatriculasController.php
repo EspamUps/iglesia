@@ -167,7 +167,7 @@ class MatriculasController extends AbstractActionController
                                                                 $estadoMatricula='Activa';
                                                                 $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA APROBÓ ESTE NIVEL Y TIENE UNA MATRÍCULA ACTIVA EN UN CURSO DE NIVEL SUPERIOR. </div>';                            
                                                             }else{
-                                                                $mensaje = '<div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA APROBÓ ESTE NIVEL Y DEBE VOLVER A MATRICULARSE EN UN CURSO DE NIVEL SUPERIOR PORQUE TIENE UNA MATRÍCULA CANCELADA.</div>';                            
+                                                                $mensaje = ' '.$listaMatricula[0]['estadoMatricula'].' <div class="alert alert-warning text-center" role="alert">LA PERSONA CON IDENTIFICACIÓN '.$identificacion.' YA APROBÓ ESTE NIVEL Y DEBE VOLVER A MATRICULARSE EN UN CURSO DE NIVEL SUPERIOR PORQUE TIENE UNA MATRÍCULA CANCELADA.</div>';                            
                                                             }
                                                         }
                                                     else 

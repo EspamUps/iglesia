@@ -262,7 +262,6 @@ function filtrarlistaHorariosCursoSeleccionado(){
             dataType: 'JSON',
             data: {id:idCurso, idPeriodo:idPeriodo},
             beforeSend: function(){
-                cargandoMatriculas("#contenedorlistahorarios");
                 $("#mensajeContenedorHorario").html("");
                 $("#contenedorlistahorarios").html("");
                 $("#contenedorHorarioSeleccionado").html("");
@@ -272,6 +271,7 @@ function filtrarlistaHorariosCursoSeleccionado(){
                 $("#mensajeFormIngresoMatricula").html("");
                 $("#contenedorFormIngresoMatricula").html("");
                 $("#contenedorDatosEstudianteParaMatricular").html("");
+                cargandoMatriculas("#contenedorlistahorarios");
             },
             uploadProgress: function(event,position,total,percentComplete){
 
@@ -317,7 +317,7 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
     var idPeriodo = $("#selectPeriodo").val();
 
     if(idPeriodo == 0){
-       
+       $("#mensajeContenedorHorario").html("");
         $("#contenedorlistacursos").html('');
         $("#contenedorlistahorarios").html('');
         $("#contenedorInfoGeneralHorarioSeleccionado").html("");
@@ -325,6 +325,8 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
         $("#mensajeFormIngresoMatricula").html("");
         $("#contenedorFormIngresoMatricula").html("");
         $("#contenedorDatosEstudianteParaMatricular").html("");
+        $("#mensajeTablaMatriculasActuales").html("");
+        $("#contenedorTablaMatriculasActuales").html("");
         
     }else{
         $.ajax({
@@ -333,7 +335,6 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
             dataType: 'JSON',
             data: {id:idPeriodo},
             beforeSend: function(){
-                cargandoMatriculas("#contenedorlistahorarios");
                 $("#mensajeContenedorHorario").html("");
                 $("#contenedorlistahorarios").html("");
                 $("#contenedorlistacursos").html("");
@@ -341,7 +342,10 @@ function filtrarlistaCursosPorPeriodoSeleccionado(){
                 $("#contenedorInfoGeneralHorarioSeleccionado").html("");
                 $("#mensajeTablaMatriculasActuales").html("");
                 $("#contenedorTablaMatriculasActuales").html("");
+                 $("#mensajeFormIngresoMatricula").html("");
+                $("#contenedorFormIngresoMatricula").html("");
                 $("#contenedorDatosEstudianteParaMatricular").html("");
+                 cargandoMatriculas("#contenedorlistacursos"); 
             },
             uploadProgress: function(event,position,total,percentComplete){
 

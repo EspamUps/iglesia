@@ -563,4 +563,40 @@ class AdministradorController extends AbstractActionController
         }
         return new ViewModel($array);
     }
+    
+    public function asistenciasAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objPerido = new Periodos($this->dbAdapter);
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objMetodos = new Metodos();
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 16);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {       
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 14, 3);
+                $listaPeriodo = $objPerido->ObtenerPeriodosEstado(1);
+                $optionPeriodos = '<option value="0">SELECCIONE UN PERIODO</option>';
+                foreach ($listaPeriodo as $valueP) {
+                    $idPeriodoEncriptado = $objMetodos->encriptar($valueP['idPeriodo']);
+                    $optionPeriodos = $optionPeriodos.'<option value="'.$idPeriodoEncriptado.'">'.$valueP['nombrePeriodo'].'</option>';
+                }
+                
+                
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio,
+                    'optionPeriodos' => $optionPeriodos
+                );
+            }
+        }
+        return new ViewModel($array);
+    }
 }
