@@ -22,6 +22,21 @@ class FechaAsistencia extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarFechasAsistencia('{$idConfigurarCurso}','{$fechaAsistencia}','{$estadoFechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function FiltrarFechaAsistenciaPorIdConfCurso($idConfigurarCurso, $estadoFechaAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarFechaAsistenciaPorIdConfCurso('{$idConfigurarCurso}','{$estadoFechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarFechaAsistenciaPorFechaAsistencia($idFechaAsistencia, $estadoFechaAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarFechaAsistenciaPorFechaAsistencia('{$idFechaAsistencia}','{$estadoFechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function FiltrarFechaAsistencia($idFechaAsistencia, $estadoFechaAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarFechaAsistencia('{$idFechaAsistencia}','{$estadoFechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 }

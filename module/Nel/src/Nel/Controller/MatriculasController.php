@@ -681,7 +681,6 @@ class MatriculasController extends AbstractActionController
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CONFIGURAR CURSO EN EL SISTEMA</div>';
                             else{
                                 ini_set('date.timezone','America/Bogota'); 
-                                $hoy = getdate();
                                 $fechaActual = strtotime(date("d-m-Y"));
                                 $fechaInicioMat = strtotime($listaConfCurso[0]['fechaInicioMatricula']);
                                  $fechaFinMat = strtotime($listaConfCurso[0]['fechaFinMatricula']);                                    

@@ -17,7 +17,7 @@ use Nel\Metodos\MetodosControladores;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Matricula;
 use Nel\Modelo\Entity\Persona;
-use Nel\Modelo\Entity\Cursos;
+use Nel\Modelo\Entity\Asistencia;
 use Nel\Modelo\Entity\HoraHorario;
 use Nel\Modelo\Entity\Horario;
 use Nel\Modelo\Entity\FechaAsistencia;
@@ -184,6 +184,7 @@ class AsistenciasController extends AbstractActionController
                     $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
                     $objMatricula = new Matricula($this->dbAdapter);
                     $objHorarioCurso = new HorarioCurso($this->dbAdapter);
+                    $objFechaAsistencia = new FechaAsistencia($this->dbAdapter);
                     $post = array_merge_recursive(
                         $request->getPost()->toArray(),
                         $request->getFiles()->toArray()
@@ -216,14 +217,14 @@ class AsistenciasController extends AbstractActionController
                             $cuposDisponibles = $listaConfigurarCurso[0]['cupos']-count($listaMatriculados);
 
                            $divInfoGeneral = 
-                            '<div class="box box-solid  bg-aqua" >
+                            '<div class="box box-solid form-group" style="border-style: solid;border: 1px solid #d2d6de;">
                                 <div class="box-header ui-sortable-handle" style="cursor: move;">
-                                    <i class="fa fa-calendar"></i>
+                                    <i class="fa  fa-info-circle"></i>
 
                                     <h3 class="box-title">INFORMACIÓN GENERAL DEL HORARIO SELECCIONADO</h3>
                                     <!-- tools box -->
                                     <div class="pull-right box-tools">
-                                      <button type="button" class="btn  bg-aqua  btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                                      <button type="button" class="btn  btn-sm btn-default" data-widget="collapse"><i class="fa fa-minus"></i>
                                       </button>
                                     </div>
                                     <!-- /. tools -->
@@ -273,14 +274,14 @@ class AsistenciasController extends AbstractActionController
 
 
                            $tabla = 
-                            '<div class="box box-solid  bg-aqua" >
+                            '<div class="box box-solid form-group" style="border-style: solid;border: 1px solid #d2d6de;" >
                                 <div class="box-header ui-sortable-handle" style="cursor: move;">
                                     <i class="fa fa-calendar"></i>
 
                                     <h3 class="box-title">HORARIO DE CLASES</h3>
                                     <!-- tools box -->
                                     <div class="pull-right box-tools">
-                                      <button type="button" class="btn  bg-aqua  btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                                      <button type="button" class="btn  btn-default btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
                                       </button>
                                     </div>
                                     <!-- /. tools -->
@@ -309,16 +310,70 @@ class AsistenciasController extends AbstractActionController
                                   <!-- /.box-body -->
                                     <!-- /.row -->
                             </div>';
+                           
+                            ini_set('date.timezone','America/Bogota'); 
+                            $fechaActual = strtotime(date("d-m-Y"));
+                            $fechaInicioClases = strtotime($listaConfigurarCurso[0]['fechaInicio']);
+                            
+                            $listaFechasAsistencia= $objFechaAsistencia->FiltrarFechaAsistenciaPorIdConfCurso($idConfigurarCurso, 1);
+                            if(count($listaMatriculados)==0)
+                            {
+                                $small= '<small class="label label-default"><i class="fa fa-close"></i> curso sin estudiantes matriculados</small>';
+                                $smallhoy ='  <small class="label label-default"><i class="fa fa-close"></i> curso sin estudiantes matriculados</small>
+                                                ';
+                            }else
+                            {
+                                if(count($listaFechasAsistencia)>0)
+                                { 
+                                   $small= '<small class="label label-success"><i class="fa fa-check"></i> realizado</small>';
+                                    $smallhoy ='  <small class="label label-default"><i class="fa fa-close"></i> hoy no clases</small>
+                                                ';
+                                    foreach ($listaFechasAsistencia as $valueFechasAsistencia)
+                                    {
+                                        $fechaAsistencia = strtotime($valueFechasAsistencia['fechaAsistencia']);
+                                        if($fechaAsistencia==$fechaActual)
+                                        {
+                                            $listaFechasAsistenciaTomada= $objFechaAsistencia->FiltrarFechaAsistenciaPorFechaAsistencia($listaFechasAsistencia[0]['idFechaAsistencia'], 1);
+
+                                            if(count($listaFechasAsistenciaTomada)==0){
+                                                $idFechaAsistenciaEncriptado = $objMetodos->encriptar($valueFechasAsistencia['idFechaAsistencia']);
+                                                $smallhoy ='  <small class="label label-danger"><i class="fa fa-clock-o"></i> pendiente</small>
+                                                 <button type="button" onClick="GenerarAsistenciaHoy(\''.$idFechaAsistenciaEncriptado.'\')" class="btn  btn-success  btn-xs"><i class="fa fa-check"></i> TOMAR ASISTENCIA
+                                               </button>';
+                                            }else
+                                             $smallhoy ='  <small class="label label-success"><i class="fa fa-check"></i> realizado</small>
+                                                ';
+                                        }
+                                    }  
+                                }else
+                                 {                              
+
+                                    if($fechaActual>= $fechaInicioClases)
+                                    {
+                                        $small ='  <small class="label label-danger"><i class="fa fa-clock-o"></i> pendiente</small>
+                                          <button type="button" onClick="GenerarAsistencia()" class="btn  btn-success  btn-xs"><i class="fa fa-check"></i> GENERAR ASISTENCIA
+                                           </button>';
+                                        $smallhoy ='  <small class="label label-danger"><i class="fa fa-clock-o"></i> pendiente </small>';
+                                    }else
+                                    {
+                                        $small= ' <small class="label label-default"><i class="fa fa-close"></i> deshabilitado hasta que finalicen las matrículas</small>';
+                                        $smallhoy='  <small class="label label-default"><i class="fa fa-close"></i> deshabilitado hasta que inicien las clases</small>';
+                                    }
+                                }
+                            }
+                            
+                           
+                           
 
                             $tablaAsistencia = 
-                            '<div class="box box-solid  bg-aqua" >
+                            '<div class="box box-solid form-group" style="border-style: solid;border: 1px solid #d2d6de;">
                                 <div class="box-header ui-sortable-handle" style="cursor: move;">
-                                    <i class="fa fa-calendar"></i>
+                                    <i class="fa fa-user"></i>
 
-                                    <h3 class="box-title">ASISTENCIA DE LOS ESTUDIANTES</h3>
+                                    <h3 class="box-title">ACTIVIDADES PARA EL DOCENTE</h3>
                                     <!-- tools box -->
                                     <div class="pull-right box-tools">
-                                      <button type="button" class="btn  bg-aqua  btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                                      <button type="button" class="btn  btn-default  btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
                                       </button>
                                     </div>
                                     <!-- /. tools -->
@@ -329,15 +384,23 @@ class AsistenciasController extends AbstractActionController
                                     <div id="calendar" style="width: 100%">
                                     <div class="datepicker datepicker-inline">
                                     <div class="datepicker-days" style="display: block;">
-                                    <label>Por favor, genere la asistencia para el inicio de clases:</label>
-                                    <button type="button" onClick="GenerarAsistencia()" class="btn  btn-success  btn-sm"><i class="fa fa-check"></i> GENERAR ASISTENCIA
-                                      </button>
+                                    <div class="form-group" style="padding-right:10%; padding-left:10%;"> 
+                                        <tr class="text-center">
+                                            <td class="text-center">ASISTENCIA DEL CURSO: </td>
+                                            <td>'.$small.'</td>
+                                        </tr> 
+                                    </div>
+                                    <div class="form-group" style="padding-right:10%; padding-left:10%;"> 
+                                         <tr class="text-center">
+                                            <td class="text-center">ASISTENCIA DE HOY:</td>
+                                            <td>'.$smallhoy.'</td>
+                                        </tr>
+                                    </div>
+                                    </div>
                                     </div>
                                     </div>
                                     </div>
                                 </div>
-                                  <!-- /.box-body -->
-                                    <!-- /.row -->
                             </div>';
                             $mensaje = '';
                             $validar = TRUE;
@@ -391,27 +454,108 @@ class AsistenciasController extends AbstractActionController
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DEL CURSO CONFIGURADO ESTÁ VACÍO</div>';
                         }else{
                             $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
-                            
                             $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
-                            $listaHorarioRegistrado =$objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($idConfigurarCurso);
-                            $fechaInicioClases =$listaConfigurarCurso[0]['fechaInicio'];
-                            $fechaFinClases = $listaConfigurarCurso[0]['fechaFin'];
-                            for($i=$fechaInicioClases;$i<=$fechaFinClases;$i = date("Y-m-d", strtotime($i ."+ 1 days"))){
+                            if(count($listaConfigurarCurso) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO NO ESTÁ CONFIGURADO</div>';
+                            }else if($listaConfigurarCurso[0]['estadoConfigurarCurso'] == FALSE){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO NO HA SIDO HABILITADO</div>';
+                            }else{
                                
-                               $fechaAsistencia= strtotime($i);
-                               $numeroDia =date("w",$fechaAsistencia);
-                               foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
-                               {
-                                   if($valueDiaHorarioR['identificadorDia']==$numeroDia)
-                                       $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
-                               }
-                            }
+                            
+                                $listaHorarioRegistrado =$objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($idConfigurarCurso);
+                              
+                                $fechaInicioClases =$listaConfigurarCurso[0]['fechaInicio'];
+                                $fechaFinClases = $listaConfigurarCurso[0]['fechaFin'];
+                                for($i=$fechaInicioClases;$i<=$fechaFinClases;$i = date("Y-m-d", strtotime($i ."+ 1 days"))){
+
+                                   $fechaAsistencia= strtotime($i);
+                                   $numeroDia =date("w",$fechaAsistencia);
+                                   foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
+                                   {
+                                       if($valueDiaHorarioR['identificadorDia']==$numeroDia)
+                                           $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
+                                   }
+                                }
                             
                                 
-                            $mensaje = '<div class="alert alert-success text-center" role="alert">SE REGISTRARON LAS FECHAS PARA LA ASISTENCIA DE FORMA CORRECTA</div>';
-                            $validar = TRUE;
-                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-                                   
+                                $mensaje = '<div class="alert alert-success text-center" role="alert">SE REGISTRARON LAS FECHAS PARA LA ASISTENCIA DE FORMA CORRECTA</div>';
+                                $validar = TRUE;
+                                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+                                }
+                            }   
+                        }
+                    }                    
+                }
+            }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function generarasistenciahoyAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 16);
+            $objMetodos = new Metodos();
+            $objMetodosC = new MetodosControladores();
+            $objAsistencia = new Asistencia($this->dbAdapter);
+            $objMatricula= new Matricula($this->dbAdapter);
+            $objFechaAsistencia = new FechaAsistencia($this->dbAdapter);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 16, 3);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{
+
+                        $post = array_merge_recursive(
+                                $request->getPost()->toArray(),
+                                $request->getFiles()->toArray()
+                            );
+                        $idFechaAsistenciaEncriptado = $post['idFechaAsistencia'];
+
+                        if(empty($idFechaAsistenciaEncriptado) || $idFechaAsistenciaEncriptado == NULL){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DEL REGISTRO FECHA ASISTENCIA ESTÁ VACÍO</div>';
+                        }else{
+                            $idFechaAsistencia = $objMetodos->desencriptar($idFechaAsistenciaEncriptado);
+                            $listaFechaAsistencia = $objFechaAsistencia->FiltrarFechaAsistencia($idFechaAsistencia, 1);
+                            if(count($listaFechaAsistencia) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA SIDO CONFIGURADO LA FECHA DE ESTE DÍA</div>';
+                            }else{
+                                $idConfigurarCurso = $listaFechaAsistencia[0]['idConfigurarCurso'];
+                                
+                                $listaMatriculadosEnElCurso= $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso,1);
+                                if(count($listaMatriculadosEnElCurso)==0)
+                                  $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HAY MATRICULADOS EN ESTE CURSO</div>';
+                                else{
+                                    
+                                    ini_set('date.timezone','America/Bogota'); 
+                                    $hoy = getdate();
+                                    $fechaAsistencia = $hoy['year']."-".$hoy['mon']."-".$hoy['mday'];
+                                        
+                                    
+                                    foreach ($listaMatriculadosEnElCurso as $valueMatriculado) {
+                                        $resultado = $objAsistencia->IngresarAsistenciaHoy($idFechaAsistencia, $valueMatriculado['idMatricula'], 1, $fechaAsistencia, 1);
+                                    }
+                                    
+                                    $mensaje = '<div class="alert alert-success text-center" role="alert">ASISTENCIA DE HOY, INGRESADA CORRECTAMENTE</div>';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+                                    }
+                                }   
                             }   
                         }
                     }                    

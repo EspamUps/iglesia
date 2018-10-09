@@ -11,6 +11,7 @@ function cargando(contenedor){
 
 
 
+
 function filtrarlistaCursosPorPeriodo(){
     var url = $("#rutaBase").text();
     var idPeriodo = $("#selectPeriodoAsistencia").val();
@@ -21,6 +22,9 @@ function filtrarlistaCursosPorPeriodo(){
         $("#contenedorlistahorariosAsistencia").html('');
         $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html("");
         $("#contenedorHorarioSeleccionadoAsistencia").html("");
+        $("#mensajeContenedorListaAsistencia").html("");
+        $("#contenedorContenedorListaAsistencia").html("");
+        $("#contenedorOpcionesAsistencia").html("");
         
     }else{
         $.ajax({
@@ -35,6 +39,9 @@ function filtrarlistaCursosPorPeriodo(){
                 $("#contenedorlistacursosAsistencia").html("");
                 $("#contenedorHorarioSeleccionadoAsistencia").html("");
                 $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html("");
+                $("#mensajeContenedorListaAsistencia").html("");
+                $("#contenedorContenedorListaAsistencia").html("");
+                $("#contenedorOpcionesAsistencia").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
                 
@@ -84,6 +91,9 @@ function filtrarlistaHorariosPorCurso(){
         $("#contenedorHorarioSeleccionadoAsistencia").html("");
         $("#contenedorlistahorariosAsistencia").html("");
         $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html("");
+        $("#mensajeContenedorListaAsistencia").html("");
+        $("#contenedorContenedorListaAsistencia").html("");
+        $("#contenedorOpcionesAsistencia").html("");
     }else{
         $.ajax({
             url : url+'/asistencias/obtenerhorarios',
@@ -96,6 +106,9 @@ function filtrarlistaHorariosPorCurso(){
                 $("#contenedorlistahorariosAsistencia").html("");
                 $("#contenedorHorarioSeleccionadoAsistencia").html("");
                 $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html("");
+                $("#mensajeContenedorListaAsistencia").html("");
+                $("#contenedorContenedorListaAsistencia").html("");
+                $("#contenedorOpcionesAsistencia").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
 
@@ -142,6 +155,11 @@ function filtrarHorarioPorCurso(){
     var idConfCurso = $("#selectConfigurarCursoAsistencia").val();
     if(idConfCurso == 0){
         $("#mensajeContenedorHorarioAsistencia").html("");
+        $("#mensajeContenedorListaAsistencia").html("");
+        $("#contenedorContenedorListaAsistencia").html("");
+        $("#contenedorOpcionesAsistencia").html("");
+        $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html("");
+        $("#contenedorHorarioSeleccionadoAsistencia").html("");
     }else{
         $.ajax({
             url : url+'/asistencias/filtrardatoshorario',
@@ -152,6 +170,9 @@ function filtrarHorarioPorCurso(){
                 cargando("#contenedorInfoGeneralHorarioSeleccionadoAsistencia");
                 cargando("#contenedorHorarioSeleccionadoAsistencia");                
                 $("#mensajeContenedorHorarioAsistencia").html("");
+                $("#mensajeContenedorListaAsistencia").html("");
+                $("#contenedorContenedorListaAsistencia").html("");
+                $("#contenedorOpcionesAsistencia").html("");
                 
             },
             uploadProgress: function(event,position,total,percentComplete){
@@ -218,10 +239,13 @@ function GenerarAsistencia(){
             success: function(data){ 
                 if(data.validar == true)
                 {               
+                    filtrarHorarioPorCurso();
                 }else{
                      
                 }
                 $("#mensajeContenedorListaAsistencia").html(data.mensaje);
+                
+                setTimeout(function() {$("#mensajeContenedorListaAsistencia").html('');},1500);
             },
             complete: function(){
             },
@@ -246,5 +270,60 @@ function GenerarAsistencia(){
         }); 
     }
 } 
+
+function GenerarAsistenciaHoy(id){
+     var url = $("#rutaBase").text();
+    if(id == 0){
+       $("#mensajeContenedorHorarioAsistencia").html("");
+       $("#mensajeContenedorListaAsistencia").html("");
+       $("#contenedorContenedorListaAsistencia").html("");
+        
+    }else{
+        $.ajax({
+            url : url+'/asistencias/generarasistenciahoy',
+            type: 'post',
+            dataType: 'JSON',
+            data: {idFechaAsistencia:id},
+            beforeSend: function(){
+                cargando("#mensajeContenedorListaAsistencia");
+                $("#contenedorContenedorListaAsistencia").html("");
+            },
+            uploadProgress: function(event,position,total,percentComplete){
+                
+            },
+            success: function(data){ 
+                if(data.validar == true)
+                {               
+                  GenerarAsistencia();
+                }else{
+                     
+                }
+                $("#mensajeContenedorListaAsistencia").html(data.mensaje);
+                
+                setTimeout(function() {$("#mensajeContenedorListaAsistencia").html('');},1500);
+            },
+            complete: function(){
+            },
+            error: function(xhr, textStatus, errorThrown) { 
+                $("#contenedorContenedorListaAsistencia").html("");
+                if(xhr.status === 0){
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                }else if(xhr.status == 404){
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                }else if(xhr.status == 500){
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                }else if(errorThrown === 'parsererror'){
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                }else if(errorThrown === 'timeout'){
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                }else if(errorThrown === 'abort'){
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                }else{
+                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                }
+            }
+        }); 
+    }
+}
 
 </script>
