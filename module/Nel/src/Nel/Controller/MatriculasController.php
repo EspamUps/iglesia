@@ -377,56 +377,102 @@ class MatriculasController extends AbstractActionController
                                 $listaMatriculados = $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso, 1); 
                                 $cuposDisponibles = $listaConfigurarCurso[0]['cupos']-count($listaMatriculados);
                                 
-                                $div = '<h4 class="text-center">INFORMACIÓN GENERAL DEL HORARIO SELECCIONADO</h4>
-                                         <hr>
-                                        <div class="table-responsive">
-                                        <table class="table">
-                                        <thead> 
-                                            <tr>
-                                                    <th><label for="nombres">FECHA DE INICIO DE MATRÍCULAS</label></th>
+                                $div = '<div class="box box-solid form-group" style="border-style: solid;border: 1px solid #d2d6de;">
+                                <div class="box-header ui-sortable-handle" style="cursor: move;">
+                                    <i class="fa  fa-info-circle"></i>
+
+                                    <h3 class="box-title">INFORMACIÓN GENERAL DEL HORARIO SELECCIONADO</h3>
+                                    <!-- tools box -->
+                                    <div class="pull-right box-tools">
+                                      <button type="button" class="btn  btn-sm btn-default" data-widget="collapse"><i class="fa fa-minus"></i>
+                                      </button>
+                                    </div>
+                                    <!-- /. tools -->
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body no-padding" style="display: block;">
+                                    <!--The calendar -->
+                                    <div id="calendar" style="width: 100%">
+                                    <div class="datepicker datepicker-inline">
+                                    <div class="datepicker-days" style="display: block;">
+                                    <table class="table table-condensed">
+                                    <thead> 
+                                        <tr>
+                                                <th><label for="nombres">FECHA DE INICIO DE MATRÍCULAS</label></th>
                                                 <td>'.$listaConfigurarCurso[0]['fechaInicioMatricula'].'</td>
                                             </tr>
                                             <tr>
                                                 <th><label for="nombres">FECHA DE FIN DE MATRÍCULAS</label></th>
                                                 <td>'.$listaConfigurarCurso[0]['fechaFinMatricula'].'</td>
                                             </tr>
-                                            <tr>
-                                                <th><label for="apellidos">FECHA DE INICIO DE CLASES</label></th>
-                                                <td>'.$listaConfigurarCurso[0]['fechaInicio'].'</td>
-                                            </tr>
-                                            <tr>
-                                                <th><label for="apellidos">FECHA DE FIN DE CLASES</label></th>
-                                                <td>'.$listaConfigurarCurso[0]['fechaFin'].'</td>
-                                            </tr>
-                                            <tr>
-                                                <th><label for="apellidos">CUPOS TOTALES</label></th>
-                                                <td>'.$listaConfigurarCurso[0]['cupos'].'</td>
-                                            </tr>
-                                            <tr>
-                                                <th><label for="apellidos">CUPOS DISPONIBLES</label></th>
-                                                <td>'.$cuposDisponibles.'</td>
-                                            </tr>
-                                            <tr>
-                                                <th><label for="apellidos">DOCENTE</label></th>
-                                                <td>'.$listaConfigurarCurso[0]['primerNombre'].' '.$listaConfigurarCurso[0]['primerApellido'].'</td>
-                                            </tr>
-                                        </thead>
-                                        </table></div>';
+                                        <tr>
+                                        <tr>
+                                            <th><label for="apellidos">FECHA DE INICIO DE CLASES</label></th>
+                                            <td>'.$listaConfigurarCurso[0]['fechaInicio'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="apellidos">FECHA DE FIN DE CLASES</label></th>
+                                            <td>'.$listaConfigurarCurso[0]['fechaFin'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="apellidos">CUPOS TOTALES</label></th>
+                                            <td>'.$listaConfigurarCurso[0]['cupos'].'</td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="apellidos">CUPOS NO UTILIZADOS</label></th>
+                                            <td>'.$cuposDisponibles.'</td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="apellidos">DOCENTE</label></th>
+                                            <td>'.$listaConfigurarCurso[0]['primerNombre'].' '.$listaConfigurarCurso[0]['primerApellido'].'</td>
+                                        </tr>
+                                    </thead>
+                                    </table>
+                                    </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                  <!-- /.box-body -->
+                                    <!-- /.row -->
+                            </div>'; 
                                 
-                                $tabla = '<h4 class="text-center">HORARIO DE CLASES</h4>
-                                         <hr><div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>DÍA</td>
-                                                        <th>HORAS</td>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    '.$cuerpoTablaHorario.'
-                                                </tbody>
-                                            </table>
-                                        </div>';
+                                $tabla = 
+                            '<div class="box box-solid form-group" style="border-style: solid;border: 1px solid #d2d6de;" >
+                                <div class="box-header ui-sortable-handle" style="cursor: move;">
+                                    <i class="fa fa-calendar"></i>
+
+                                    <h3 class="box-title">HORARIO DE CLASES</h3>
+                                    <!-- tools box -->
+                                    <div class="pull-right box-tools">
+                                      <button type="button" class="btn  btn-default btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                                      </button>
+                                    </div>
+                                    <!-- /. tools -->
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body no-padding" style="display: block;">
+                                    <!--The calendar -->
+                                    <div id="calendar" style="width: 100%">
+                                    <div class="datepicker datepicker-inline">
+                                    <div class="datepicker-days" style="display: block;">
+                                    <table class="table table-condensed">
+                                    <thead>
+                                                <tr>
+                                                    <th>DÍA</td>
+                                                    <th>HORAS</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                '.$cuerpoTablaHorario.'
+                                            </tbody>
+                                    </table>
+                                    </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                  <!-- /.box-body -->
+                                    <!-- /.row -->
+                            </div>';
                                 $mensaje = '';
                                 $validar = TRUE;
                                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla,'datosGenerales'=>$div));

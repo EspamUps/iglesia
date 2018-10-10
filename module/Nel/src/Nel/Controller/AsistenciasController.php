@@ -316,35 +316,33 @@ class AsistenciasController extends AbstractActionController
                             $fechaInicioClases = strtotime($listaConfigurarCurso[0]['fechaInicio']);
                             
                             $listaFechasAsistencia= $objFechaAsistencia->FiltrarFechaAsistenciaPorIdConfCurso($idConfigurarCurso, 1);
+                           
+                            $selectFechas='';
                             if(count($listaMatriculados)==0)
                             {
                                 $small= '<small class="label label-default"><i class="fa fa-close"></i> curso sin estudiantes matriculados</small>';
-                                $smallhoy ='  <small class="label label-default"><i class="fa fa-close"></i> curso sin estudiantes matriculados</small>
-                                                ';
+                                
                             }else
                             {
                                 if(count($listaFechasAsistencia)>0)
                                 { 
                                    $small= '<small class="label label-success"><i class="fa fa-check"></i> realizado</small>';
-                                    $smallhoy ='  <small class="label label-default"><i class="fa fa-close"></i> hoy no clases</small>
-                                                ';
-                                    foreach ($listaFechasAsistencia as $valueFechasAsistencia)
-                                    {
-                                        $fechaAsistencia = strtotime($valueFechasAsistencia['fechaAsistencia']);
+                                   
+                                    
+                                    $optionFechas = '<option value="0">SELECCIONE UNA FECHA</option>';
+                                    foreach ($listaFechasAsistencia as $valueF) {
+                                        $fechaAsistencia = strtotime($valueF['fechaAsistencia']);
+                                        $idFechaAsistenciaEncriptado = $objMetodos->encriptar($valueF['idFechaAsistencia']);
                                         if($fechaAsistencia==$fechaActual)
-                                        {
-                                            $listaFechasAsistenciaTomada= $objFechaAsistencia->FiltrarFechaAsistenciaPorFechaAsistencia($listaFechasAsistencia[0]['idFechaAsistencia'], 1);
+                                            $optionFechas = $optionFechas.'<option selected value="'.$idFechaAsistenciaEncriptado.'">'.$valueF['fechaAsistencia'].'</option>';
+                                        else
+                                            $optionFechas = $optionFechas.'<option value="'.$idFechaAsistenciaEncriptado.'">'.$valueF['fechaAsistencia'].'</option>';
+                                    }
 
-                                            if(count($listaFechasAsistenciaTomada)==0){
-                                                $idFechaAsistenciaEncriptado = $objMetodos->encriptar($valueFechasAsistencia['idFechaAsistencia']);
-                                                $smallhoy ='  <small class="label label-danger"><i class="fa fa-clock-o"></i> pendiente</small>
-                                                 <button type="button" onClick="GenerarAsistenciaHoy(\''.$idFechaAsistenciaEncriptado.'\')" class="btn  btn-success  btn-xs"><i class="fa fa-check"></i> TOMAR ASISTENCIA
-                                               </button>';
-                                            }else
-                                             $smallhoy ='  <small class="label label-success"><i class="fa fa-check"></i> realizado</small>
-                                                ';
-                                        }
-                                    }  
+                                    
+                                    $selectFechas = '<label for="selectListaFechasAsistencia">ASISTENCIA</label><select onchange="cargarTablaListaAsistencia();"  id="selectListaFechasAsistencia" name="selectListaFechasAsistencia" class="form-control">'.$optionFechas.'</select>';
+                                   
+                                     
                                 }else
                                  {                              
 
@@ -352,12 +350,9 @@ class AsistenciasController extends AbstractActionController
                                     {
                                         $small ='  <small class="label label-danger"><i class="fa fa-clock-o"></i> pendiente</small>
                                           <button type="button" onClick="GenerarAsistencia()" class="btn  btn-success  btn-xs"><i class="fa fa-check"></i> GENERAR ASISTENCIA
-                                           </button>';
-                                        $smallhoy ='  <small class="label label-danger"><i class="fa fa-clock-o"></i> pendiente </small>';
-                                    }else
+                                           </button>';}else
                                     {
                                         $small= ' <small class="label label-default"><i class="fa fa-close"></i> deshabilitado hasta que finalicen las matrículas</small>';
-                                        $smallhoy='  <small class="label label-default"><i class="fa fa-close"></i> deshabilitado hasta que inicien las clases</small>';
                                     }
                                 }
                             }
@@ -390,12 +385,6 @@ class AsistenciasController extends AbstractActionController
                                             <td>'.$small.'</td>
                                         </tr> 
                                     </div>
-                                    <div class="form-group" style="padding-right:10%; padding-left:10%;"> 
-                                         <tr class="text-center">
-                                            <td class="text-center">ASISTENCIA DE HOY:</td>
-                                            <td>'.$smallhoy.'</td>
-                                        </tr>
-                                    </div>
                                     </div>
                                     </div>
                                     </div>
@@ -404,7 +393,7 @@ class AsistenciasController extends AbstractActionController
                             </div>';
                             $mensaje = '';
                             $validar = TRUE;
-                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla,'datosGenerales'=>$divInfoGeneral, 'tablaAsistencia'=>$tablaAsistencia));
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla,'datosGenerales'=>$divInfoGeneral, 'tablaAsistencia'=>$tablaAsistencia, 'select'=>$selectFechas));
 
                         }
                     }
@@ -432,6 +421,8 @@ class AsistenciasController extends AbstractActionController
             $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
             $objHorarioCurso= new HorarioCurso($this->dbAdapter);
             $objFechaAsistencia = new FechaAsistencia($this->dbAdapter);
+            $objMatricula = new Matricula($this->dbAdapter);
+            $objAsistencia = new Asistencia($this->dbAdapter);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
@@ -463,24 +454,44 @@ class AsistenciasController extends AbstractActionController
                                
                             
                                 $listaHorarioRegistrado =$objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($idConfigurarCurso);
-                              
-                                $fechaInicioClases =$listaConfigurarCurso[0]['fechaInicio'];
-                                $fechaFinClases = $listaConfigurarCurso[0]['fechaFin'];
-                                for($i=$fechaInicioClases;$i<=$fechaFinClases;$i = date("Y-m-d", strtotime($i ."+ 1 days"))){
+                                $listaMatriculadosEnElCurso= $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso,1);
+                                if(count($listaMatriculadosEnElCurso)==0)
+                                  $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HAY MATRICULADOS EN ESTE CURSO</div>';
+                                else{
+                                    $fechaInicioClases =$listaConfigurarCurso[0]['fechaInicio'];
+                                    $fechaFinClases = $listaConfigurarCurso[0]['fechaFin'];
+                                    for($i=$fechaInicioClases;$i<=$fechaFinClases;$i = date("Y-m-d", strtotime($i ."+ 1 days"))){
 
-                                   $fechaAsistencia= strtotime($i);
-                                   $numeroDia =date("w",$fechaAsistencia);
-                                   foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
-                                   {
-                                       if($valueDiaHorarioR['identificadorDia']==$numeroDia)
-                                           $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
-                                   }
-                                }
-                            
-                                
-                                $mensaje = '<div class="alert alert-success text-center" role="alert">SE REGISTRARON LAS FECHAS PARA LA ASISTENCIA DE FORMA CORRECTA</div>';
-                                $validar = TRUE;
-                                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+                                       $fechaAsistencia= strtotime($i);
+                                       $numeroDia =date("w",$fechaAsistencia);
+                                       foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
+                                       {
+                                           if($valueDiaHorarioR['identificadorDia']==$numeroDia)
+                                           {
+                                              $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
+                                              $idFechaAsistencia = $resultado[0]['idFechaAsistencia'];
+                                              $this->generarasistenciascompletasAction($listaMatriculadosEnElCurso,$idFechaAsistencia,$objAsistencia);
+                                           }
+                                               
+
+                                       }
+                                    }
+                                    
+                                    $listaFechasIngresadas = $objFechaAsistencia->FiltrarFechaAsistenciaPorIdConfCurso($idConfigurarCurso, 1);
+                                    
+                                    $optionFechas = '<option value="0">SELECCIONE UNA FECHA</option>';
+                                    foreach ($listaFechasIngresadas as $valueF) {
+                                        $idFechaAsistenciaEncriptado = $objMetodos->encriptar($valueF['idFechaAsistencia']);
+                                        $optionFechas = $optionFechas.'<option value="'.$idFechaAsistenciaEncriptado.'">'.$valueF['fechaAsistencia'].'</option>';
+                                    }
+
+
+                                    $select = '<label for="selectListaFechasAsistencia">ASISTENCIA</label><select onchange="cargarTablaListaAsistencia();"  id="selectListaFechasAsistencia" name="selectListaFechasAsistencia" class="form-control">'.$optionFechas.'</select>';
+        
+                                    $mensaje = '<div class="alert alert-success text-center" role="alert">SE REGISTRÓ LA ASISTENCIA DE TODOS LOS ESTUDIANTES DE FORMA CORRECTA</div>';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar, 'select'=>$select));
+                                    }
                                 }
                             }   
                         }
@@ -490,8 +501,18 @@ class AsistenciasController extends AbstractActionController
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
+    function  generarasistenciascompletasAction($listaMatriculadosEnElCurso, $idFechaAsistencia, $objAsistencia)
+    {
+        ini_set('date.timezone','America/Bogota'); 
+        $hoy = getdate();
+        $fechaActual = $hoy['year']."-".$hoy['mon']."-".$hoy['mday'];
+
+        foreach ($listaMatriculadosEnElCurso as $valueMatriculado) {
+            $resultado = $objAsistencia->IngresarAsistenciaHoy($idFechaAsistencia, $valueMatriculado['idMatricula'], 1, $fechaActual, 1);
+        }
+    }
     
-    public function generarasistenciahoyAction()
+    public function obtenerasistenciasAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -503,64 +524,47 @@ class AsistenciasController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 16);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
             $objMetodos = new Metodos();
-            $objMetodosC = new MetodosControladores();
-            $objAsistencia = new Asistencia($this->dbAdapter);
-            $objMatricula= new Matricula($this->dbAdapter);
-            $objFechaAsistencia = new FechaAsistencia($this->dbAdapter);
+            $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+            $objMatricula = new Matricula($this->dbAdapter);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
-                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 16, 3);
-                if ($validarprivilegio==false)
-                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
-                else{
-                    $request=$this->getRequest();
-                    if(!$request->isPost()){
-                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    
+                    $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                    $idConfigurarCursoEncriptado = $post['id'];
+                    
+                    if(empty($idConfigurarCursoEncriptado) || $idConfigurarCursoEncriptado == NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DEL CONFIGURAR CURSO VACÍO</div>';
                     }else{
-
-                        $post = array_merge_recursive(
-                                $request->getPost()->toArray(),
-                                $request->getFiles()->toArray()
-                            );
-                        $idFechaAsistenciaEncriptado = $post['idFechaAsistencia'];
-
-                        if(empty($idFechaAsistenciaEncriptado) || $idFechaAsistenciaEncriptado == NULL){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DEL REGISTRO FECHA ASISTENCIA ESTÁ VACÍO</div>';
-                        }else{
-                            $idFechaAsistencia = $objMetodos->desencriptar($idFechaAsistenciaEncriptado);
-                            $listaFechaAsistencia = $objFechaAsistencia->FiltrarFechaAsistencia($idFechaAsistencia, 1);
-                            if(count($listaFechaAsistencia) == 0){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA SIDO CONFIGURADO LA FECHA DE ESTE DÍA</div>';
+                        $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
+                        $listaConfCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
+                        if(count($listaConfCurso)==0)
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CONFIGURAR CURSO EN EL SISTEMA</div>';
+                        else{                            
+                            $listaMatricula = $objMatricula->FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso);
+                            if(count($listaMatricula)==0)
+                            {
+                               $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO TIENE ESTUDIANTES MATRICULADOS</div>';
                             }else{
-                                $idConfigurarCurso = $listaFechaAsistencia[0]['idConfigurarCurso'];
-                                
-                                $listaMatriculadosEnElCurso= $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso,1);
-                                if(count($listaMatriculadosEnElCurso)==0)
-                                  $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HAY MATRICULADOS EN ESTE CURSO</div>';
-                                else{
-                                    
-                                    ini_set('date.timezone','America/Bogota'); 
-                                    $hoy = getdate();
-                                    $fechaAsistencia = $hoy['year']."-".$hoy['mon']."-".$hoy['mday'];
-                                        
-                                    
-                                    foreach ($listaMatriculadosEnElCurso as $valueMatriculado) {
-                                        $resultado = $objAsistencia->IngresarAsistenciaHoy($idFechaAsistencia, $valueMatriculado['idMatricula'], 1, $fechaAsistencia, 1);
-                                    }
-                                    
-                                    $mensaje = '<div class="alert alert-success text-center" role="alert">ASISTENCIA DE HOY, INGRESADA CORRECTAMENTE</div>';
-                                    $validar = TRUE;
-                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-                                    }
-                                }   
-                            }   
+                                $tabla = $this->CargarTablaMatriculasAction($listaConfCurso,$listaMatricula, 0, count($listaMatricula));
+                                $mensaje = '';
+                                $validar = TRUE;
+                                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                            } 
                         }
-                    }                    
-                }
+                    }                   
+                }                    
             }
+        }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     

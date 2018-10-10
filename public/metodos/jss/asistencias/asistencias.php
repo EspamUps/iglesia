@@ -25,6 +25,7 @@ function filtrarlistaCursosPorPeriodo(){
         $("#mensajeContenedorListaAsistencia").html("");
         $("#contenedorContenedorListaAsistencia").html("");
         $("#contenedorOpcionesAsistencia").html("");
+        $("#contenderListaFechaAsistencia").html("");
         
     }else{
         $.ajax({
@@ -42,6 +43,7 @@ function filtrarlistaCursosPorPeriodo(){
                 $("#mensajeContenedorListaAsistencia").html("");
                 $("#contenedorContenedorListaAsistencia").html("");
                 $("#contenedorOpcionesAsistencia").html("");
+                $("#contenderListaFechaAsistencia").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
                 
@@ -94,6 +96,7 @@ function filtrarlistaHorariosPorCurso(){
         $("#mensajeContenedorListaAsistencia").html("");
         $("#contenedorContenedorListaAsistencia").html("");
         $("#contenedorOpcionesAsistencia").html("");
+        $("#contenderListaFechaAsistencia").html("");
     }else{
         $.ajax({
             url : url+'/asistencias/obtenerhorarios',
@@ -109,6 +112,7 @@ function filtrarlistaHorariosPorCurso(){
                 $("#mensajeContenedorListaAsistencia").html("");
                 $("#contenedorContenedorListaAsistencia").html("");
                 $("#contenedorOpcionesAsistencia").html("");
+                $("#contenderListaFechaAsistencia").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
 
@@ -160,6 +164,7 @@ function filtrarHorarioPorCurso(){
         $("#contenedorOpcionesAsistencia").html("");
         $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html("");
         $("#contenedorHorarioSeleccionadoAsistencia").html("");
+        $("#contenderListaFechaAsistencia").html("");
     }else{
         $.ajax({
             url : url+'/asistencias/filtrardatoshorario',
@@ -173,6 +178,7 @@ function filtrarHorarioPorCurso(){
                 $("#mensajeContenedorListaAsistencia").html("");
                 $("#contenedorContenedorListaAsistencia").html("");
                 $("#contenedorOpcionesAsistencia").html("");
+                $("#contenderListaFechaAsistencia").html("");
                 
             },
             uploadProgress: function(event,position,total,percentComplete){
@@ -184,6 +190,8 @@ function filtrarHorarioPorCurso(){
                     $("#contenedorInfoGeneralHorarioSeleccionadoAsistencia").html(data.datosGenerales);
                     $("#contenedorHorarioSeleccionadoAsistencia").html(data.tabla);
                     $("#contenedorOpcionesAsistencia").html(data.tablaAsistencia);
+                    $("#contenderListaFechaAsistencia").html(data.select);
+                         
                 }else{
                      $("#contenedorHorarioSeleccionadoAsistencia").html("");
                 }
@@ -222,6 +230,7 @@ function GenerarAsistencia(){
        $("#mensajeContenedorHorarioAsistencia").html("");
        $("#mensajeContenedorListaAsistencia").html("");
        $("#contenedorContenedorListaAsistencia").html("");
+       $("#contenderListaFechaAsistencia").html("");
         
     }else{
         $.ajax({
@@ -238,63 +247,9 @@ function GenerarAsistencia(){
             },
             success: function(data){ 
                 if(data.validar == true)
-                {               
+                {
                     filtrarHorarioPorCurso();
-                }else{
-                     
-                }
-                $("#mensajeContenedorListaAsistencia").html(data.mensaje);
-                
-                setTimeout(function() {$("#mensajeContenedorListaAsistencia").html('');},1500);
-            },
-            complete: function(){
-            },
-            error: function(xhr, textStatus, errorThrown) { 
-                $("#contenedorContenedorListaAsistencia").html("");
-                if(xhr.status === 0){
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-                }else if(xhr.status == 404){
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-                }else if(xhr.status == 500){
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-                }else if(errorThrown === 'parsererror'){
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-                }else if(errorThrown === 'timeout'){
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-                }else if(errorThrown === 'abort'){
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-                }else{
-                    $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-                }
-            }
-        }); 
-    }
-} 
-
-function GenerarAsistenciaHoy(id){
-     var url = $("#rutaBase").text();
-    if(id == 0){
-       $("#mensajeContenedorHorarioAsistencia").html("");
-       $("#mensajeContenedorListaAsistencia").html("");
-       $("#contenedorContenedorListaAsistencia").html("");
-        
-    }else{
-        $.ajax({
-            url : url+'/asistencias/generarasistenciahoy',
-            type: 'post',
-            dataType: 'JSON',
-            data: {idFechaAsistencia:id},
-            beforeSend: function(){
-                cargando("#mensajeContenedorListaAsistencia");
-                $("#contenedorContenedorListaAsistencia").html("");
-            },
-            uploadProgress: function(event,position,total,percentComplete){
-                
-            },
-            success: function(data){ 
-                if(data.validar == true)
-                {               
-                  GenerarAsistencia();
+                    $("#contenderListaFechaAsistencia").html(data.select);
                 }else{
                      
                 }
@@ -325,5 +280,110 @@ function GenerarAsistenciaHoy(id){
         }); 
     }
 }
+
+function seleccionarFila(ID)
+{
+    var menues2 = $("#tablaAsistencias tbody tr td");
+    menues2.removeAttr("style");
+    menues2.css({ 'cursor': 'pointer' });
+    $("#filaTablaAsistencias" + ID + " td").removeAttr("style");
+    $("#filaTablaAsistencias" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
+}
+
+
+function obtenerAsistencias(){
+    var url = $("#rutaBase").text();
+    var idFechaAsistencia = $("#selectListaFechasAsistencia").val();
+    if(idFechaAsistencia == 0){
+        $("#contenderListaFechaAsistencia").html("");
+        $("#mensajeContenedorListaAsistencia").html("");
+    }else{
+    $.ajax({
+        url : url+'/asistencias/obtenerasistencias',
+        type: 'post',
+        dataType: 'JSON',
+        data: {id:idFechaAsistencia},
+        beforeSend: function(){
+            cargandoMatriculas('#contenderListaFechaAsistencia');
+            $("#mensajeContenedorListaAsistencia").html("");
+            
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+        },
+        success: function(data){  
+            if(data.validar == true){
+                $("#contenderListaFechaAsistencia").html('<hr><div class="box-body table-responsive no-padding"><table class="table table-hover" id="tablaAsistencias"></table></div>');
+                $('#tablaAsistencias').DataTable({
+                    destroy: true,
+                    order: [],
+                    data: data.tabla,
+                    'createdRow': function (row, data, dataIndex) {
+                        var division = dataIndex % 2;
+                        if (division == "0")
+                        {
+                            $(row).attr('style', 'background-color: #DCFBFF;text-align: center;font-weight: bold;');
+                        } else {
+                            $(row).attr('style', 'background-color: #CFCFCF;text-align: center;font-weight: bold;');
+                        }
+                        
+                        $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
+                        $(row).attr('id', 'filatablaAsistencias' + dataIndex);
+                    },
+                    'columnDefs': [
+                       
+                     ],
+                    columns: [
+                        {
+                            title: '#',
+                            data: '_j'
+                        },
+                        {
+                            title: 'DNI',
+                            data: 'identificacion'
+                        },
+                        {
+                            title: 'NOMBRES',
+                            data: 'nombres'
+                        },
+                        {
+                            title: 'APELLIDOS',
+                            data: 'apellidos'
+                        },
+                        {
+                            title: 'ASISTENCIA',
+                            data: 'asistencia'
+                        }
+                    ],
+                });    
+                seleccionarFila(0)
+            }else{
+                $("#contenderListaFechaAsistencia").html("");
+            }
+            $("#mensajeContenedorListaAsistencia").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#contenderListaFechaAsistencia").html('');
+            if(xhr.status === 0){
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeContenedorListaAsistencia").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    }); 
+    }
+}
+
 
 </script>
