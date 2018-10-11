@@ -191,6 +191,7 @@ function filtrarHorarioPorCurso(){
                     $("#contenedorHorarioSeleccionadoAsistencia").html(data.tabla);
                     $("#contenedorOpcionesAsistencia").html(data.tablaAsistencia);
                     $("#contenderListaFechaAsistencia").html(data.select);
+                    cargarTablaListaAsistencia();
                          
                 }else{
                      $("#contenedorHorarioSeleccionadoAsistencia").html("");
@@ -239,7 +240,7 @@ function GenerarAsistencia(){
             dataType: 'JSON',
             data: {idConfCurso:idConfCurso},
             beforeSend: function(){
-                cargando("#mensajeContenedorListaAsistencia");
+               
                 $("#contenedorContenedorListaAsistencia").html("");
             },
             uploadProgress: function(event,position,total,percentComplete){
@@ -250,6 +251,8 @@ function GenerarAsistencia(){
                 {
                     filtrarHorarioPorCurso();
                     $("#contenderListaFechaAsistencia").html(data.select);
+                    
+                    cargarTablaListaAsistencia();
                 }else{
                      
                 }
@@ -281,22 +284,13 @@ function GenerarAsistencia(){
     }
 }
 
-function seleccionarFila(ID)
-{
-    var menues2 = $("#tablaAsistencias tbody tr td");
-    menues2.removeAttr("style");
-    menues2.css({ 'cursor': 'pointer' });
-    $("#filaTablaAsistencias" + ID + " td").removeAttr("style");
-    $("#filaTablaAsistencias" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
-}
-
-
-function obtenerAsistencias(){
+function cargarTablaListaAsistencia(){
     var url = $("#rutaBase").text();
     var idFechaAsistencia = $("#selectListaFechasAsistencia").val();
     if(idFechaAsistencia == 0){
-        $("#contenderListaFechaAsistencia").html("");
+        $("#contenedorContenedorListaAsistencia").html("");
         $("#mensajeContenedorListaAsistencia").html("");
+        
     }else{
     $.ajax({
         url : url+'/asistencias/obtenerasistencias',
@@ -304,7 +298,7 @@ function obtenerAsistencias(){
         dataType: 'JSON',
         data: {id:idFechaAsistencia},
         beforeSend: function(){
-            cargandoMatriculas('#contenderListaFechaAsistencia');
+           cargando('#contenedorContenedorListaAsistencia');
             $("#mensajeContenedorListaAsistencia").html("");
             
         },
@@ -312,52 +306,9 @@ function obtenerAsistencias(){
         },
         success: function(data){  
             if(data.validar == true){
-                $("#contenderListaFechaAsistencia").html('<hr><div class="box-body table-responsive no-padding"><table class="table table-hover" id="tablaAsistencias"></table></div>');
-                $('#tablaAsistencias').DataTable({
-                    destroy: true,
-                    order: [],
-                    data: data.tabla,
-                    'createdRow': function (row, data, dataIndex) {
-                        var division = dataIndex % 2;
-                        if (division == "0")
-                        {
-                            $(row).attr('style', 'background-color: #DCFBFF;text-align: center;font-weight: bold;');
-                        } else {
-                            $(row).attr('style', 'background-color: #CFCFCF;text-align: center;font-weight: bold;');
-                        }
-                        
-                        $(row).attr('onclick', 'seleccionarFila(' + dataIndex + ');');
-                        $(row).attr('id', 'filatablaAsistencias' + dataIndex);
-                    },
-                    'columnDefs': [
-                       
-                     ],
-                    columns: [
-                        {
-                            title: '#',
-                            data: '_j'
-                        },
-                        {
-                            title: 'DNI',
-                            data: 'identificacion'
-                        },
-                        {
-                            title: 'NOMBRES',
-                            data: 'nombres'
-                        },
-                        {
-                            title: 'APELLIDOS',
-                            data: 'apellidos'
-                        },
-                        {
-                            title: 'ASISTENCIA',
-                            data: 'asistencia'
-                        }
-                    ],
-                });    
-                seleccionarFila(0)
+                 $("#contenedorContenedorListaAsistencia").html(data.tabla);
             }else{
-                $("#contenderListaFechaAsistencia").html("");
+                $("#contenedorContenedorListaAsistencia").html("");
             }
             $("#mensajeContenedorListaAsistencia").html(data.mensaje);
         },

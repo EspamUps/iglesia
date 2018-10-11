@@ -23,6 +23,11 @@ class Asistencia extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarAsistenciaPorFechaAsistencia($idFechaAsistencia, $estadoAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsistenciaPorFechaAsistencia('{$idFechaAsistencia}','{$estadoAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
 
 
 }

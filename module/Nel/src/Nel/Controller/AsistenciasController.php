@@ -340,7 +340,7 @@ class AsistenciasController extends AbstractActionController
                                     }
 
                                     
-                                    $selectFechas = '<label for="selectListaFechasAsistencia">ASISTENCIA</label><select onchange="cargarTablaListaAsistencia();"  id="selectListaFechasAsistencia" name="selectListaFechasAsistencia" class="form-control">'.$optionFechas.'</select>';
+                                    $selectFechas = '<label for="selectListaFechasAsistencia">LISTA DE FECHAS DE ASISTENCIA</label><select onchange="cargarTablaListaAsistencia();"  id="selectListaFechasAsistencia" name="selectListaFechasAsistencia" class="form-control">'.$optionFechas.'</select>';
                                    
                                      
                                 }else
@@ -524,10 +524,10 @@ class AsistenciasController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 14);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 16);
             $objMetodos = new Metodos();
-            $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
-            $objMatricula = new Matricula($this->dbAdapter);
+            $objFechaAsistencia = new FechaAsistencia($this->dbAdapter);
+            $objAsistencia = new Asistencia($this->dbAdapter);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
@@ -540,22 +540,72 @@ class AsistenciasController extends AbstractActionController
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
                         );
-                    $idConfigurarCursoEncriptado = $post['id'];
+                    $idFechaAsistenciaEncriptado = $post['id'];
                     
-                    if(empty($idConfigurarCursoEncriptado) || $idConfigurarCursoEncriptado == NULL){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DEL CONFIGURAR CURSO VACÍO</div>';
+                    if(empty($idFechaAsistenciaEncriptado) || $idFechaAsistenciaEncriptado == NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DE LA FECHA ASISTENCIA VACÍO</div>';
                     }else{
-                        $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
-                        $listaConfCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
-                        if(count($listaConfCurso)==0)
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CONFIGURAR CURSO EN EL SISTEMA</div>';
-                        else{                            
-                            $listaMatricula = $objMatricula->FiltrarMatriculaPorConfigurarCurso($idConfigurarCurso);
-                            if(count($listaMatricula)==0)
+                        $idFechaAsistencia = $objMetodos->desencriptar($idFechaAsistenciaEncriptado);
+                        $listaFechaAsistencia = $objFechaAsistencia->FiltrarFechaAsistencia($idFechaAsistencia, 1);
+                        if(count($listaFechaAsistencia)==0)
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA FECHA ASISTENCIA EN EL SISTEMA</div>';
+                        else{           
+                            
+                            $listaAsistencias = $objAsistencia->FiltrarAsistenciaPorFechaAsistencia($idFechaAsistencia, 1);
+                            
+                             if(count($listaAsistencias)==0)
                             {
-                               $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO TIENE ESTUDIANTES MATRICULADOS</div>';
+                               $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO HA REGISTRADO SU ASISTENCIA PORQUE NO TIENE ESTUDIANTES</div>';
                             }else{
-                                $tabla = $this->CargarTablaMatriculasAction($listaConfCurso,$listaMatricula, 0, count($listaMatricula));
+                                
+                           
+                            $cuerpoTablaListaEstudiantes = '';
+                            $num=1;
+                            foreach ($listaAsistencias as $valueAsistencia) {
+                                
+                                if($valueAsistencia['estadoAsistenciaTomada']==0)
+                                {
+                                    
+                                    $optionAsistencia = '<option class="" selected value="0">No asistió</option>';
+                                    $optionAsistencia = $optionAsistencia.'<option value="1">Sí asistió</option>';
+                                }else{
+                                    $optionAsistencia = '<option value="0">No asistió</option>';
+                                    $optionAsistencia = $optionAsistencia.'<option selected value="1">Sí asistió</option>';
+                                }
+                                
+                                $selectAsistencia = '<select id="selectAsistenciaDiaria" name="selectAsistenciaDiaria">
+                                    '.$optionAsistencia.'</select>';
+                                
+                                $cuerpoTablaListaEstudiantes = $cuerpoTablaListaEstudiantes.
+                                        '<tr role="row" class="odd"><td>'.$num.'</td>
+                                        <td>'.$valueAsistencia['primerApellido'].' '.$valueAsistencia['segundoApellido'].' '.$valueAsistencia['primerNombre'].' '.$valueAsistencia['segundoNombre'].' </td>
+                                        <td>'.$selectAsistencia.'</td></tr>';
+                            
+                                $num++;
+                                }
+                                
+                                
+                                $tabla = '<div class="box">
+                                            <div class="box-header">
+                                              <h3 class="box-title">Tabla de Asistencias</h3>
+                                            </div>
+                                            <!-- /.box-header -->
+                                            <div class="box-body">
+                                              <table id="example2" class="table table-bordered table-hover">
+                                                <thead role="row">
+                                                <tr>
+                                                 <th>N</th> 
+                                                 <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending" aria-sort="ascending">Apellidos y Nombres</th>
+                                                  <th>Asistencia</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                '.$cuerpoTablaListaEstudiantes.'
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </div>';
+                                
                                 $mensaje = '';
                                 $validar = TRUE;
                                 return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
