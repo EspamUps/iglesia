@@ -557,58 +557,75 @@ class AsistenciasController extends AbstractActionController
                             {
                                $mensaje = '<div class="alert alert-warning text-center" role="alert">ESTE CURSO NO HA REGISTRADO SU ASISTENCIA PORQUE NO TIENE ESTUDIANTES</div>';
                             }else{
-                                
-                           
-                            $cuerpoTablaListaEstudiantes = '';
-                            $num=1;
-                            foreach ($listaAsistencias as $valueAsistencia) {
-                                
-                                if($valueAsistencia['estadoAsistenciaTomada']==0)
-                                {
-                                    
-                                    $optionAsistencia = '<option class="" selected value="0">No asistió</option>';
-                                    $optionAsistencia = $optionAsistencia.'<option value="1">Sí asistió</option>';
-                                }else{
-                                    $optionAsistencia = '<option value="0">No asistió</option>';
-                                    $optionAsistencia = $optionAsistencia.'<option selected value="1">Sí asistió</option>';
-                                }
-                                
-                                $selectAsistencia = '<select id="selectAsistenciaDiaria" name="selectAsistenciaDiaria">
-                                    '.$optionAsistencia.'</select>';
-                                
-                                $cuerpoTablaListaEstudiantes = $cuerpoTablaListaEstudiantes.
-                                        '<tr role="row" class="odd"><td>'.$num.'</td>
-                                        <td>'.$valueAsistencia['primerApellido'].' '.$valueAsistencia['segundoApellido'].' '.$valueAsistencia['primerNombre'].' '.$valueAsistencia['segundoNombre'].' </td>
-                                        <td>'.$selectAsistencia.'</td></tr>';
-                            
-                                $num++;
-                                }
+                                 ini_set('date.timezone','America/Bogota'); 
+                                $fechaActual = strtotime(date("d-m-Y"));
+                                $fechaAsistencia= strtotime($listaFechaAsistencia[0]['fechaAsistencia']);
                                 
                                 
-                                $tabla = '<div class="box">
-                                            <div class="box-header">
-                                              <h3 class="box-title">Tabla de Asistencias</h3>
-                                            </div>
-                                            <!-- /.box-header -->
-                                            <div class="box-body">
-                                              <table id="example2" class="table table-bordered table-hover">
-                                                <thead role="row">
-                                                <tr>
-                                                 <th>N</th> 
-                                                 <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending" aria-sort="ascending">Apellidos y Nombres</th>
-                                                  <th>Asistencia</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                '.$cuerpoTablaListaEstudiantes.'
-                                                </tbody>
-                                              </table>
-                                            </div>
-                                          </div>';
                                 
-                                $mensaje = '';
-                                $validar = TRUE;
-                                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                                $cuerpoTablaListaEstudiantes = '';
+                                $num=1;
+                                $i=0;
+                                foreach ($listaAsistencias as $valueAsistencia) {
+
+                                   if($fechaActual==$fechaAsistencia)
+                                   {
+                                        if($valueAsistencia['estadoAsistenciaTomada']==0)
+                                        {
+                                            $optionAsistencia = '<option selected value="0">No asistió</option>';
+                                            $optionAsistencia = $optionAsistencia.'<option value="1">Sí asistió</option>';
+                                        }else{
+                                            $optionAsistencia = '<option value="0">No asistió</option>';
+                                            $optionAsistencia = $optionAsistencia.'<option selected value="1">Sí asistió</option>';
+                                        }
+
+                                        $idAsistenciaEncriptado = $objMetodos->encriptar( $valueAsistencia['idAsistencia']);
+                                        $selectAsistencia = '<select onchange="cambiarAsistenciaHoy(\''.$idAsistenciaEncriptado.'\','.$i.')" id="selectAsistenciaDiaria" name="selectAsistenciaDiaria">
+                                                            '.$optionAsistencia.'</select>';
+                                   }
+                                   else{
+                                        $selectAsistencia = '<small style="color:green">Sí</small>';
+                                        if($valueAsistencia['estadoAsistenciaTomada']==0)
+                                           $selectAsistencia='<small style="color:red" small>No</small>';                                       
+                                   }
+                                
+                                       
+                                   
+
+                                    $cuerpoTablaListaEstudiantes = $cuerpoTablaListaEstudiantes.
+                                            '<tr id="numerofila'.$i.'" role="row" class="odd"><td class="text-center">'.$num.'</td>
+                                            <td class="text-center">'.$valueAsistencia['primerApellido'].' '.$valueAsistencia['segundoApellido'].' '.$valueAsistencia['primerNombre'].' '.$valueAsistencia['segundoNombre'].' </td>
+                                            <td class="text-center">'.$selectAsistencia.'</td></tr>';
+
+                                    $num++;
+                                    $i++;
+                                    }
+
+
+                                    $tabla = '<div class="box">
+                                                <div class="box-header">
+                                                  <h3 class="box-title">Tabla de Asistencias</h3>
+                                                </div>
+                                                <!-- /.box-header -->
+                                                <div class="box-body">
+                                                  <table id="example2" class="table table-bordered table-hover">
+                                                    <thead role="row">
+                                                    <tr>
+                                                     <th class="text-center">N</th> 
+                                                     <th class="text-center"">Apellidos y Nombres</th>
+                                                     <th class="text-center">Asistencia</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    '.$cuerpoTablaListaEstudiantes.'
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </div>';
+
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
                             } 
                         }
                     }                   
@@ -617,5 +634,89 @@ class AsistenciasController extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
+    
+    
+    public function  asistenciahoyAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 16);
+            $objMetodos = new Metodos();
+            $objAsistencia = new Asistencia($this->dbAdapter);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    
+                    $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                    $idAsistenciaEncriptado = $post['idAsistenciaEncriptado'];
+                    $numeroFila = $post['Nfila'];
+                    if($idAsistenciaEncriptado == NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">ÍNDICE DE LA ASISTENCIA VACÍO</div>';
+                    }else if($numeroFila==NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NUMERO DE FILA VACÍO</div>';
+                    }else{
+                        $idAsistencia = $objMetodos->desencriptar($idAsistenciaEncriptado);
+                        $listaAsistencia = $objAsistencia->FiltrarAsistencia($idAsistencia);
+                        if(count($listaAsistencia)==0)
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA ASISTENCIA EN EL SISTEMA</div>';
+                        else{       
+//                                ini_set('date.timezone','America/Bogota'); 
+//                                $hoy = getdate();
+//                                $fechaActual = $hoy['year']."-".$hoy['mon']."-".$hoy['mday'];
+                                $nuevoEstadoAsistencia=0;
+                                if($listaAsistencia[0]['estadoAsistenciaTomada']==0)
+                                    $nuevoEstadoAsistencia=1;
+                                
+                                $resultado=$objAsistencia->ActualizarEstadoAsistencia($idAsistencia, $nuevoEstadoAsistencia);
+                                
+                                if(count($resultado)==0)
+                                   $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR Y NO SE PUDO ACTUALIZAR LA ASISTENCIA. INTENTE MÁS TARDE.</div>';
+                                else{
+                                    
+                                    if($resultado[0]['estadoAsistenciaTomada']==0)
+                                    {
+                                        $optionAsistencia = '<option selected value="0">No asistió</option>';
+                                        $optionAsistencia = $optionAsistencia.'<option value="1">Sí asistió</option>';
+                                    }else{
+                                        $optionAsistencia = '<option value="0">No asistió</option>';
+                                        $optionAsistencia = $optionAsistencia.'<option selected value="1">Sí asistió</option>';
+                                    }
+                                
+                                    $idAsistenciaEncriptado = $objMetodos->encriptar( $resultado[0]['idAsistencia']);
+                                    $selectAsistencia = '<select onchange="cambiarAsistenciaHoy(\''.$idAsistenciaEncriptado.'\','.$numeroFila.')" id="selectAsistenciaDiaria" name="selectAsistenciaDiaria">
+                                        '.$optionAsistencia.'</select>';
+                                    $num=$numeroFila+1;
+                                    $nuevaFila=  '<td class="text-center">'.$num.'</td>
+                                            <td class="text-center">'.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].' '.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' </td>
+                                            <td class="text-center">'.$selectAsistencia.'</td>';
+
+                                    $mensaje = '';
+                                    $validar = TRUE;
+                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar, 'nuevafila'=>$nuevaFila, 'numeroFila'=>$numeroFila));
+                                } 
+                            }
+                        }
+                    }                   
+                }                    
+            }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+
+    
     
 }

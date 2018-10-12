@@ -28,6 +28,16 @@ class Asistencia extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarAsistencia($idAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsistencia('{$idAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function ActualizarEstadoAsistencia($idAsistencia, $nuevoEstadoAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_ActualizarAsistenciaHoy('{$idAsistencia}','{$nuevoEstadoAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
 
 
 }
