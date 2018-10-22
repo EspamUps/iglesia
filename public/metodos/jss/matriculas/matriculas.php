@@ -465,7 +465,7 @@ function validarIngresoMatricula(f){
 
 function limpiarFormIngresoMatriculas()
 {
-    $('input[id="identificacion"]').val('');
+//    $('input[id="identificacion"]').val('');
     $("#botonMatricular").html("");
     $("#contenedorDatosEstudianteParaMatricular").html("");
     

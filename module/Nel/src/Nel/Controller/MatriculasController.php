@@ -13,6 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
+use Nel\Metodos\PlantillaPdf;
 use Nel\Metodos\MetodosControladores;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Matricula;
@@ -27,6 +28,7 @@ use Nel\Modelo\Entity\Adjunto;
 use Nel\Modelo\Entity\AdjuntoMatricula;
 use Nel\Modelo\Entity\HorarioCurso;
 use Nel\Modelo\Entity\ConfigurarCurso;
+use Nel\Modelo\Entity\NombreIglesia;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -447,9 +449,7 @@ class MatriculasController extends AbstractActionController
                                       <button type="button" class="btn  btn-default btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
                                       </button>
                                     </div>
-                                    <!-- /. tools -->
                                 </div>
-                                <!-- /.box-header -->
                                 <div class="box-body no-padding" style="display: block;">
                                     <!--The calendar -->
                                     <div id="calendar" style="width: 100%">
@@ -608,11 +608,13 @@ class MatriculasController extends AbstractActionController
     
      function CargarTablaMatriculasAction($listaConfigurarCurso,$listaMatriculas, $i, $j)
     {
+         
+       
         $objAdjuntoMat = new AdjuntoMatricula($this->dbAdapter);
         $objMetodos = new Metodos();
         $array1 = array();
         ini_set('date.timezone','America/Bogota'); 
-        $hoy = getdate();
+        $objMatricula = new Matricula($this->dbAdapter);
         $fechaActual = strtotime(date("d-m-Y"));
         $fechaInicioMat = strtotime($listaConfigurarCurso[0]['fechaInicioMatricula']);
         $fechaFinMat = strtotime($listaConfigurarCurso[0]['fechaFinMatricula']); 
@@ -648,7 +650,7 @@ class MatriculasController extends AbstractActionController
                $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
 
             }
-       
+            $botonimprimir =' <a target="_blank" href="'.$this->getRequest()->getBaseUrl().'/matriculas/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'">Imprimir</a> ';  
             $fechaInicioClases = strtotime($value['fechaInicio']);
             $fechaFinClases =strtotime($value['fechaFin']);
             
@@ -662,7 +664,7 @@ class MatriculasController extends AbstractActionController
             } else
                 $estadoCurso='Esperando inicio clases';
             
-            $botones = $botonCambiarEstadoMatricula;
+            $botones = $botonCambiarEstadoMatricula.''.$botonimprimir;
 
              
             $array1[$i] = array(
@@ -1050,5 +1052,162 @@ class MatriculasController extends AbstractActionController
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
+//    
+//    public function generarcomprobanteAction()
+//    {
+//        $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+//        require($_SERVER['DOCUMENT_ROOT'].$this->getRequest()->getBaseUrl().'/public/metodos/fpdf/fpdf.php');
+//        
+  
+//        
+//        $idMatriculaEncriptado = $this->params()->fromQuery('id');
+//
+//        $objMetodos = new Metodos();
+//        $idMatricula = $objMetodos->desencriptar($idMatriculaEncriptado);
+//        $objMat = new Matricula($this->dbAdapter);
+//        $pdf = new \FPDF();
+//	$resultado = $objMat->FiltrarMatricula($idMatricula);
+//	$pdf->AliasNbPages();
+//	$pdf->AddPage();
+//	
+//	$pdf->SetFillColor(232,232,232);
+//	$pdf->SetFont('Arial','B',12);
+////	$pdf->Cell(70,6,'ESTADO',1,0,'C',1);
+//        $pdf->Cell(40,10,utf8_decode('¡Mi primera página pdf con FPDF!'),1,0,'C',1);
+//	$pdf->Cell(10,40,'ID',1,0,'C',1);
+//	
+//	$pdf->SetFont('Arial','B',10);
+//	
+//        
+//	foreach ($resultado as $row)
+//	{
+////		$pdf->Cell(70,6,utf8_decode($row['estadoMatricula']),1,0,'C');
+//		$pdf->Cell(20,6,$row['idMatricula'],1,0,'C');
+//	}
+////        print_r($resultado);
+//	return $pdf->output();
+//
+//    }
+    
+    
+     public function generarcomprobanteAction()
+    {
+        $this->layout("layout/administrador");
+        $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+        $sesionUsuario = new Container('sesionparroquia');
+        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+        
+        $objMetodos = new Metodos();
+        $objConfCurso = new ConfigurarCurso($this->dbAdapter);
+        $objNombreIglesia = new NombreIglesia($this->dbAdapter);
+        $objHorarioCurso = new HorarioCurso($this->dbAdapter);
+        $listaIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($idIglesia, 1);
+        $idMatriculaEncriptado = $this->params()->fromQuery('id');
+
+        
+        $idMatricula = $objMetodos->desencriptar($idMatriculaEncriptado);
+        $objMat = new Matricula($this->dbAdapter);
+        $resultado = $objMat->FiltrarMatricula($idMatricula);
+        $listaConfCurso = $objConfCurso->FiltrarConfigurarCurso($resultado[0]['idConfigurarCurso']);
+	
+        $listaHorarioCurso = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($resultado[0]['idConfigurarCurso']);
+         $cuerpoTablaHorario = '';
+        foreach ($listaHorarioCurso as $valueHorarioCurso) {
+            $horaInicio = strtotime ( '-1 second' , strtotime($valueHorarioCurso['horaInicio']));
+            $horaInicio = date( 'H:i:s' , $horaInicio );
+            $horaFin = strtotime ( '+1 second' , strtotime($valueHorarioCurso['horaFin']));
+            $horaFin = date( 'H:i:s' , $horaFin );
+            $horas = $horaInicio.' - '.$horaFin;
+        $cuerpoTablaHorario = $cuerpoTablaHorario.'<tr class="text-center"><td class="text-center">'.$valueHorarioCurso['nombreDia'].'</td><td>'.$horas.'</td></tr>';}
+                                
+        $tablahorarios= '<table style="text-align:center; width:100%"  class="table " >
+                        <thead>
+                                <tr>
+                                    <th style="text-align:center; width:100%" colspan="2" >HORARIO DE CLASES</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:center; width:50%" >DÍA</td>
+                                    <th style="text-align:center; width:50%" >HORAS</td>
+                                </tr>
+                        </thead>
+                            <tbody>
+                                '.$cuerpoTablaHorario.'
+                            </tbody>
+                         </table>';
+        
+        $tabla = '<div class="box box-success">
+            <div class="box-header text-center"  style="text-align:center; width:100%" >
+              <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
+              <h3 class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'</h3>
+            </div>
+            <div class="box-body text-center">
+              <!-- Minimal style -->
+              <h3  style="text-align:center; width:100%" >COMPROBANTE DE MATRÍCULA</h3>
+               <div class="col-lg-1"></div>
+                <div class="col-lg-10">
+              <table style="text-align:center; width:100%" class="table" >
+              <tbody>
+                <tr>
+                    <td>CÓDIGO DE MATRÍCULA:</td>
+                    <td>'.$resultado[0]['idMatricula'].' </td>
+                 </tr>
+                <tr>
+                    <td>ESTUDIANTE:</td>
+                    <td>'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
+                </tr>
+                 <tr>
+                    <td>CURSO:</td>
+                    <td>'.$listaConfCurso[0]['nombreCurso'].' </td>
+                 </tr>
+                 <tr>
+                    <td>NIVEL:</td>
+                    <td>'.$listaConfCurso[0]['nivelCurso'].' </td>
+                 </tr>
+                <tr>
+                    <td>DOCENTE:</td>
+                    <td>'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
+                 </tr>
+                 <tr>
+                    <td>FECHA Y HORA DE MATRÍCULA:</td>
+                    <td>'.$resultado[0]['fechaMatricula'].' </td>
+                 </tr>
+                  <tr>
+                    <td>FECHA DE INICIO DE CLASES:</td>
+                    <td>'.$listaConfCurso[0]['fechaInicio'].' </td>
+                 </tr>
+                  <tr>
+                    <td>FECHA DE FIN DE CLASES:</td>
+                    <td>'.$listaConfCurso[0]['fechaFin'].' </td>
+                 </tr>
+                  <tr>
+                    <td>PRECIO:</td>
+                    <td>$ '.$listaConfCurso[0]['precio'].' </td>
+                 </tr>
+
+               </tbody>
+               </table>
+               </div>
+                <div class="col-lg-1"></div>
+               <br>
+               <div class="col-lg-4"></div>
+               '.$tablahorarios.'
+             <div class="col-lg-4"></div>
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer text-center"  style="text-align:center; width:100%">
+             <p> Comprobante de matrícula generado automáticamente por el Sistema de Gestión Parroquial. </p>
+            </div>
+          </div>';
+        
+        
+	$array =  array(
+            'tabla'=>$tabla            
+        );
+        
+        
+        
+	return new ViewModel($array);
+
+    }
  
 }

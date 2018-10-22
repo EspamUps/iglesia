@@ -1,0 +1,41 @@
+<?php
+$tabla = $this->tabla;
+ ?>
+
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Comprobante Matricula
+            <small>SWGP</small>
+        </h1>
+       
+    </section>
+
+    
+    
+    <section class="content">
+        <div class="box-body">
+            <div class="row ">
+                 <div class="col-lg-12">
+                     <div class="col-lg-2"></div>
+                        <div class="col-lg-8"  id="contenedorReporte">
+                        <?php echo $tabla;?>
+                        </div>
+                            <button onclick="imprimir('contenedorReporte');" type="button" class="btn btn-success pull-right btn-flat"  autofocus="true"> <span class="fa fa-download"></span> Descargar comprobante</button>
+                       
+                     <div class="col-lg-2"></div>
+                  </div>
+            </div>
+        </div>
+    </section>
+    </div>
+    
+<script>
+    
+   $(document).ready(function(){
+        imprimir('contenedorReporte');
+    });
+</script>
+ 

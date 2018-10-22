@@ -34,6 +34,7 @@ if($sesionUsuario->offsetExists('idUsuario')){
         
 
                         <?php echo $this->headScript()  
+                 ->prependFile($this->basePath() . '/public/librerias/js/printThis.js')
                 ->prependFile($this->basePath() . '/public/librerias/js/jquery.dataTables.min.js')   
                 ->prependFile($this->basePath() . '/public/librerias/js/jquery.form.js')   
                 ->prependFile($this->basePath() . '/public/librerias/dist/js/demo.js') 
@@ -51,6 +52,16 @@ if($sesionUsuario->offsetExists('idUsuario')){
     </head>
     
     <body class="hold-transition skin-blue sidebar-mini">
+    
+        <script>
+            
+            function imprimir(contenedor)
+            {
+                $("#"+contenedor).printThis();
+            }
+        
+        </script>
+        
         <style type="text/css">
             input {
                 font-weight: bold;
