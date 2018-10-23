@@ -1143,7 +1143,7 @@ class MatriculasController extends AbstractActionController
             <hr>
             <div class="box-body text-center"   >
               <!-- Minimal style -->
-              <h3  style="text-align:center; width:100%; color:#3c8dbc" ><b>COMPROBANTE DE MATRÍCULA</b></h3>
+              <h2  style="text-align:center; width:100%; color:#3c8dbc" ><b>COMPROBANTE DE MATRÍCULA</b></h2>
                <div class="col-lg-1"></div>
                 <div class="col-lg-10">
               <table style="text-align:center;width:100%;" class="table" >
