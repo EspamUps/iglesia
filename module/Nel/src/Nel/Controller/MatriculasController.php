@@ -614,7 +614,6 @@ class MatriculasController extends AbstractActionController
         $objMetodos = new Metodos();
         $array1 = array();
         ini_set('date.timezone','America/Bogota'); 
-        $objMatricula = new Matricula($this->dbAdapter);
         $fechaActual = strtotime(date("d-m-Y"));
         $fechaInicioMat = strtotime($listaConfigurarCurso[0]['fechaInicioMatricula']);
         $fechaFinMat = strtotime($listaConfigurarCurso[0]['fechaFinMatricula']); 
@@ -646,11 +645,11 @@ class MatriculasController extends AbstractActionController
             {
                $docAdjunto = $objAdjuntoMat->FiltrarAdjuntoPorIdMatriculaYTipoAdjunto($idMatricula, 2);
                
-               $botonCambiarEstadoMatricula = '<a class="btn btn-primary btn-sm btn-flat" href=" '.$this->getRequest()->getBaseUrl().$docAdjunto[0]['rutaAdjunto'].'"  download="'.$docAdjunto[0]['nombreAdjunto'].'"><i class="fa fa-download"></i></a>';
+               $botonCambiarEstadoMatricula = '<a class="btn btn-primary btn-sm btn-flat"  title="DESCARGAR COMPROBANTE DE CANCELACIÓN DE MATRÍCULA" href=" '.$this->getRequest()->getBaseUrl().$docAdjunto[0]['rutaAdjunto'].'"  download="'.$docAdjunto[0]['nombreAdjunto'].'"><i class="fa fa-download"></i></a>';
                $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
 
             }
-            $botonimprimir =' <a target="_blank" href="'.$this->getRequest()->getBaseUrl().'/matriculas/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'">Imprimir</a> ';  
+            $botonimprimir =' <a title="IMPRIMIR COMPROBANTE DE MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].' " class="btn bg-purple btn-sm btn-flat"  target="_blank" href="'.$this->getRequest()->getBaseUrl().'/matriculas/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'"><i class="fa  fa-file-pdf-o"></i></a> ';  
             $fechaInicioClases = strtotime($value['fechaInicio']);
             $fechaFinClases =strtotime($value['fechaFin']);
             
@@ -1135,53 +1134,53 @@ class MatriculasController extends AbstractActionController
                             </tbody>
                          </table>';
         
-        $tabla = '<div class="box box-success">
-            <div class="box-header text-center"  style="text-align:center; width:100%" >
+        $tabla = '<br><br><br><div class="box box-success">
+            <div  style="text-align:center; width:100%; color:#777" >
               <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-              <h3 class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'</h3>
+              <h4 class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'</h4>
             </div>
-            <div class="box-body text-center">
+            <div class="box-body text-center"   >
               <!-- Minimal style -->
-              <h3  style="text-align:center; width:100%" >COMPROBANTE DE MATRÍCULA</h3>
+              <h3  style="text-align:center; width:100%; color:#3c8dbc" ><b>COMPROBANTE DE MATRÍCULA</b></h3>
                <div class="col-lg-1"></div>
                 <div class="col-lg-10">
-              <table style="text-align:center; width:100%" class="table" >
+              <table style="text-align:center;width:100%;" class="table" >
               <tbody>
                 <tr>
-                    <td>CÓDIGO DE MATRÍCULA:</td>
-                    <td>'.$resultado[0]['idMatricula'].' </td>
+                    <td><b>CÓDIGO DE MATRÍCULA:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['idMatricula'].' </td>
                  </tr>
                 <tr>
-                    <td>ESTUDIANTE:</td>
-                    <td>'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
+                    <td><b>ESTUDIANTE:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
                 </tr>
                  <tr>
-                    <td>CURSO:</td>
-                    <td>'.$listaConfCurso[0]['nombreCurso'].' </td>
+                    <td><b>CURSO:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
                  </tr>
                  <tr>
-                    <td>NIVEL:</td>
-                    <td>'.$listaConfCurso[0]['nivelCurso'].' </td>
+                    <td><b>NIVEL:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
                  </tr>
                 <tr>
-                    <td>DOCENTE:</td>
-                    <td>'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
+                    <td><b>DOCENTE:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
                  </tr>
                  <tr>
-                    <td>FECHA Y HORA DE MATRÍCULA:</td>
-                    <td>'.$resultado[0]['fechaMatricula'].' </td>
+                    <td><b>FECHA Y HORA DE MATRÍCULA:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['fechaMatricula'].' </td>
                  </tr>
                   <tr>
-                    <td>FECHA DE INICIO DE CLASES:</td>
-                    <td>'.$listaConfCurso[0]['fechaInicio'].' </td>
+                    <td><b>FECHA DE INICIO DE CLASES:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaInicio'].' </td>
                  </tr>
                   <tr>
-                    <td>FECHA DE FIN DE CLASES:</td>
-                    <td>'.$listaConfCurso[0]['fechaFin'].' </td>
+                    <td><b>FECHA DE FIN DE CLASES:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaFin'].' </td>
                  </tr>
                   <tr>
-                    <td>PRECIO:</td>
-                    <td>$ '.$listaConfCurso[0]['precio'].' </td>
+                    <td><b>PRECIO:</b></td>
+                    <td style="text-align:left;">$ '.$listaConfCurso[0]['precio'].' </td>
                  </tr>
 
                </tbody>
