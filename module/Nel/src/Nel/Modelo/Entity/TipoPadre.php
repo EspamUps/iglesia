@@ -61,6 +61,10 @@ class TipoPadre extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTipoPadrePorIdentificador('{$identificadorTipoPadre}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    public function FiltrarTipoPadre($idTipoPadre){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTipoPadre('{$idTipoPadre}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function FiltrarPersonaPorIdentificacion($identificacion){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();

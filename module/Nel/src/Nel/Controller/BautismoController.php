@@ -334,7 +334,9 @@ class BautismoController extends AbstractActionController
                         $objProvincias = new Provincias($this->dbAdapter);
                         $objBautismo = new Bautismo($this->dbAdapter);
                         $objSexo = new Sexo($this->dbAdapter);
+                        $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                         $objPadresBautismo = new PadresBautismo($this->dbAdapter);
+                        $objPadrinosBautismo = new PadrinosBautismo($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -495,36 +497,100 @@ class BautismoController extends AbstractActionController
                                     $mensaje = '';
                                     $validar = TRUE;
                                 }else{
+                                    
                                     $nombres = $listaBautismo[0]['primerApellido'].' '.$listaBautismo[0]['segundoApellido'].' '.$listaBautismo[0]['primerNombre'].' '.$listaBautismo[0]['segundoNombre'];
-                                    $tablaIzquierda = '<div class="table-responsive">
-                                            <table class="table"> 
-                                                <tbody>
+                                    
+                                    $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
+                                    $fechaBautismo = $objMetodos->obtenerFechaEnLetraSinHora($listaBautismo[0]['fechaBautizo']);
+                                    $listaSacerdote = $objSacerdotes->FiltrarSacerdote($listaBautismo[0]['idSacerdote']);
+                                    $listaPersonaSacerdote = $objPersona->FiltrarPersona($listaSacerdote[0]['idPersona']);
+                                    $nombresSacerdote = $listaPersonaSacerdote[0]['primerApellido'].' '.$listaPersonaSacerdote[0]['segundoApellido'].' '.$listaPersonaSacerdote[0]['primerNombre'].' '.$listaPersonaSacerdote[0]['segundoNombre'];
+                                    $listaDireccion = $objConfigurarParroquiaCanton->FitrarDireccionesPorConfigurarParroquiaCanton($listaBautismo[0]['idConfigurarParroquiaCanton']);
+                                    $direccionNacimiento = $listaDireccion[0]['nombreParroquia'].' - '.$listaDireccion[0]['nombreCanton'].' - '.$listaDireccion[0]['nombreProvincia'];
+                                    $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($fechaNacimiento);
+                                    $listaPadres = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($listaBautismo[0]['idBautismo']);
+                                    $padre = '';
+                                    $madre = '';
+                                    foreach ($listaPadres as $valuePadres) {
+                                        if($valuePadres['identificadorTipoPadre'] == 1){
+                                            $padre = $valuePadres['primerApellido'].' '.$valuePadres['segundoApellido'].' '.$valuePadres['primerNombre'].' '.$valuePadres['segundoNombre'];
+                                        }else{
+                                            $madre = $valuePadres['primerApellido'].' '.$valuePadres['segundoApellido'].' '.$valuePadres['primerNombre'].' '.$valuePadres['segundoNombre'];
+                                        }
+                                    }
+                                    $listaPadrinos = $objPadrinosBautismo->FiltrarPadrinosBautismoPorBautismo($listaBautismo[0]['idBautismo']);
+                                    $padrino = '';
+                                    $madrina = '';
+                                    foreach ($listaPadrinos as $valuePadrinos) {
+                                        if($valuePadrinos['identificadorTipoPadre'] == 1){
+                                            $padrino = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
+                                        }else{
+                                            $madrina = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
+                                        }
+                                    }
+                                    $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia.'</b> el <b>'.$fechaBautismo.'</b> el 
+                                        Padre <b>'.$nombresSacerdote.'</b> bautizó solemnemente a: <b>'.$nombres.'</b> nacido en <b>'.$direccionNacimiento.'</b> el 
+                                            <b>'.$fechaNacimiento.'</b> hijo legítimo de <b>'.$padre.'</b> y de <b>'.$madre.'.</b>
+                                            </p>
+                                            <p class="text-justify" style="line-height: 30px;font-size:15px"> Fueron sus Padrinos: <b>'.$padrino.'</b> y <b>'.$madrina.'.</b>
+                                            </p>';
+                                    
+                                    $tablaCaabecera = '<table class="table" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th> 
+                                                            <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
+                                                            <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'</label>
+                                                            <br> <label>Sistema Web de Gestión Parroquial</label>
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th> 
+                                                            <h3>CERTIFICADO DE BAUTIZO</h3>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                            </table>';
+                                    $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
+                                                <thead>
                                                     <tr> 
                                                         <th>N°</th>
-                                                        <td>'.$listaBautismo[0]['numero'].'</td>
+                                                        <th > '.$listaBautismo[0]['numero'].'</th>
                                                     </tr> 
                                                     <tr> 
-                                                        <th colspan="2">NOMBRE</th>
+                                                        <th colspan="2" >NOMBRE</th>
                                                     </tr>
                                                     <tr> 
-                                                        <td colspan="2">'.$nombres.'</td>
+                                                        <th colspan="2" >'.$nombres.'</th>
                                                     </tr>
                                                     <tr> 
                                                         <th colspan="2">REGISTRO CIVIL</th>
                                                     </tr>
                                                     <tr> 
-                                                        <td><b>AÑO</b> '.$listaBautismo[0]['anoRegistroCivil'].'</td>
-                                                        <td><b>TOMO</b> '.$listaBautismo[0]['tomo'].'</td>
+                                                        <th><b>AÑO</b> '.$listaBautismo[0]['anoRegistroCivil'].'</th>
+                                                        <th><b>TOMO</b> '.$listaBautismo[0]['tomo'].'</th>
                                                     </tr>
                                                      <tr> 
-                                                        <td><b>FOLIO</b> '.$listaBautismo[0]['folio'].'</td>
-                                                        <td><b>ACTA</b> '.$listaBautismo[0]['acta'].'</td>
+                                                        <th><b>FOLIO</b> '.$listaBautismo[0]['folio'].'</th>
+                                                        <th><b>ACTA</b> '.$listaBautismo[0]['acta'].'</th>
                                                     </tr>
-                                                </tbody>
-                                            </table>
-                                            </div>';
-                                            
-                                    $tabla = '<div class="col-lg-4">'.$tablaIzquierda.'</div>';
+                                                    
+                                                </thead>
+                                            </table>';
+                                    
+                                    
+                                     $tablaFirma = '<table class="table text-center" style="width:100%" > 
+                                                <thead>
+                                                    <tr> 
+                                                        <th>_________________________________<br>LO CERTIFICO</th>
+                                                    </tr> 
+                                                </thead>
+                                            </table>';
+                                    
+                                    
+                                    
+                                          
+                                    $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br><br><br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br><br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
                                     $mensaje = '';
                                     $validar = TRUE;
                                 }
