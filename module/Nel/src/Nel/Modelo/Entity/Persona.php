@@ -41,6 +41,11 @@ public function ModificarPersona(
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function FiltrarPersonaPorNombres($nombres,$fechaNacimiento){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorNombres('{$nombres}','{$fechaNacimiento}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function FiltrarPersonaPorApellidosNombres($primerApellido,$segundoApellido,$primerNombre,$segundoNombre,$fechaNacimiento){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorApellidosNombres('{$primerApellido}','{$segundoApellido}','{$primerNombre}','{$segundoNombre}','{$fechaNacimiento}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;

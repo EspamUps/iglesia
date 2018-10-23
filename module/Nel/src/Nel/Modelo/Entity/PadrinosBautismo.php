@@ -11,27 +11,27 @@ namespace Nel\Modelo\Entity;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 
-class Sexo extends TableGateway
+class PadrinosBautismo extends TableGateway
 {
     public function __construct(Adapter $adapter = null, $databaseSchema = null, ResultSet $selectResultPrototype = null)
     {
-        return parent::__construct('sexo', $adapter, $databaseSchema, $selectResultPrototype);
+        return parent::__construct('padrinosbautismo', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
 //    
-    public function ObtenerSexoActivo(){
-        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerSexoActivo()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//    public function ObtenerPadreBautismoActivo(){
+//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerPadreBautismoActivo()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
+////    
+//    public function FiltrarPadreBautismoPorBautismo($idBautismo){
+//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPadreBautismoPorBautismo('{$idBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
+    public function IngresarPadrinosBautismo($idTipoPadre,$idPersona,$idBautismo,$fechaIngreso,$estadoPadrinosBautismo){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarPadrinosBautismo('{$idTipoPadre}','{$idPersona}','{$idBautismo}','{$fechaIngreso}','{$estadoPadrinosBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    
-//    public function ObtenerCursosEstado($estado){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
 //    public function FiltrarCursoPorNombre($nombreCurso){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
@@ -57,10 +57,10 @@ class Sexo extends TableGateway
 //    
 //    
 //    
-    public function FiltrarSexo($idSexo){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarSexo('{$idSexo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+//    public function FiltrarPersona($idPersona){
+//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
 //    
 //    public function FiltrarPersonaPorIdentificacion($identificacion){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
