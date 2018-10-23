@@ -1100,14 +1100,17 @@ class MatriculasController extends AbstractActionController
         $objConfCurso = new ConfigurarCurso($this->dbAdapter);
         $objNombreIglesia = new NombreIglesia($this->dbAdapter);
         $objHorarioCurso = new HorarioCurso($this->dbAdapter);
+        $objPeriodo = new Periodos($this->dbAdapter);
         $listaIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($idIglesia, 1);
         $idMatriculaEncriptado = $this->params()->fromQuery('id');
 
-        
+       
         $idMatricula = $objMetodos->desencriptar($idMatriculaEncriptado);
         $objMat = new Matricula($this->dbAdapter);
         $resultado = $objMat->FiltrarMatricula($idMatricula);
         $listaConfCurso = $objConfCurso->FiltrarConfigurarCurso($resultado[0]['idConfigurarCurso']);
+         $listaPeriodo = $objPeriodo->FiltrarPeriodo($listaConfCurso[0]['idPeriodo']);
+        
 	
         $listaHorarioCurso = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($resultado[0]['idConfigurarCurso']);
          $cuerpoTablaHorario = '';
@@ -1117,17 +1120,14 @@ class MatriculasController extends AbstractActionController
             $horaFin = strtotime ( '+1 second' , strtotime($valueHorarioCurso['horaFin']));
             $horaFin = date( 'H:i:s' , $horaFin );
             $horas = $horaInicio.' - '.$horaFin;
-        $cuerpoTablaHorario = $cuerpoTablaHorario.'<tr class="text-center"><td class="text-center">'.$valueHorarioCurso['nombreDia'].'</td><td>'.$horas.'</td></tr>';}
+        $cuerpoTablaHorario = $cuerpoTablaHorario.'<tr class="text-center"><td class="text-center">'.$valueHorarioCurso['nombreDia'].'</td><td style="text-align:left;">'.$horas.'</td></tr>';}
                                 
         $tablahorarios= '<table style="text-align:center; width:100%"  class="table " >
                         <thead>
                                 <tr>
-                                    <th style="text-align:center; width:100%" colspan="2" >HORARIO DE CLASES</td>
+                                    <th style=" width:50%" colspan="2" >HORARIO DE CLASES</td>
                                 </tr>
-                                <tr>
-                                    <th style="text-align:center; width:50%" >DÍA</td>
-                                    <th style="text-align:center; width:50%" >HORAS</td>
-                                </tr>
+                               
                         </thead>
                             <tbody>
                                 '.$cuerpoTablaHorario.'
@@ -1137,8 +1137,10 @@ class MatriculasController extends AbstractActionController
         $tabla = '<br><br><br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
               <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-              <h4 class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'</h4>
+             <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'</label>
+             <br> <label>Sistema Web de Gestión Parroquial</label>
             </div>
+            <hr>
             <div class="box-body text-center"   >
               <!-- Minimal style -->
               <h3  style="text-align:center; width:100%; color:#3c8dbc" ><b>COMPROBANTE DE MATRÍCULA</b></h3>
@@ -1147,39 +1149,49 @@ class MatriculasController extends AbstractActionController
               <table style="text-align:center;width:100%;" class="table" >
               <tbody>
                 <tr>
-                    <td><b>CÓDIGO DE MATRÍCULA:</b></td>
+                    <td><b>Código de matrícula:</b></td>
                     <td style="text-align:left;">'.$resultado[0]['idMatricula'].' </td>
                  </tr>
                 <tr>
-                    <td><b>ESTUDIANTE:</b></td>
+                    <td><b>Estudiante:</b></td>
                     <td style="text-align:left;">'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
                 </tr>
-                 <tr>
-                    <td><b>CURSO:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
-                 </tr>
-                 <tr>
-                    <td><b>NIVEL:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
-                 </tr>
                 <tr>
-                    <td><b>DOCENTE:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
+                    <td><b>Cédula de ciudadanía:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['identificacion'].' </td>
                  </tr>
                  <tr>
-                    <td><b>FECHA Y HORA DE MATRÍCULA:</b></td>
+                    <td><b>Fecha y hora de la matrícula:</b></td>
                     <td style="text-align:left;">'.$resultado[0]['fechaMatricula'].' </td>
                  </tr>
                   <tr>
-                    <td><b>FECHA DE INICIO DE CLASES:</b></td>
+                    <td><b>Periodo lectivo:</b></td>
+                    <td style="text-align:left;">'.$listaPeriodo[0]['nombrePeriodo'].' </td>
+                 </tr>
+               
+                 <tr>
+                    <td><b>Nombre del curso:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
+                 </tr>
+                 <tr>
+                    <td><b>Nivel del curso:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
+                 </tr>
+                <tr>
+                    <td><b>Docente:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
+                 </tr>
+                 
+                  <tr>
+                    <td><b>Fecha de inicio de clases:</b></td>
                     <td style="text-align:left;">'.$listaConfCurso[0]['fechaInicio'].' </td>
                  </tr>
                   <tr>
-                    <td><b>FECHA DE FIN DE CLASES:</b></td>
+                    <td><b>Fecha de fin de clases:</b></td>
                     <td style="text-align:left;">'.$listaConfCurso[0]['fechaFin'].' </td>
                  </tr>
                   <tr>
-                    <td><b>PRECIO:</b></td>
+                    <td><b>Precio del curso:</b></td>
                     <td style="text-align:left;">$ '.$listaConfCurso[0]['precio'].' </td>
                  </tr>
 
@@ -1189,12 +1201,13 @@ class MatriculasController extends AbstractActionController
                 <div class="col-lg-1"></div>
                <br>
                <div class="col-lg-4"></div>
+             
                '.$tablahorarios.'
              <div class="col-lg-4"></div>
             </div>
             <!-- /.box-body -->
             <div class="box-footer text-center"  style="text-align:center; width:100%">
-             <p> Comprobante de matrícula generado automáticamente por el Sistema de Gestión Parroquial. </p>
+             <p style=" padding-top:55%"> <i> Comprobante de matrícula generado automáticamente por el Sistema Web de Gestión Parroquial.</i> </p>
             </div>
           </div>';
         
