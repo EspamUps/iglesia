@@ -99,8 +99,8 @@ class Administrativos2Controller extends AbstractActionController
                                             '.$optionCargosAdministrativos.'</select>';
                                     
                                     $tabla = '<input type="hidden" id="idPersonaEncriptado" name="idPersonaEncriptado" value="'.$idPersonaEncriptado.'">
-                                        <div class="table-responsive"><table class="table">
-                                        <thead> 
+                                        <div class="table-responsive">
+                                        <table class="table">
                                             <tr>
                                                 <th>NOMBRES</th>
                                                 <td>'.$nombres.'</td>
@@ -116,7 +116,6 @@ class Administrativos2Controller extends AbstractActionController
                                             <tr>
                                                 <td colspan="2">'.$botonGuardar.'</td>
                                             </tr>
-                                        </thead>
                                     </table></div>';
                                     $mensaje = '';
                                     $validar = TRUE;
@@ -206,6 +205,85 @@ class Administrativos2Controller extends AbstractActionController
             }
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function obteneradministrativosAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objAdministrativos = new Administrativos($this->dbAdapter);
+                    $listaAdministrativos = $objAdministrativos->ObtenerAdministrativos();
+                    $tabla = $this->CargarTablaAdministrativosAction($listaAdministrativos);
+                    
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                }                    
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    function CargarTablaAdministrativosAction($listaAdministrativos)
+    {
+        $objPersona =new Persona($this->dbAdapter);
+        $objCargoAdmin = new CargosAdministrativos($this->dbAdapter);
+        $cuerpoTabla="";
+        $contador=1;
+        foreach ($listaAdministrativos as $valueAdmin)
+        {
+            $persona = $objPersona->FiltrarPersona($valueAdmin['idPersona']);
+            $cargo = $objCargoAdmin->FiltrarCargoAdministrativo($valueAdmin['idCargoAdministrativo']);
+            
+            $cuerpoTabla = $cuerpoTabla.'<tr>
+                    <td>'.$contador.'</td>
+                    <td>'.$persona[0]['identificacion'].'</td>
+                    <td>'.$persona[0]['primerNombre'].' '.$persona[0]['segundoNombre'].' '.$persona[0]['primerApellido'].' '.$persona[0]['segundoApellido'].'</td>
+                    <td>'.$cargo[0]['descripcion'].'</td></tr>';
+            $contador++;
+        }
+        
+        $tabla = '<div class="col-lg-2"></div><div class="col-lg-8 table-responsive" ><table class="table">
+                 <thead>
+                    <tr>
+                        <td>
+                            #
+                        </td>
+                        <td>
+                            IDENTIFICACIÓN
+                        </td>
+                        <td>
+                            PERSONA
+                        </td>
+                        <td>
+                            CARGO
+                        </td>
+                    </tr>
+                 </thead>
+                  <tbody>
+                    '.$cuerpoTabla.'
+                  </tbody>
+                  </table></div><div class="col-lg-2"></div>';
+        
+        return $tabla;
     }
 
 
