@@ -78,7 +78,7 @@ class BautismoController extends AbstractActionController
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
         $objMetodosC = new MetodosControladores();
-        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 15, 1);
+//        $validarprivilegioEliminar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 15, 1);
 //        $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 15, 2);
         $array1 = array();
         foreach ($listaBautismo as $value) {
@@ -88,14 +88,14 @@ class BautismoController extends AbstractActionController
             $fechaNacimiento = $value['fechaNacimiento'];
             $botonEliminarBautismo = '';
             $botonDeshabilitarBautismo = '';
-            if($validarprivilegioEliminar == TRUE){
+//            if($validarprivilegioEliminar == TRUE){
 //                if(count($objConfigurarCurso->FiltrarConfigurarCursoPorCursoLimit1($value['idCurso'])) == 0)
-                if($value['estadoBautismo'] == 0){    
-                    $botonEliminarBautismo = '<button id="btnEliminarBautismo'.$i.'" title="ELIMINAR '.$nombres.'" onclick="eliminarBautismo(\''.$idBautismoEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
-                    $botonDeshabilitarBautismo = '<button id="btnHabilitarBautismo'.$i.'" title="HABILITAR '.$nombres.'" onclick="habilitarBautismo(\''.$idBautismoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
-                }
-                
-            }
+//                if($value['estadoBautismo'] == 0){    
+//                    $botonEliminarBautismo = '<button id="btnEliminarBautismo'.$i.'" title="ELIMINAR '.$nombres.'" onclick="eliminarBautismo(\''.$idBautismoEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+//                    $botonDeshabilitarBautismo = '<button id="btnHabilitarBautismo'.$i.'" title="HABILITAR '.$nombres.'" onclick="habilitarBautismo(\''.$idBautismoEncriptado.'\','.$i.','.$j.')" class="btn btn-danger btn-sm btn-flat"><i class="fa  fa-plus-square"></i></button>';
+//                }
+//                
+//            }
 
 //            if($validarprivilegioModificar == TRUE){
 //                if($value['estadoCurso'] == TRUE)
@@ -501,6 +501,7 @@ class BautismoController extends AbstractActionController
                                     $nombres = $listaBautismo[0]['primerApellido'].' '.$listaBautismo[0]['segundoApellido'].' '.$listaBautismo[0]['primerNombre'].' '.$listaBautismo[0]['segundoNombre'];
                                     
                                     $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
+                                    $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
                                     $fechaBautismo = $objMetodos->obtenerFechaEnLetraSinHora($listaBautismo[0]['fechaBautizo']);
                                     $listaSacerdote = $objSacerdotes->FiltrarSacerdote($listaBautismo[0]['idSacerdote']);
                                     $listaPersonaSacerdote = $objPersona->FiltrarPersona($listaSacerdote[0]['idPersona']);
@@ -540,7 +541,7 @@ class BautismoController extends AbstractActionController
                                                     <tr>
                                                         <th> 
                                                             <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-                                                            <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'</label>
+                                                            <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'<br>'.$direccionIglesia.'</label>
                                                             <br> <label>Sistema Web de Gestión Parroquial</label>
                                                         </th>
                                                     </tr>

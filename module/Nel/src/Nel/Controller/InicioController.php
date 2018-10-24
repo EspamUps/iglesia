@@ -18,6 +18,7 @@ use Nel\Modelo\Entity\NombreIglesia;
 use Nel\Modelo\Entity\Iglesias;
 use Nel\Modelo\Entity\Usuario;
 use Nel\Modelo\Entity\TipoUsuario;
+use Nel\Modelo\Entity\DireccionIglesia;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -51,6 +52,7 @@ class InicioController extends AbstractActionController
                 $objTipoUsuario = new TipoUsuario($this->dbAdapter);
                 $objPersona = new Persona($this->dbAdapter);
                 $objIglesia = new Iglesias($this->dbAdapter);
+                $objDireccionIglesia = new DireccionIglesia($this->dbAdapter);
                 $objNombreIglesia = new NombreIglesia($this->dbAdapter); 
                 $objAsignarModulo = new AsignarModulo($this->dbAdapter);
                 $objMetodos = new Metodos();
@@ -123,7 +125,8 @@ class InicioController extends AbstractActionController
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
                                         </li>';
                                     }
-                                    if($valueAsignarM['identificadorModulo'] == 15){
+                                    if($valueAsignarM['identificadorModulo'] == 15 || 
+                                       $valueAsignarM['identificadorModulo'] == 18){
                                         $subMenuCertificados=$subMenuCertificados.'
                                         <li>
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
@@ -227,8 +230,13 @@ class InicioController extends AbstractActionController
                                 if(count($listaNombreIglesia) == 1){
                                     $nombreIglesia = $listaNombreIglesia[0]['nombreIglesia'];
                                 }
+                                $listaDireccionIglesia = $objDireccionIglesia->FiltrarDireccionIglesiaPorIglesia($listaPersona[0]['idIglesia']);
+                                $direccionIglesia = "";
+                                if(count($listaDireccionIglesia) > 0){
+                                    $direccionIglesia = $listaDireccionIglesia[0]['nombreParroquia'].' - '.$listaDireccionIglesia[0]['nombreCanton'].' - '.$listaDireccionIglesia[0]['nombreProvincia'];
+                                }
                                 $sesionUsuario->offsetSet('nombreIglesia',$nombreIglesia);
-
+                                $sesionUsuario->offsetSet('direccionIgleisia',$direccionIglesia);    
                                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
                         
                             }
