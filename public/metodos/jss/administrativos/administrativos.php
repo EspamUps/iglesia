@@ -136,6 +136,7 @@ function CargarAdministrativos(){
                 if(data.validar == true)
                 {                    
                     $("#contenedorTablaResponsables").html(data.tabla);
+                    CargarCargosAdministrativos();
                 }else{
                       $("#contenedorTablaResponsables").html("");
                 }
@@ -167,6 +168,8 @@ function CargarAdministrativos(){
         });
 }
 
+
+
 function EliminarCargoAsignado(idAdministrativo,ID){
     if (confirm('¿DESEAS ELIMINAR EL CARGO ASIGNADO?')) {
         var url = $("#rutaBase").text();
@@ -184,6 +187,7 @@ function EliminarCargoAsignado(idAdministrativo,ID){
             success: function (data) {
                 if (data.validar == true) {
                     CargarAdministrativos();
+                    
                 } else {
                     $("#btnEliminarAdministrativo" + ID).html('<i class="fa fa-times"></i>');
                 }

@@ -88,6 +88,7 @@ return array(
             'Nel\Controller\Asistencias' => 'Nel\Controller\AsistenciasController',
             'Nel\Controller\Administrativos2' => 'Nel\Controller\Administrativos2Controller',
             'Nel\Controller\Matrimonio' => 'Nel\Controller\MatrimonioController',
+            'Nel\Controller\CargosAdministrativos' => 'Nel\Controller\CargosAdministrativosController',
         ),
     ),
     'view_manager' => array(

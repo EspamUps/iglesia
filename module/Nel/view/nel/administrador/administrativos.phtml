@@ -1,6 +1,7 @@
 <?php
 $validacionPrivilegio = $this->validacionPrivilegio;
  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/administrativos/administrativos.php');
+  include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/cargosadministrativos/cargosadministrativos.php');
 ?>
 
 <div class="content-wrapper" style="min-height: 1123px;">
@@ -50,11 +51,38 @@ $validacionPrivilegio = $this->validacionPrivilegio;
         </div>
     </section>
     
+     <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaCargosAdministrativos"> </div>
+                    <div class="form-group col-lg-5">
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoCargo(this)" id="formIngresoCargo" method="post" action="<?php echo $this->basePath();?>/cargosadministrativos/ingresarcargoadministrativo">
+                      
+                            <label for="cargo">NUEVO CARGO</label>
+                            <input autocomplete="off" type="text" id="nombreCargo" name="nombreCargo" class="form-control">
+                            <br>
+                            <button data-loading-text="GUARDANDO..." id="btnGuardarCargo" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR CARGO</button>
+                   
+
+                   
+                    </form>
+                    </div>
+               
+                <div  class="col-lg-7">
+                    <div id="contenedorTablaCargosAdministrativos"></div>
+                </div>
+                </div>
+              </div>
+            </div>
+    </section>
+    
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
     cargandoAdministrativos('#contenedorTablaResponsables');
     CargarAdministrativos();
+    
 });
 
 </script>

@@ -287,9 +287,9 @@ class Administrativos2Controller extends AbstractActionController
             $contador++;
         }
         
-        $tabla = '<div class="col-lg-2"></div><div class="col-lg-8 table-responsive" ><table class="table">
+        $tabla = '<div class="col-lg-2"></div><div class="col-lg-8 table-responsive" > <h4>PERSONAS CON CARGOS ADMINISTRATIVOS ASIGNADOS</h4><table class="table">
                  <thead>
-                    <tr>
+                    <tr style="background-color:#eee">
                         <td>
                             #
                         </td>
@@ -382,6 +382,8 @@ class Administrativos2Controller extends AbstractActionController
         }
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
+    
+   
     
 
 

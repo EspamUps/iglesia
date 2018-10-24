@@ -23,8 +23,28 @@ class CargosAdministrativos extends TableGateway
         return $resultado;
     }
     
+    public function ObtenerTodosCargosAdministrativos(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerTodosCargosAdministrativos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
      public function FiltrarCargoAdministrativo($idCargoAdministrativo){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCargoAdministrativo('{$idCargoAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+      public function FiltrarCargoAdministrativoPorDescripcion($descripcion){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCargoAdministrativoPorDescripcion('{$descripcion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+      public function IngresarCargoAdministrativo($descripcion, $identificador, $fechaIngreso, $estado){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCargoAdministrativo('{$descripcion}','{$identificador}','{$fechaIngreso}', '{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+      public function FiltrarCargoAdministrativoLast(){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCargoAdministrativoLast()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
    
