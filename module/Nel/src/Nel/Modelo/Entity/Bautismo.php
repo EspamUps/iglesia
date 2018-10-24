@@ -29,12 +29,15 @@ class Bautismo extends TableGateway
 //        return $resultado;
 //    }
     public function IngresarBautismo($idPersona, $idSacerdote,
-    $idConfigurarParroquiaCanton,$idIglesia,$numero,$fechaBautizo,
-    $anoRegistroCivil,$tomo,$folio,$acta,$fechaInscripcion,$fechaRegistro,$estadoBautismo){
+    $idConfigurarParroquiaCanton,$idIglesia,$idLugar,$numero,$fechaBautizo,
+    $anoRegistroCivil,$tomo,$folio,$acta,
+    $anoEclesiastico,$tomoEclesiastico,$folioEclesiastico,$actaEclesiastico,      
+            $fechaInscripcionEclesiastico,$fechaInscripcion,$fechaRegistro,$estadoBautismo){
         
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarBautismo('{$idPersona}','{$idSacerdote}',
-        '{$idConfigurarParroquiaCanton}','{$idIglesia}','{$numero}','{$fechaBautizo}','{$anoRegistroCivil}','{$tomo}',
-        '{$folio}','{$acta}','{$fechaInscripcion}','{$fechaRegistro}','{$estadoBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        '{$idConfigurarParroquiaCanton}','{$idIglesia}','{$idLugar}','{$numero}','{$fechaBautizo}','{$anoRegistroCivil}','{$tomo}',
+        '{$folio}','{$acta}','{$anoEclesiastico}','{$tomoEclesiastico}',
+        '{$folioEclesiastico}','{$actaEclesiastico}','{$fechaInscripcionEclesiastico}','{$fechaInscripcion}','{$fechaRegistro}','{$estadoBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
     public function FiltrarBautismoPorPersona($idPersona){

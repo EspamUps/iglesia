@@ -34,6 +34,57 @@ class AdministradorController extends AbstractActionController
 {
     public $dbAdapter;
     
+    public function matrimonioAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }
+        else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objPersonas = new Persona($this->dbAdapter);
+            $objSexo = new Sexo($this->dbAdapter);
+            $objMetodos = new Metodos();
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 18);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 18, 3);
+                if($validarprivilegio == TRUE){
+                    $listaPersonas = $objPersonas->ObtenerPersonas();
+                    $optionHombre ='';
+                    $optionMujer = '';
+                    foreach ($listaPersonas as $value){
+                        $listaSexo = $objSexo->FiltrarSexo($value['idSexo']);
+                        if($listaSexo[0]['identificadorSexo'] == 1){
+                            $optionHombre = $optionHombre.'<option value="'.$value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'].'"></option>';
+                        }else{
+                            $optionMujer = $optionMujer.'<option value="'.$value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'].'"></option>';
+                        }
+                    }
+                    $array = array(
+                        'validacionPrivilegio' =>  $validarprivilegio,
+                        'optionHombre'=>$optionHombre,
+                        'optionMujer'=>$optionMujer,
+                    );
+                }else{
+                    $array = array(
+                        'validacionPrivilegio' =>  $validarprivilegio
+                    );
+                }
+                
+            }
+            
+        }
+        return new ViewModel($array);
+    }
+    
     public function bautismoAction()
     {
         $this->layout("layout/administrador");
@@ -76,6 +127,7 @@ class AdministradorController extends AbstractActionController
         }
         return new ViewModel($array);
     }
+    
     
     public function  configurarcursoAction()
     {

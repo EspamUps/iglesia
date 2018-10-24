@@ -1,0 +1,85 @@
+<?php
+$validacionPrivilegio = $this->validacionPrivilegio;
+// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/bautismo/obtenerdireccionesselect.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/matrimonio/matrimonio.php');
+ ?>
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            MATRIMONIO
+            <small>SWGP</small>
+        </h1>
+    </section>
+    <?php
+        if($validacionPrivilegio==true)
+        {
+            $optionHombres = $this->optionHombre;
+            $optionMujeres = $this->optionMujer;
+        ?>
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeFormIngresarMatrimonio"> </div>
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" method="post" action="<?php echo $this->basePath()?>/matrimonio/ingresarmatrimonio" id="formIngresarMatrimonio">
+                        <div class="col-lg-6 form-group">
+                            <label for="nombresEsposo">APELLIDOS Y NOMBRES ESPOSO</label>
+                            <input onchange="$('#contenedorRestoDelFormulario').html('');" list="buscadoEsposo" id="nombresEsposo" autocomplete="off" name="nombresEsposo" type="text" class="form-control" placeholder="Buscar">
+                            <datalist id="buscadoEsposo">
+                                <?php echo $optionHombres; ?>
+                            </datalist>
+                        </div> 
+                        <div class="col-lg-6 form-group">
+                            <label for="fechaNacimientoEsposo">FECHA DE NACIMIENTO</label>
+                            <input type="date" id="fechaNacimientoEsposo" name="fechaNacimientoEsposo" class="form-control" >
+                        </div>
+                        <div class="col-lg-6 form-group">
+                            <label for="nombresEsposa">APELLIDOS Y NOMBRES ESPOSA</label>
+                            <input onchange="$('#contenedorRestoDelFormulario').html('');" list="buscadoEsposa" id="nombresEsposa" autocomplete="off" name="nombresEsposa" type="text" class="form-control" placeholder="Buscar">
+                            <datalist id="buscadoEsposa">
+                                <?php echo $optionMujeres; ?>
+                            </datalist>
+                        </div> 
+                        <div class="col-lg-6 form-group">
+                            <label for="fechaNacimientoEsposa">FECHA DE NACIMIENTO ESPOSA</label>
+                            <input type="date" id="fechaNacimientoEsposa" name="fechaNacimientoEsposa" class="form-control" >
+                        </div>
+                        <div class="col-lg-12 form-group">
+                            <button onclick="filtrarMatrimonioPorEsposoEsposa();" type="button" id="btnBuscarPersona" data-loading-text="BUSCANDO..." class="btn  btn-primary btn-flat pull-right"><i class="fa fa-search"></i>BUSCAR</button>
+                        </div>
+                        
+                        <div id="contenedorRestoDelFormulario" class="col-lg-12">
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+       <?php } ?>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div id="mensajeTablaMatrimonio"> </div>
+                    <div id="contenedorTablaMatrimonio"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<script type="text/javascript">  
+$(document).ready(function(){
+    cargandoBautismo("#contenedorTablaBautismo");
+   obtenerBautismos(); 
+});
+
+
+</script>
+    

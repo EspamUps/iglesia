@@ -87,6 +87,7 @@ return array(
             'Nel\Controller\Bautismo' => 'Nel\Controller\BautismoController',
             'Nel\Controller\Asistencias' => 'Nel\Controller\AsistenciasController',
             'Nel\Controller\Administrativos2' => 'Nel\Controller\Administrativos2Controller',
+            'Nel\Controller\Matrimonio' => 'Nel\Controller\MatrimonioController',
         ),
     ),
     'view_manager' => array(

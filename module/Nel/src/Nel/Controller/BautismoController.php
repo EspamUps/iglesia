@@ -24,6 +24,7 @@ use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Bautismo;
+use Nel\Modelo\Entity\LugaresMisa;
 use Nel\Modelo\Entity\Sexo;
 use Nel\Modelo\Entity\PadresBautismo;
 use Nel\Modelo\Entity\PadrinosBautismo;
@@ -151,6 +152,7 @@ class BautismoController extends AbstractActionController
                         $objPersona = new Persona($this->dbAdapter);
                         $objSacerdote = new Sacerdotes($this->dbAdapter);
                         $objTipoPadre = new TipoPadre($this->dbAdapter);
+                        $objLugar = new LugaresMisa($this->dbAdapter);
                         $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
@@ -161,6 +163,7 @@ class BautismoController extends AbstractActionController
                         $idSacerdoteEncriptado = $post['selectSacerdote'];
                         $fechaBautizo = $post['fechaBautizo'];
                         $idConfigurarParroquiaCantonEncriptado = $post['selectParroquias'];
+                        $idLugarEncriptado = $post['lugarBautizo'];
                         $anoRegistroCivil = trim($post['ano']);
                         $tomo = strtoupper(trim($post['tomo']));
                         $folio = strtoupper(trim($post['folio']));
@@ -176,6 +179,12 @@ class BautismoController extends AbstractActionController
                         $fechaNacimientoMadre = $post['fechaNacimientoMadre'];
                         $fechaNacimientoPadrino = $post['fechaNacimientoPadrino'];
                         $fechaNacimientoMadrina = $post['fechaNacimientoMadrina'];
+                        
+                        $anoEclesiastico = trim($post['anoEclesiastico']);
+                        $tomoEclesiastico = strtoupper(trim($post['tomoEclesiastico']));
+                        $folioEclesiastico = strtoupper(trim($post['folioEclesiastico']));
+                        $actaEclesiastico = strtoupper(trim($post['actaEclesiastico']));
+                        $fechaInscripcionEclesiastico = $post['fechaInscripcionEclesiastico'];
                         if(empty ($nombresPadre)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LOS DATOS DEL PADRE</div>';
                         }else if(empty ($fechaNacimientoPadre)){
@@ -200,6 +209,8 @@ class BautismoController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL SACERDOTE</div>';
                         }else if(empty ($fechaBautizo)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA DEL BAUTIZO</div>';
+                        }else if(empty ($idLugarEncriptado) || $idLugarEncriptado == "0"){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE LA IGLESIA</div>';
                         }else if(empty ($idConfigurarParroquiaCantonEncriptado) || $idConfigurarParroquiaCantonEncriptado == NULL){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA DIRECCIÓN</div>';
                         }else if(!is_numeric ($anoRegistroCivil) || strlen($anoRegistroCivil) > 4){
@@ -212,84 +223,101 @@ class BautismoController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL ACTA</div>';
                         }else if(empty ($fechaInscripcion)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA DE INSCRIPCIÓN</div>';
+                        }else if(!is_numeric ($anoEclesiastico) || strlen($anoEclesiastico) > 4){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL AÑO ECLESIÁSTICO 4 DÍGITOS</div>';
+                        }else if(empty ($tomoEclesiastico)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL TOMO ECLESIÁSTICO</div>';
+                        }else if(empty ($folioEclesiastico)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL FOLIO ECLESIÁSTICO</div>';
+                        }else if(empty ($actaEclesiastico)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL ACTA ECLESIÁSTICO</div>';
+                        }else if(empty ($fechaInscripcionEclesiastico)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA DE INSCRIPCIÓN ECLESIÁSTICO</div>';
                         }else if(count ($objBautismo->FiltrarBautismoPorNumero($numero)) > 0 ){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN BAUTIZO CON EL NÚMERO '.$numero.'</div>';
                         }else {
-                            
-                            $listaPadre = $objPersona->FiltrarPersonaPorNombres($nombresPadre, $fechaNacimientoPadre);
-                            $listaMadre = $objPersona->FiltrarPersonaPorNombres($nombresMadre, $fechaNacimientoMadre);
-                            $listaPadrino = $objPersona->FiltrarPersonaPorNombres($nombresPadrino, $fechaNacimientoPadrino);
-                            $listaMadrina = $objPersona->FiltrarPersonaPorNombres($nombresMadrina, $fechaNacimientoMadrina);
-                            
-                            if(count($listaPadre) != 1){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRE CON NOMBRES '.$nombresPadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
-                            }else if(count($listaMadre) != 1){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRE CON NOMBRES '.$nombresMadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
-                            }else if(count($listaPadrino) != 1){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRINO CON NOMBRES '.$nombresPadrino.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadrino.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
-                            }else if(count($listaMadrina) != 1){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRINA CON NOMBRES '.$nombresMadrina.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadrina.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                            $idLugar = $objMetodos->desencriptar($idLugarEncriptado);
+                            $listaLugar = $objLugar->FiltrarLugaresMisa($idLugar);
+                            if(count($listaLugar) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA IGLESIA SELECCIONADA NO EXISTE EN LA BASE DE DATOS</div>';
                             }else{
-                                
-                                $idPadre = $listaPadre[0]['idPersona'];
-                                $idMadre = $listaMadre[0]['idPersona'];
-                                $idPadrino = $listaPadrino[0]['idPersona'];
-                                $idMadrina = $listaMadrina[0]['idPersona'];
                             
-                            
-                                ini_set('date.timezone','America/Bogota'); 
-                                $fechaActualCom =  strtotime(date("d-m-Y"));
-                                $fechaBautizoCom = strtotime($fechaBautizo);
-                                $fechaInscripcionCom = strtotime($fechaInscripcion);
-                                if($fechaBautizoCom > $fechaActualCom){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE BAUTIZO NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
-                                }else if($fechaInscripcionCom > $fechaActualCom){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INSCRIPCIÓN NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
-                                }else{
-                                    $idPersona = $objMetodos->desencriptar($idPersonaEncriptado);
-                                    $listaPersona = $objPersona->FiltrarPersona($idPersona);
-                                    if(count($listaPersona) == 0){
-                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE EN LA BASE DE DATOS</div>';
-                                    }else{
-                                        if(count ($objBautismo->FiltrarBautismoPorPersona($idPersona)) > 0 ){
-                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA YA CUENTA CON UN BAUTIZO POR FAVOR RECARGUE LA PÁGINA</div>';
-                                        }else {
-                                            $idSacerdote = $objMetodos->desencriptar($idSacerdoteEncriptado);
-                                            $listaSacerdote = $objSacerdote->FiltrarSacerdote($idSacerdote);
-                                            if(count($listaSacerdote) == 0){
-                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SACERDOTE SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
-                                            }else{
+                                $listaPadre = $objPersona->FiltrarPersonaPorNombres($nombresPadre, $fechaNacimientoPadre);
+                                $listaMadre = $objPersona->FiltrarPersonaPorNombres($nombresMadre, $fechaNacimientoMadre);
+                                $listaPadrino = $objPersona->FiltrarPersonaPorNombres($nombresPadrino, $fechaNacimientoPadrino);
+                                $listaMadrina = $objPersona->FiltrarPersonaPorNombres($nombresMadrina, $fechaNacimientoMadrina);
 
-                                                $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
-                                                $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
-                                                if(count($listaConfigurarParroquiaCanton) == 0){
-                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA DIRECCIÓN DEL LUGAR DE NACIMIENTO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                if(count($listaPadre) != 1){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRE CON NOMBRES '.$nombresPadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                }else if(count($listaMadre) != 1){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRE CON NOMBRES '.$nombresMadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                }else if(count($listaPadrino) != 1){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRINO CON NOMBRES '.$nombresPadrino.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadrino.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                }else if(count($listaMadrina) != 1){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRINA CON NOMBRES '.$nombresMadrina.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadrina.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                }else{
+
+                                    $idPadre = $listaPadre[0]['idPersona'];
+                                    $idMadre = $listaMadre[0]['idPersona'];
+                                    $idPadrino = $listaPadrino[0]['idPersona'];
+                                    $idMadrina = $listaMadrina[0]['idPersona'];
+
+
+                                    ini_set('date.timezone','America/Bogota'); 
+                                    $fechaActualCom =  strtotime(date("d-m-Y"));
+                                    $fechaBautizoCom = strtotime($fechaBautizo);
+                                    $fechaInscripcionCom = strtotime($fechaInscripcion);
+                                    if($fechaBautizoCom > $fechaActualCom){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE BAUTIZO NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
+                                    }else if($fechaInscripcionCom > $fechaActualCom){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INSCRIPCIÓN NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
+                                    }else{
+                                        $idPersona = $objMetodos->desencriptar($idPersonaEncriptado);
+                                        $listaPersona = $objPersona->FiltrarPersona($idPersona);
+                                        if(count($listaPersona) == 0){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE EN LA BASE DE DATOS</div>';
+                                        }else{
+                                            if(count ($objBautismo->FiltrarBautismoPorPersona($idPersona)) > 0 ){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA YA CUENTA CON UN BAUTIZO POR FAVOR RECARGUE LA PÁGINA</div>';
+                                            }else {
+                                                $idSacerdote = $objMetodos->desencriptar($idSacerdoteEncriptado);
+                                                $listaSacerdote = $objSacerdote->FiltrarSacerdote($idSacerdote);
+                                                if(count($listaSacerdote) == 0){
+                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SACERDOTE SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
                                                 }else{
-                                                    $idIglesia = $sesionUsuario->offsetGet('idIglesia');
-                                                    $hoy = getdate();
-                                                    $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                                                    $resultado = $objBautismo->IngresarBautismo($idPersona, $idSacerdote, $idConfigurarParroquiaCanton, $idIglesia, $numero, $fechaBautizo, $anoRegistroCivil, $tomo, $folio, $acta, $fechaInscripcion, $fechaSubida, 0);
-                                                    if(count($resultado) == 0){
-                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
-                                                    }else{ 
-                                                        
-                                                        $idBautismo = $resultado[0]['idBautismo'];
-                                                        $listaTipoPadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(1);
-                                                        $listaTipoMadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(2);
-                                                        $idTipoPadre = $listaTipoPadre[0]['idTipoPadre'];
-                                                        $idTipoMadre = $listaTipoMadre[0]['idTipoPadre'];
-                                                        
-                                                        $resultadoPadre = $objPadresBautismo->IngresarPadresBautismo($idTipoPadre, $idPadre, $idBautismo, $fechaSubida, 1);
-                                                        $resultadoMadre = $objPadresBautismo->IngresarPadresBautismo($idTipoMadre, $idMadre, $idBautismo, $fechaSubida, 1);
-                                                        
-                                                        $resultadoPadrino = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoPadre, $idPadrino, $idBautismo, $fechaSubida, 1);
-                                                        $resultadoMadrina = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoMadre, $idMadrina, $idBautismo, $fechaSubida, 1);
-                                                        
-                                                        $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
-                                                        $validar = TRUE;
+
+                                                    $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
+                                                    $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
+                                                    if(count($listaConfigurarParroquiaCanton) == 0){
+                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA DIRECCIÓN DEL LUGAR DE NACIMIENTO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                                    }else{
+                                                        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+                                                        $hoy = getdate();
+                                                        $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                                                        $resultado = $objBautismo->IngresarBautismo($idPersona, $idSacerdote, $idConfigurarParroquiaCanton, $idIglesia,$idLugar, $numero, $fechaBautizo, $anoRegistroCivil, $tomo, $folio, $acta,$anoEclesiastico,$tomoEclesiastico,$folioEclesiastico,$actaEclesiastico,$fechaInscripcionEclesiastico, $fechaInscripcion, $fechaSubida, 0);
+                                                        if(count($resultado) == 0){
+                                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
+                                                        }else{ 
+
+                                                            $idBautismo = $resultado[0]['idBautismo'];
+                                                            $listaTipoPadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(1);
+                                                            $listaTipoMadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(2);
+                                                            $idTipoPadre = $listaTipoPadre[0]['idTipoPadre'];
+                                                            $idTipoMadre = $listaTipoMadre[0]['idTipoPadre'];
+
+                                                            $resultadoPadre = $objPadresBautismo->IngresarPadresBautismo($idTipoPadre, $idPadre, $idBautismo, $fechaSubida, 1);
+                                                            $resultadoMadre = $objPadresBautismo->IngresarPadresBautismo($idTipoMadre, $idMadre, $idBautismo, $fechaSubida, 1);
+
+                                                            $resultadoPadrino = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoPadre, $idPadrino, $idBautismo, $fechaSubida, 1);
+                                                            $resultadoMadrina = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoMadre, $idMadrina, $idBautismo, $fechaSubida, 1);
+
+                                                            $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
+                                                            $validar = TRUE;
+                                                        }
                                                     }
                                                 }
                                             }
+
                                         }
                                     }
                                 }
@@ -337,6 +365,7 @@ class BautismoController extends AbstractActionController
                         $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                         $objPadresBautismo = new PadresBautismo($this->dbAdapter);
                         $objPadrinosBautismo = new PadrinosBautismo($this->dbAdapter);
+                        $objLugaresMisa = new LugaresMisa($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -351,6 +380,8 @@ class BautismoController extends AbstractActionController
                             $listaPersona = $objPersona->FiltrarPersonaPorNombres($nombres,$fechaNacimiento);
                             if(count($listaPersona) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE LA PERSONA '.$nombres.' NACIDO(A) EN LA FECHA '.$fechaNacimiento.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                            }else if(count($listaPersona) != 1){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">POR FAVOR INGRESE LOS DATOS CORRECTAMENTE O EXISTE MÁS DE UNA PERSONA CON LOS MISMOS NOMBRES APELLIDOS Y FECHA DE NACIMIENTO</div>';
                             }else if($listaPersona[0]['estadoPersona'] == FALSE){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA HA SIDO DESHABILITADA POR LO TANTO NO PUEDE SER UTILIZADA HASTA QUE SEA HABILITADA</div>';
                             } else{
@@ -393,6 +424,15 @@ class BautismoController extends AbstractActionController
                                             $optionMujeres = $optionMujeres.'<option value="'.$valuePM['primerApellido'].' '.$valuePM['segundoApellido'].' '.$valuePM['primerNombre'].' '.$valuePM['segundoNombre'].'"></option>';
                                         }
                                     }
+                                    
+                                    $listaLugares = $objLugaresMisa->ObtenerObtenerLugaresMisa();
+                                    $optionLugares  = '<option value="0">SELECCIONE UNA IGLESIA</option>';
+                                    foreach ( $listaLugares as $valuesLugares  ){
+                                        $idLugarEncriptado = $objMetodos->encriptar($valuesLugares['idLugarMisa']);
+                                        $optionLugares  = $optionLugares.'<option value="'.$idLugarEncriptado.'">'.$valuesLugares['nombreLugar'].'</option>';
+                                    }
+                                    
+                                    $selectLugares = '<label for="lugarBautizo">SELECCIONE LA IGLESIA</label><select class="form-control" id="lugarBautizo" name="lugarBautizo">'.$optionLugares.'</select>';
                                     
                                     
                                     $selectPadre = '<div class="form-group col-lg-6">
@@ -443,13 +483,15 @@ class BautismoController extends AbstractActionController
                                     
                                     
                                     
+                                    
+                                    
                                     $tabla = '
                                         
                                             '.$selectPadre.$selectMadre.$selectPadrino.$selectMadrina.'
                                   
 
 
-                                        <div class="form-group col-lg-4">
+                                        <div class="form-group col-lg-3">
                                             <h4 class="text-center">DATOS DEL BAUTIZO</h4>
                                             <input type="hidden" value="'.$idPersonaEncriptado.'" name="idPersonaEncriptado" id="idPersonaEncriptado">
                                             <label for="numero">NÚMERO</label>
@@ -461,9 +503,10 @@ class BautismoController extends AbstractActionController
                                             </select>
                                             <label for="fechaBautizo">FECHA BAUTIZO</label>
                                             <input type="date" class="form-control" id="fechaBautizo" name="fechaBautizo">
+                                            '.$selectLugares.'
                                         </div>
                                         
-                                        <div class="col-lg-4 form-group">
+                                        <div class="col-lg-3 form-group">
                                             <h4 class="text-center">LUGAR DE NACIMIENTO</h4>
                                             <label for="selectProvincias">PROVINCIAS</label>
                                             <select class="form-control" onchange="filtrarCantonesPorProvincia()" id="selectProvincias" name="selectProvincias">
@@ -478,7 +521,7 @@ class BautismoController extends AbstractActionController
                                                 <option value="0">SELECCIONE UNA PARRÓQUIA</option>
                                             </select>
                                         </div>
-                                        <div class="form-group col-lg-4">
+                                        <div class="form-group col-lg-3">
                                             <h4 class="text-center">REGISTRO CIVIL</h4>
                                             <label for="ano">AÑO</label>
                                             <input onkeydown="validarNumeros(\'ano\');" maxlength="10" autocomplete="off"  type="text" id="ano" name="ano" class="form-control">
@@ -491,6 +534,19 @@ class BautismoController extends AbstractActionController
                                             <label for="fechaInscripcion">FECHA DE INSCRIPCIÓN</label>
                                             <input type="date" class="form-control" id="fechaInscripcion" name="fechaInscripcion">
                                         </div>
+                                        <div class="form-group col-lg-3">
+                                            <h4 class="text-center">REGISTRO ECLESIÁSTICO</h4>
+                                            <label for="anoEclesiastico">AÑO</label>
+                                            <input onkeydown="validarNumeros(\'anoEclesiastico\');" maxlength="10" autocomplete="off"  type="text" id="anoEclesiastico" name="anoEclesiastico" class="form-control">
+                                            <label for="tomoEclesiastico">TOMO</label>
+                                            <input maxlength="10" autocomplete="off"  type="text" id="tomoEclesiastico" name="tomoEclesiastico" class="form-control">
+                                            <label for="folioEclesiastico">FOLIO</label>
+                                            <input maxlength="10" autocomplete="off" type="text" id="folioEclesiastico" name="folioEclesiastico" class="form-control">
+                                            <label for="actaEclesiastico">ACTA</label>
+                                            <input maxlength="10" autocomplete="off"  type="text" id="actaEclesiastico" name="actaEclesiastico" class="form-control">
+                                            <label for="fechaInscripcionEclesiastico">FECHA DE INSCRIPCIÓN</label>
+                                            <input type="date" class="form-control" id="fechaInscripcionEclesiastico" name="fechaInscripcionEclesiastico">
+                                        </div>
                                         <div class="form-group col-lg-12">
                                             '.$botonCancelar.' '.$botonGuardar.'
                                         </div>';
@@ -501,6 +557,10 @@ class BautismoController extends AbstractActionController
                                     $nombres = $listaBautismo[0]['primerApellido'].' '.$listaBautismo[0]['segundoApellido'].' '.$listaBautismo[0]['primerNombre'].' '.$listaBautismo[0]['segundoNombre'];
                                     
                                     $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
+                                    
+                                    $listaLugar = $objLugaresMisa->FiltrarLugaresMisa($listaBautismo[0]['idLugar']);
+                                    $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
+                                    
                                     $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
                                     $fechaBautismo = $objMetodos->obtenerFechaEnLetraSinHora($listaBautismo[0]['fechaBautizo']);
                                     $listaSacerdote = $objSacerdotes->FiltrarSacerdote($listaBautismo[0]['idSacerdote']);
@@ -529,7 +589,7 @@ class BautismoController extends AbstractActionController
                                             $madrina = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
                                         }
                                     }
-                                    $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia.'</b> el <b>'.$fechaBautismo.'</b> el 
+                                    $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el <b>'.$fechaBautismo.'</b> el 
                                         Padre <b>'.$nombresSacerdote.'</b> bautizó solemnemente a: <b>'.$nombres.'</b> nacido en <b>'.$direccionNacimiento.'</b> el 
                                             <b>'.$fechaNacimiento.'</b> hijo legítimo de <b>'.$padre.'</b> y de <b>'.$madre.'.</b>
                                             </p>
@@ -555,26 +615,38 @@ class BautismoController extends AbstractActionController
                                     $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
                                                 <thead>
                                                     <tr> 
-                                                        <th>N°</th>
-                                                        <th > '.$listaBautismo[0]['numero'].'</th>
+                                                        <th colspan="2">N°</th>
+                                                        <th colspan="2"> '.$listaBautismo[0]['numero'].'</th>
                                                     </tr> 
                                                     <tr> 
-                                                        <th colspan="2" >NOMBRE</th>
+                                                        <th colspan="4" >NOMBRE</th>
                                                     </tr>
                                                     <tr> 
-                                                        <th colspan="2" >'.$nombres.'</th>
+                                                        <th colspan="4" >'.$nombres.'</th>
                                                     </tr>
                                                     <tr> 
                                                         <th colspan="2">REGISTRO CIVIL</th>
+                                                        <th colspan="2">REGISTRO ECLESIÁSTICO</th>
                                                     </tr>
                                                     <tr> 
                                                         <th><b>AÑO</b> '.$listaBautismo[0]['anoRegistroCivil'].'</th>
                                                         <th><b>TOMO</b> '.$listaBautismo[0]['tomo'].'</th>
+                                                        <th><b>AÑO</b> '.$listaBautismo[0]['anoEclesiastico'].'</th>
+                                                        <th><b>TOMO</b> '.$listaBautismo[0]['tomoEclesiastico'].'</th>
+                                                        
                                                     </tr>
                                                      <tr> 
                                                         <th><b>FOLIO</b> '.$listaBautismo[0]['folio'].'</th>
-                                                        <th><b>ACTA</b> '.$listaBautismo[0]['acta'].'</th>
+                                                        <th><b>ACTA</b> '.$listaBautismo[0]['acta'].'</th> 
+                                                        <th><b>FOLIO</b> '.$listaBautismo[0]['folioEclesiastico'].'</th>
+                                                        <th><b>ACTA</b> '.$listaBautismo[0]['actaEclesiastico'].'</th> 
                                                     </tr>
+                                                    <tr> 
+                                                        <th>FECHA INSCRIPCIÓN</th>
+                                                        <th> '.$listaBautismo[0]['fechaInscripcion'].'</th>
+                                                        <th>FECHA INSCRIPCIÓN</th>
+                                                        <th> '.$listaBautismo[0]['fechaInscripcionEclesiastico'].'</th>
+                                                    </tr> 
                                                     
                                                 </thead>
                                             </table>';
