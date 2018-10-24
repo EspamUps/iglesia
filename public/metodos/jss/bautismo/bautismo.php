@@ -106,33 +106,30 @@
 
 function limpiarFormularioBautismo()
 {
-    $('#formIngresarBautismo').each(function () {
-        this.reset();
-    });
+//    $('#formIngresarBautismo').each(function () {
+//        this.reset();
+//    });
     $("#contenedorRestoDelFormulario").html('');
     setTimeout(function() {$("#mensajeFormIngresarBautismo").html('');},1500);
 }
 function filtrarPersonaPorNombres(){
         var url = $("#rutaBase").text();
-        var primerApellido = $("#primerApellido").val();
-        var segundoApellido = $("#segundoApellido").val();
-        var primerNombre = $("#primerNombre").val();
-        var segundoNombre = $("#segundoNombre").val();
+        var nombres = $("#nombres").val();
         var fechaNacimiento = $("#fechaNacimiento").val();
         $.ajax({
             url : url+'/bautismo/filtrarpersonapornombres',
             type: 'post',
             dataType: 'JSON',
-            data: {primerApellido:primerApellido,segundoApellido:segundoApellido,primerNombre:primerNombre,segundoNombre:segundoNombre,fechaNacimiento:fechaNacimiento},
+            data: {nombres:nombres,fechaNacimiento:fechaNacimiento},
             beforeSend: function(){
-
-                $("#btnBuscarPersona").button('loading');
+                cargandoBautismo("#contenedorRestoDelFormulario");
                 $("#mensajeFormIngresarBautismo").html('');
-                cargandoBautismo('#contenedorRestoDelFormulario');
+                
             },
             uploadProgress: function(event,position,total,percentComplete){
             },
             success: function(data){  
+                console.log(data)
                 if(data.validar == true){
                     $("#contenedorRestoDelFormulario").html(data.tabla);
                 }else{
@@ -145,7 +142,6 @@ function filtrarPersonaPorNombres(){
             },
             error: function(xhr, textStatus, errorThrown) {
                 $("#contenedorRestoDelFormulario").html('');
-                $("#btnBuscarPersona").button('reset');
                 if(xhr.status === 0){
                     $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
                 }else if(xhr.status == 404){
@@ -163,9 +159,62 @@ function filtrarPersonaPorNombres(){
                 }
             }
         }); 
-    
-    
 }
+
+//function filtrarPersonaPorNombres(){
+//        var url = $("#rutaBase").text();
+//        var primerApellido = $("#primerApellido").val();
+//        var segundoApellido = $("#segundoApellido").val();
+//        var primerNombre = $("#primerNombre").val();
+//        var segundoNombre = $("#segundoNombre").val();
+//        var fechaNacimiento = $("#fechaNacimiento").val();
+//        $.ajax({
+//            url : url+'/bautismo/filtrarpersonapornombres',
+//            type: 'post',
+//            dataType: 'JSON',
+//            data: {primerApellido:primerApellido,segundoApellido:segundoApellido,primerNombre:primerNombre,segundoNombre:segundoNombre,fechaNacimiento:fechaNacimiento},
+//            beforeSend: function(){
+//
+//                $("#btnBuscarPersona").button('loading');
+//                $("#mensajeFormIngresarBautismo").html('');
+//                cargandoBautismo('#contenedorRestoDelFormulario');
+//            },
+//            uploadProgress: function(event,position,total,percentComplete){
+//            },
+//            success: function(data){  
+//                if(data.validar == true){
+//                    $("#contenedorRestoDelFormulario").html(data.tabla);
+//                }else{
+//                    $("#contenedorRestoDelFormulario").html(data.mensaje);
+//                }
+//                $("#btnBuscarPersona").button('reset');
+////                $("#mensajeFormIngresarBautismo").html(data.mensaje);
+//            },
+//            complete: function(){
+//            },
+//            error: function(xhr, textStatus, errorThrown) {
+//                $("#contenedorRestoDelFormulario").html('');
+//                $("#btnBuscarPersona").button('reset');
+//                if(xhr.status === 0){
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+//                }else if(xhr.status == 404){
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+//                }else if(xhr.status == 500){
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+//                }else if(errorThrown === 'parsererror'){
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+//                }else if(errorThrown === 'timeout'){
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+//                }else if(errorThrown === 'abort'){
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+//                }else{
+//                    $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+//                }
+//            }
+//        }); 
+//    
+//    
+//}
 function seleccionarFila(ID)
 {
     var menues2 = $("#tablaBautismo tbody tr td");
@@ -222,8 +271,8 @@ function obtenerBautismos(){
                             data: 'nombresPersona'
                         },
                         {
-                            title: 'FECHA DE REGISTRO',
-                            data: 'fechaIngreso'
+                            title: 'FECHA DE NACIMIENTO',
+                            data: 'fechaNacimiento'
                         },
                         {
                             title: 'OPC.',
@@ -272,8 +321,8 @@ $(function(){
         success: function(data){
             if(data.validar==true){
                 filtrarPersonaPorNombres();
-//                limpiarFormIngresarCurso();
-//                obtenerCursos()
+                limpiarFormularioBautismo();
+                obtenerBautismos();
             }
             $("#btnGuardarBautismo").button('reset');
             $("#mensajeFormIngresarBautismo").html(data.mensaje);

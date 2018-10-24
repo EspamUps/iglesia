@@ -46,19 +46,31 @@ class AdministradorController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objPersonas = new Persona($this->dbAdapter);
+            $objMetodos = new Metodos();
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 15);
             if (count($AsignarModulo)==0)
                 $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
             else{
                 
                 $objMetodosC = new MetodosControladores();
-         
-               
-                
                 $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 15, 3);
-                $array = array(
-                    'validacionPrivilegio' =>  $validarprivilegio,
-                );
+                if($validarprivilegio == TRUE){
+                    $listaPersonas = $objPersonas->ObtenerPersonas();
+                    $optionPersona ='';
+                    foreach ($listaPersonas as $value){
+                        $optionPersona = $optionPersona.'<option value="'.$value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'].'"></option>';
+                    }
+                    $array = array(
+                        'validacionPrivilegio' =>  $validarprivilegio,
+                        'optionPersona'=>$optionPersona,
+                    );
+                }else{
+                    $array = array(
+                        'validacionPrivilegio' =>  $validarprivilegio
+                    );
+                }
+                
             }
             
         }

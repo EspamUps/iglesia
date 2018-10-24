@@ -11,18 +11,18 @@ namespace Nel\Modelo\Entity;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 
-class Sexo extends TableGateway
+class TipoPadre extends TableGateway
 {
     public function __construct(Adapter $adapter = null, $databaseSchema = null, ResultSet $selectResultPrototype = null)
     {
-        return parent::__construct('sexo', $adapter, $databaseSchema, $selectResultPrototype);
+        return parent::__construct('tipopadre', $adapter, $databaseSchema, $selectResultPrototype);
     }
     
 //    
-    public function ObtenerSexoActivo(){
-        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerSexoActivo()", Adapter::QUERY_MODE_EXECUTE)->toArray();
-        return $resultado;
-    }
+//    public function ObtenerSexoActivo(){
+//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerSexoActivo()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+//        return $resultado;
+//    }
 //    
 //    public function ObtenerCursosEstado($estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
@@ -57,8 +57,12 @@ class Sexo extends TableGateway
 //    
 //    
 //    
-    public function FiltrarSexo($idSexo){
-        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarSexo('{$idSexo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+    public function FiltrarTipoPadrePorIdentificador($identificadorTipoPadre){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTipoPadrePorIdentificador('{$identificadorTipoPadre}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    public function FiltrarTipoPadre($idTipoPadre){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTipoPadre('{$idTipoPadre}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
 //    

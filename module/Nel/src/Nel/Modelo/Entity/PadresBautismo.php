@@ -28,10 +28,10 @@ class PadresBautismo extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPadreBautismoPorBautismo('{$idBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    public function IngresarCurso($nombreCurso,$fechaIngreso,$estadoCurso){
-//        $resultado = $this->getAdapter()->query("CALL Sp_IngresarCurso('{$nombreCurso}','{$fechaIngreso}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function IngresarPadresBautismo($idTipoPadre,$idPersona,$idBautismo,$fechaIngreso,$estadoPadresBautismo){
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarPadresBautismo('{$idTipoPadre}','{$idPersona}','{$idBautismo}','{$fechaIngreso}','{$estadoPadresBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    public function FiltrarCursoPorNombre($nombreCurso){
 //        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoPorNombre('{$nombreCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;

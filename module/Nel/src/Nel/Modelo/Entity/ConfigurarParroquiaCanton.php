@@ -39,7 +39,10 @@ class ConfigurarParroquiaCanton extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfigurarParroquiaCanton('{$idConfigurarParroquiaCanton}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-    
+    public function FitrarDireccionesPorConfigurarParroquiaCanton($idConfigurarParroquiaCanton){
+        $resultado = $this->getAdapter()->query("CALL Sp_FitrarDireccionesPorConfigurarParroquiaCanton('{$idConfigurarParroquiaCanton}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
     public function IngresarConfigurarParroquiaCanton($idConfigurarCantonProvincia,$idParroquia,$estado){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarConfigurarParroquiaCanton('{$idConfigurarCantonProvincia}','{$idParroquia}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
