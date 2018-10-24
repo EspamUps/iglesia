@@ -27,10 +27,10 @@ class Administrativos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerAdministrativosPorCargoAdministrativo('{$idCargoAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    public function FiltrarAdministrativo($idAdministrativo){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAdministrativo('{$idAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function FiltrarAdministrativo($idAdministrativo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAdministrativo('{$idAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
      public function IngresarAdministrativo($idPersona, $idCargoAdministrativo, $fechaIngreso, $estadoAdministrativo){
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarAdministrativo('{$idPersona}','{$idCargoAdministrativo}','{$fechaIngreso}','{$estadoAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
@@ -39,6 +39,11 @@ class Administrativos extends TableGateway
     
      public function FiltrarAdministrativoPorPersona($idPersona){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAdministrativoPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    public function ModificarEstadoAdministrativo($idAdministrativo, $nuevoEstado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoAdministrativo('{$idAdministrativo}','{$nuevoEstado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
    
