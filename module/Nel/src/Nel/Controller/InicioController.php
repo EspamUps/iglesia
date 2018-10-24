@@ -96,8 +96,7 @@ class InicioController extends AbstractActionController
                                 $subMenuCertificados = '';
                                 foreach ($listaAsignarModulo as $valueAsignarM)
                                 {
-                                    if($valueAsignarM['identificadorModulo'] == 2 || 
-                                        $valueAsignarM['identificadorModulo'] == 4 || 
+                                    if($valueAsignarM['identificadorModulo'] == 4 || 
                                         $valueAsignarM['identificadorModulo'] == 5 ||
                                         $valueAsignarM['identificadorModulo'] == 6){
                                         $subMenuMisas=$subMenuMisas.'
@@ -105,9 +104,7 @@ class InicioController extends AbstractActionController
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
                                         </li>';
                                     }
-                                    if($valueAsignarM['identificadorModulo'] == 1 || 
-                                        $valueAsignarM['identificadorModulo'] == 3 || 
-                                        $valueAsignarM['identificadorModulo'] == 7){
+                                    if($valueAsignarM['identificadorModulo'] == 3 ){
                                         $submenu_slide=$submenu_slide.'
                                         <li>
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
@@ -116,7 +113,6 @@ class InicioController extends AbstractActionController
                                     
                                     if($valueAsignarM['identificadorModulo'] == 8 || 
                                             $valueAsignarM['identificadorModulo'] == 9 ||
-                                            $valueAsignarM['identificadorModulo'] == 10 || 
                                             $valueAsignarM['identificadorModulo'] == 11 ||
                                             $valueAsignarM['identificadorModulo'] == 12 ||
                                             $valueAsignarM['identificadorModulo'] == 13||
@@ -133,6 +129,33 @@ class InicioController extends AbstractActionController
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
                                         </li>';
                                     }
+                                    if($valueAsignarM['identificadorModulo'] == 1 || 
+                                       $valueAsignarM['identificadorModulo'] == 17 ||
+                                       $valueAsignarM['identificadorModulo'] == 10 || 
+                                        $valueAsignarM['identificadorModulo'] == 2 || 
+                                       $valueAsignarM['identificadorModulo'] == 7){
+                                        $subMenuTTHH=$subMenuTTHH.'
+                                        <li>
+                                            <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>
+                                        </li>';
+                                    }
+                                }
+                                
+                                if(!empty($subMenuTTHH))
+                                {
+                                    $menuTTHH = '<li class="treeview">
+                                        <a href="#">
+                                          <i class="fa fa-users"></i> <span>TALENTO HUMANO</span>
+                                          <span class="pull-right-container">
+                                            <i class="fa fa-angle-left pull-right"></i>
+                                          </span>
+                                        </a>
+                                        <ul class="treeview-menu" style="display: none;">
+                                        '.$subMenuTTHH.'
+                                        </ul>
+                                      </li>';
+                                    
+                                    
                                 }
                                 
                                 
@@ -185,7 +208,7 @@ class InicioController extends AbstractActionController
                                         </ul>
                                       </li>';
                                 }
-                                $menu_slide='<ul class="sidebar-menu">'.$submenu_slide.$menuMisas.$menuCatesismo.$menuCertificados.' <li>
+                                $menu_slide='<ul class="sidebar-menu">'.$menuTTHH.$submenu_slide.$menuMisas.$menuCatesismo.$menuCertificados.' <li>
                                         <a  href="'.$this->getRequest()->getBaseUrl().'/inicio/salir" ><i class="fa fa-sign-out"></i><span>SALIR</span></a>
                                     </li></ul>';
                                 

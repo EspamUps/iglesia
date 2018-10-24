@@ -599,4 +599,32 @@ class AdministradorController extends AbstractActionController
         }
         return new ViewModel($array);
     }
+    
+    
+     public function administrativosAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 17);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {       
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 17, 3);
+               
+                
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio
+                );
+            }
+        }
+        return new ViewModel($array);
+    }
 }
