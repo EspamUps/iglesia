@@ -75,6 +75,7 @@ function CambiarEstadoCargo(idCargo, Nfila){
                 if(data.validar == true){
                     $("#numerofila"+data.numeroFila).html(data.nuevafila);
                     $("#contenedorDatosResponsable").html("");
+                    limpiarFormIngresarCargoAdministrativo();
                 }else{
                 }
                 
@@ -135,7 +136,9 @@ $(function(){
         success: function(data){
             if(data.validar==true){
                 limpiarFormIngresarCargoAdministrativo();
+                limpiarFormIngresarAdministrativo();
                 CargarCargosAdministrativos();
+                 $("#contenedorDatosResponsable").html("");
             }
             $("#btnGuardarCargo").button('reset');
             $("#mensajeTablaCargosAdministrativos").html(data.mensaje);

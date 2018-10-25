@@ -67,12 +67,12 @@ class CargosAdministrativosController extends AbstractActionController
                             if(count($listaUtilizado)>0)
                                 $utilizado="Asignado";
                             else{
-                                $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="DESHABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$contador.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="DESHABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$contador.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
                             }
                                 
                         }
                         else
-                            $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="HABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$contador.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                            $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="HABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$contador.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                         
                         
                         $numero=$contador+1;
@@ -252,9 +252,9 @@ class CargosAdministrativosController extends AbstractActionController
                                         $utilizado='Asignado';
                                     $botonCambiarEstado="";
                                     if($resultado[0]['estadoCargoAdministrativo']==1)
-                                        $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$Nfila.'" title="DESHABILITAR CARGO '.$resultado[0]['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$Nfila.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                        $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$Nfila.'" title="DESHABILITAR CARGO '.$resultado[0]['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$Nfila.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
                                     else
-                                         $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$Nfila.'" title="HABILITAR CARGO '.$resultado[0]['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$Nfila.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                                         $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$Nfila.'" title="HABILITAR CARGO '.$resultado[0]['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$Nfila.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                                     $numero=$Nfila+1;
                                     $nuevaFila ='<td>'.$numero.'</td>
                                                  <td>'.$resultado[0]['descripcion'].'</td>

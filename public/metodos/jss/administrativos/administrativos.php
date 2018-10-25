@@ -82,6 +82,8 @@ $(function(){
             if(data.validar==true){
                 limpiarFormIngresarAdministrativo();
                 CargarAdministrativos();
+                 $("#contenedorDatosResponsable").html("");
+                
             }
             $("#btnGuardarResponsable").button('reset');
             $("#mensajeFormIngresoResponsable").html(data.mensaje);
