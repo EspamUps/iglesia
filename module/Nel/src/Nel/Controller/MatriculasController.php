@@ -633,9 +633,10 @@ class MatriculasController extends AbstractActionController
             $fechaMatricula=$value['fechaMatricula'];
             $estadoMatricula = $value['estadoMatricula'];
             
-            
+            $botonimprimir='';
             if($estadoMatricula==1)
-            {                    
+            {     
+                $botonimprimir =' <a title="IMPRIMIR COMPROBANTE DE MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].' " class="btn bg-purple btn-sm btn-flat"  target="_blank" href="'.$this->getRequest()->getBaseUrl().'/matriculas/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'"><i class="fa  fa-file-pdf-o"></i></a> ';  
                 $labelEstadoMatricula= '<label style="background-color:#b1ffa1" class="form-control" >Habilitada</label>';   
                 if(($fechaActual>=$fechaInicioMat)&&($fechaActual<$fechaFinMat))
                 {
@@ -652,7 +653,7 @@ class MatriculasController extends AbstractActionController
                $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
 
             }
-            $botonimprimir =' <a title="IMPRIMIR COMPROBANTE DE MATRÍCULA DE '.$value['primerNombre'].' '.$value['primerApellido'].' " class="btn bg-purple btn-sm btn-flat"  target="_blank" href="'.$this->getRequest()->getBaseUrl().'/matriculas/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'"><i class="fa  fa-file-pdf-o"></i></a> ';  
+            
             $fechaInicioClases = strtotime($value['fechaInicio']);
             $fechaFinClases =strtotime($value['fechaFin']);
             
@@ -1123,21 +1124,18 @@ class MatriculasController extends AbstractActionController
          $listaPeriodo = $objPeriodo->FiltrarPeriodo($listaConfCurso[0]['idPeriodo']);
         
         $objAdministrativos = new Administrativos($this->dbAdapter);
-        $objCargosAd = new CargosAdministrativos($this->dbAdapter);
         $cuerpoTablaAdm ='';
-        foreach ($objCargosAd->ObtenerCargosAdministrativos() as $valueCargos) {
-            $listaAdministrativo = $objAdministrativos->ObtenerAdministrativosPorCargoAdministrativo($valueCargos['idCargoAdministrativo']);
+        //el id 1 pertenece al parroco
+        $listaAdministrativo = $objAdministrativos->FiltrarAdministrativosPorIdentificadorCargo(1);
             if(count($listaAdministrativo)>0)
             {
                 $listaPersona = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
                 $cuerpoTablaAdm = $cuerpoTablaAdm.'<tr> 
                             <th>_________________________________________<br>
                             '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'].' '.$listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].'
-                            <br>'.$valueCargos['descripcion'].'</th>
+                            <br>'.$listaAdministrativo[0]['descripcion'].'</th>
                              </tr>';
             }
-            
-        }
          
 	
         $listaHorarioCurso = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($resultado[0]['idConfigurarCurso']);

@@ -27,6 +27,11 @@ class Administrativos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ObtenerAdministrativosPorCargoAdministrativo('{$idCargoAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+    public function FiltrarAdministrativosPorIdentificadorCargo($identificador){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAdministrativosPorIdentificadorCargo('{$identificador}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function FiltrarAdministrativo($idAdministrativo){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAdministrativo('{$idAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
