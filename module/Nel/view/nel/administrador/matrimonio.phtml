@@ -23,28 +23,19 @@ $validacionPrivilegio = $this->validacionPrivilegio;
                 <div class="col-lg-12 ">
                     <div id="mensajeFormIngresarMatrimonio"> </div>
                     <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" method="post" action="<?php echo $this->basePath()?>/matrimonio/ingresarmatrimonio" id="formIngresarMatrimonio">
+                        <h4>DATOS DE LOS ESPOSOS</h4>
                         <div class="col-lg-6 form-group">
-                            <label for="nombresEsposo">APELLIDOS Y NOMBRES ESPOSO</label>
-                            <input onchange="$('#contenedorRestoDelFormulario').html('');" list="buscadoEsposo" id="nombresEsposo" autocomplete="off" name="nombresEsposo" type="text" class="form-control" placeholder="Buscar">
-                            <datalist id="buscadoEsposo">
-                                <?php echo $optionHombres; ?>
-                            </datalist>
-                        </div> 
-                        <div class="col-lg-6 form-group">
-                            <label for="fechaNacimientoEsposo">FECHA DE NACIMIENTO</label>
-                            <input type="date" id="fechaNacimientoEsposo" name="fechaNacimientoEsposo" class="form-control" >
+                            <label for="identificacionEsposo">IDENTIFICACIÓN DEL ESPOSO</label>
+                            <input onkeyup="filtrarPersonaPorIdentificacion(event,'identificacionEsposo','contenedorDatosEsposo');" onkeydown="validarNumeros('identificacionEsposo')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionEsposo" name="identificacionEsposo" class="form-control">
+                            <div id="contenedorDatosEsposo"></div>
                         </div>
                         <div class="col-lg-6 form-group">
-                            <label for="nombresEsposa">APELLIDOS Y NOMBRES ESPOSA</label>
-                            <input onchange="$('#contenedorRestoDelFormulario').html('');" list="buscadoEsposa" id="nombresEsposa" autocomplete="off" name="nombresEsposa" type="text" class="form-control" placeholder="Buscar">
-                            <datalist id="buscadoEsposa">
-                                <?php echo $optionMujeres; ?>
-                            </datalist>
-                        </div> 
-                        <div class="col-lg-6 form-group">
-                            <label for="fechaNacimientoEsposa">FECHA DE NACIMIENTO ESPOSA</label>
-                            <input type="date" id="fechaNacimientoEsposa" name="fechaNacimientoEsposa" class="form-control" >
+                            <label  for="identificacionEsposa">IDENTIFICACIÓN DE LA ESPOSA</label>
+                            <input onkeyup="filtrarPersonaPorIdentificacion(event,'identificacionEsposa','contenedorDatosEsposa');" onkeydown="validarNumeros('identificacionEsposa')" maxlength="10" autocomplete="off" autofocus="" type="text" id="identificacionEsposa" name="identificacionEsposa" class="form-control">
+                            <div id="contenedorDatosEsposa"></div>
                         </div>
+                        
+                        
                         <div class="col-lg-12 form-group">
                             <button onclick="filtrarMatrimonioPorEsposoEsposa();" type="button" id="btnBuscarPersona" data-loading-text="BUSCANDO..." class="btn  btn-primary btn-flat pull-right"><i class="fa fa-search"></i>BUSCAR</button>
                         </div>
@@ -76,8 +67,8 @@ $validacionPrivilegio = $this->validacionPrivilegio;
 
 <script type="text/javascript">  
 $(document).ready(function(){
-    cargandoBautismo("#contenedorTablaBautismo");
-   obtenerBautismos(); 
+    cargandoMatrimonio("#contenedorTablaMatrimonio");
+    obtenerMatrimonios(); 
 });
 
 

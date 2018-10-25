@@ -19,23 +19,25 @@ class Matrimonio extends TableGateway
     }
     
 //    
-//    public function ObtenerBautismos(){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerBautismos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+    public function ObtenerMatrimonios(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerMatrimonios()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 //    
 //    public function ObtenerCursosEstado($estado){
 //        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerCursosEstado('{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
 //        return $resultado;
 //    }
-    public function IngresarMatrimonio($idEsposo, $idEsposa,
+    public function IngresarMatrimonio($idEsposo, $idEsposa,$idIglesia,
     $idLugar,$idConfigurarParroquiaCanton,$anoRegistroCivil,$tomoRegistroCivil,$paginaRegistroCivil,
-    $numeroRegistroCivil,$paginaActaMatrimonial,$actaMatrimonial,$fechaMatrimonio,
+    $numeroRegistroCivil,$anoEcleciastico,$tomoEcleciastico,
+    $paginaActaMatrimonial,$actaMatrimonial,$fechaInscripcionRegistroCivil,$fechaInsciripcionEclesiastico,
+    $fechaMatrimonio,
     $fechaIngreso,$estadoMatrimonio){
         
-        $resultado = $this->getAdapter()->query("CALL Sp_IngresarMatrimonio('{$idEsposo}','{$idEsposa}',
+        $resultado = $this->getAdapter()->query("CALL Sp_IngresarMatrimonio('{$idEsposo}','{$idEsposa}','{$idIglesia}',
         '{$idLugar}','{$idConfigurarParroquiaCanton}','{$anoRegistroCivil}','{$tomoRegistroCivil}','{$paginaRegistroCivil}','{$numeroRegistroCivil}',
-        '{$paginaActaMatrimonial}','{$actaMatrimonial}','{$fechaMatrimonio}','{$fechaIngreso}',
+        '{$anoEcleciastico}','{$tomoEcleciastico}','{$paginaActaMatrimonial}','{$actaMatrimonial}','{$fechaInscripcionRegistroCivil}','{$fechaInsciripcionEclesiastico}','{$fechaMatrimonio}','{$fechaIngreso}',
         '{$estadoMatrimonio}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }

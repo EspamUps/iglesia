@@ -27,7 +27,10 @@ class TestigosMatrimonio extends TableGateway
         return $resultado;
     }
   
-
+    public function FiltrarTestigosMatrimonioPorMatrimonio($idMatrimonio){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarTestigosMatrimonioPorMatrimonio('{$idMatrimonio}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 }
