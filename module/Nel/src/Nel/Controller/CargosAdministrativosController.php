@@ -53,13 +53,14 @@ class CargosAdministrativosController extends AbstractActionController
                     $listaCargosAdministrativos = $objCargosAdministrativos->ObtenerTodosCargosAdministrativos();
                 
                     $cuerpoTabla ="";
-                    $botonCambiarEstado="";
+                   
                     $utilizado="Sin asignar";
                     $contador=1;
                     foreach ($listaCargosAdministrativos as $valueCargos) {
                         
                         if($valueCargos['estadoCargoAdministrativo']==1)
-                        {
+                        { 
+                            $botonCambiarEstado="";
                             $listaUtilizado= $objAdministrativos->ObtenerAdministrativosPorCargoAdministrativo($valueCargos['idCargoAdministrativo']);
                             
                             if(count($listaUtilizado)>0)
