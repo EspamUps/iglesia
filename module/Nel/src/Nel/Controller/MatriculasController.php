@@ -29,6 +29,7 @@ use Nel\Modelo\Entity\AdjuntoMatricula;
 use Nel\Modelo\Entity\HorarioCurso;
 use Nel\Modelo\Entity\ConfigurarCurso;
 use Nel\Modelo\Entity\NombreIglesia;
+use Nel\Modelo\Entity\DireccionIglesia;
 use Nel\Modelo\Entity\CargosAdministrativos;
 use Nel\Modelo\Entity\Administrativos;
 use Zend\Session\Container;
@@ -1111,6 +1112,7 @@ class MatriculasController extends AbstractActionController
         $objPeriodo = new Periodos($this->dbAdapter);
         $objPersona = new Persona($this->dbAdapter);
         $listaIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($idIglesia, 1);
+        $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
         $idMatriculaEncriptado = $this->params()->fromQuery('id');
 
        
@@ -1169,7 +1171,7 @@ class MatriculasController extends AbstractActionController
         $tabla = '<br><br><br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
               <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-             <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'</label>
+             <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'<br>'.$direccionIglesia.'</label>
              <br> <label>Sistema Web de Gestión Parroquial</label>
             </div>
             <hr>

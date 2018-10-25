@@ -80,26 +80,25 @@ class CargosAdministrativosController extends AbstractActionController
                                 <td  >'.$numero.'</td>
                                 <td>'.$valueCargos['descripcion'].'</td>
                                 <td>'.$utilizado.'</td>
-                                <td>'.$botonCambiarEstado.'</td>
                             </tr>';
                         $contador++;
                     }
                     
                     
-                    $tabla = '<div class="table-responsive" >
+                    $tabla = '<div class="col-lg-2"></div><div class="col-lg-8 table-responsive" >
                             <h4>CARGOS ADMINISTRATIVOS REGISTRADOS</h4><table class="table table-bordered table-hover">
                             <thead>
                             <tr  style="background-color:#eee">
                                 <td>#</td>
                                 <td>CARGO ADMINISTRATIVO</td>
                                 <td>ESTADO</td>
-                                <td>ACCIONES</td>
+                                
                             </tr>
                             </thead>
                             <tbody>
                             '.$cuerpoTabla.'
                             </tbody>
-                            </table>';
+                            </table></div><div class="col-lg-2">';
                     
                     $mensaje = '';
                     $validar = TRUE;
