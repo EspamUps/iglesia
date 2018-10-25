@@ -28,6 +28,7 @@ use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\Sacerdotes;
 use Nel\Modelo\Entity\Docentes;
+use Nel\Modelo\Entity\Administrativos;
 use Nel\Modelo\Entity\Bautismo;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
@@ -568,6 +569,7 @@ class PersonaController extends AbstractActionController
         $objSacerdote = new Sacerdotes($adaptador);
         $objDocente = new Docentes($adaptador);
         $objBautismo = new Bautismo($adaptador);
+        $objAdministrativo = new Administrativos($adaptador);
         
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
@@ -594,11 +596,12 @@ class PersonaController extends AbstractActionController
             $listaSacerdote = $objSacerdote->FiltrarSacerdotePorPersona($value['idPersona']);
             $listaDocente = $objDocente->FiltrarDocentePorPersona($value['idPersona']);
             $listaBautismo = $objBautismo->FiltrarBautismoPorPersona($value['idPersona']);
+            $listaAdministrativos = $objAdministrativo->FiltrarAdministrativoPorPersona($value['idPersona']);
             
             if($validarPrivilegioEliminar == true){
                if(count($objHistorialPersona->FiltrarHistorialPersonaPorPersona($value['idPersona'])) == 0 && count($objUsuario->FiltrarUnUsuarioPorPersona($value['idPersona']))==0)
                {
-                   if(count($listaDocente) == 0 && count($listaBautismo) == 0 && count($listaSacerdote) == 0){
+                   if(count($listaDocente) == 0 && count($listaBautismo) == 0 && count($listaSacerdote) == 0 && count($listaAdministrativos) == 0){
                         $botonEliminarPersona = '<button id="btnEliminarPersona'.$i.'" title="ELIMINAR A '.$value['primerNombre'].' '.$value['segundoNombre'].'" onclick="EliminarPersona(\''.$idPersonaEncriptado.'\','.$i.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                    }
                    
