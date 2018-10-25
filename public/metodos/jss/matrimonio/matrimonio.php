@@ -203,46 +203,46 @@ function filtrarMatrimonioPorEsposoEsposa(){
 //    }); 
 //}
 
-//$(function(){
-//    $("#formIngresarBautismo").ajaxForm({
-//        beforeSend: function(){
-//            $("#mensajeFormIngresarBautismo").html('');
-//            $("#btnGuardarBautismo").button('loading');
-//        },
-//        uploadProgress: function(event,position,total,percentComplete){
-//
-//        },
-//        success: function(data){
-//            if(data.validar==true){
+$(function(){
+    $("#formIngresarMatrimonio").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeFormIngresarMatrimonio").html('');
+            $("#btnGuardarMatrimonio").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){
+            if(data.validar==true){
 //                filtrarPersonaPorNombres();
 //                limpiarFormularioBautismo();
 //                obtenerBautismos();
-//            }
-//            $("#btnGuardarBautismo").button('reset');
-//            $("#mensajeFormIngresarBautismo").html(data.mensaje);
-//        },
-//        complete: function(){
-//        },
-//        error: function(xhr, textStatus, errorThrown) {
-//            $("#btnGuardarBautismo").button('reset');
-//            if(xhr.status === 0){
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//            }else if(xhr.status == 404){
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//            }else if(xhr.status == 500){
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//            }else if(errorThrown === 'parsererror'){
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//            }else if(errorThrown === 'timeout'){
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//            }else if(errorThrown === 'abort'){
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//            }else{
-//                $("#mensajeFormIngresarBautismo").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//            }
-//        }
-//    });    
-//}); 
+            }
+            $("#btnGuardarMatrimonio").button('reset');
+            $("#mensajeFormIngresarMatrimonio").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnGuardarMatrimonio").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
 
 function cargandoMatrimonio(contenedor){
     var url = $("#rutaBase").text();

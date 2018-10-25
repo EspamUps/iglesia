@@ -236,6 +236,11 @@ class BautismoController extends AbstractActionController
                         }else if(count ($objBautismo->FiltrarBautismoPorNumero($numero)) > 0 ){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN BAUTIZO CON EL NÚMERO '.$numero.'</div>';
                         }else {
+                            
+                            
+                            
+                            
+                            
                             $idLugar = $objMetodos->desencriptar($idLugarEncriptado);
                             $listaLugar = $objLugar->FiltrarLugaresMisa($idLugar);
                             if(count($listaLugar) == 0){
@@ -248,13 +253,13 @@ class BautismoController extends AbstractActionController
                                 $listaMadrina = $objPersona->FiltrarPersonaPorNombres($nombresMadrina, $fechaNacimientoMadrina);
 
                                 if(count($listaPadre) != 1){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRE CON NOMBRES '.$nombresPadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRE CON NOMBRES '.$nombresPadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadre.' NO EXISTE POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
                                 }else if(count($listaMadre) != 1){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRE CON NOMBRES '.$nombresMadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRE CON NOMBRES '.$nombresMadre.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadre.' NO EXISTE POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
                                 }else if(count($listaPadrino) != 1){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRINO CON NOMBRES '.$nombresPadrino.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadrino.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRINO CON NOMBRES '.$nombresPadrino.' NACIDO(A) EN LA FECHA '.$fechaNacimientoPadrino.' NO EXISTE POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
                                 }else if(count($listaMadrina) != 1){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRINA CON NOMBRES '.$nombresMadrina.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadrina.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA MADRINA CON NOMBRES '.$nombresMadrina.' NACIDO(A) EN LA FECHA '.$fechaNacimientoMadrina.' NO EXISTE POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
                                 }else{
 
                                     $idPadre = $listaPadre[0]['idPersona'];
@@ -267,9 +272,12 @@ class BautismoController extends AbstractActionController
                                     $fechaActualCom =  strtotime(date("d-m-Y"));
                                     $fechaBautizoCom = strtotime($fechaBautizo);
                                     $fechaInscripcionCom = strtotime($fechaInscripcion);
+                                    $fechaInscripcionEclesiasticoCom = strtotime($fechaInscripcionEclesiastico);
                                     if($fechaBautizoCom > $fechaActualCom){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE BAUTIZO NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
                                     }else if($fechaInscripcionCom > $fechaActualCom){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INSCRIPCIÓN NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
+                                    }else if($fechaInscripcionEclesiastico > $fechaActualCom){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INSCRIPCIÓN NO DEBE SER MAYOR A LA FECHA ACTUAL</div>';                        
                                     }else{
                                         $idPersona = $objMetodos->desencriptar($idPersonaEncriptado);
@@ -277,42 +285,53 @@ class BautismoController extends AbstractActionController
                                         if(count($listaPersona) == 0){
                                             $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA NO EXISTE EN LA BASE DE DATOS</div>';
                                         }else{
-                                            if(count ($objBautismo->FiltrarBautismoPorPersona($idPersona)) > 0 ){
-                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA YA CUENTA CON UN BAUTIZO POR FAVOR RECARGUE LA PÁGINA</div>';
-                                            }else {
-                                                $idSacerdote = $objMetodos->desencriptar($idSacerdoteEncriptado);
-                                                $listaSacerdote = $objSacerdote->FiltrarSacerdote($idSacerdote);
-                                                if(count($listaSacerdote) == 0){
-                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SACERDOTE SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                            $fechaInscripcionCom = strtotime($fechaInscripcion);
+                                            $fechaInscripcionEclesiasticoCom = strtotime($fechaInscripcionEclesiastico);
+                                            $fechaNacimientoCom = strtotime($listaPersona[0]['fechaNacimiento']);
+                                            if($fechaNacimientoCom > $fechaInscripcionCom){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INSCRIPCION DEL REGISTRO CIVIL NO DEBE SER MENOR A LA DE NACIMIENTO</div>';
+                                            }else if($fechaNacimientoCom > $fechaInscripcionEclesiasticoCom){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INSCRIPCION DEL REGISTRO ECLESIÁSTICO NO DEBE SER MENOR A LA DE NACIMIENTO</div>';
+                                            }else if($fechaNacimientoCom > $fechaBautizoCom){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DEL BAUTIZO NO DEBE SER MENOR A LA DE NACIMIENTO</div>';
+                                            }else{
+                                                if(count ($objBautismo->FiltrarBautismoPorPersona($idPersona)) > 0 ){
+                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA PERSONA SELECCIONADA YA CUENTA CON UN BAUTIZO POR FAVOR RECARGUE LA PÁGINA</div>';
                                                 }else{
-
-                                                    $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
-                                                    $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
-                                                    if(count($listaConfigurarParroquiaCanton) == 0){
-                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA DIRECCIÓN DEL LUGAR DE NACIMIENTO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                                    $idSacerdote = $objMetodos->desencriptar($idSacerdoteEncriptado);
+                                                    $listaSacerdote = $objSacerdote->FiltrarSacerdote($idSacerdote);
+                                                    if(count($listaSacerdote) == 0){
+                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SACERDOTE SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
                                                     }else{
-                                                        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
-                                                        $hoy = getdate();
-                                                        $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
-                                                        $resultado = $objBautismo->IngresarBautismo($idPersona, $idSacerdote, $idConfigurarParroquiaCanton, $idIglesia,$idLugar, $numero, $fechaBautizo, $anoRegistroCivil, $tomo, $folio, $acta,$anoEclesiastico,$tomoEclesiastico,$folioEclesiastico,$actaEclesiastico,$fechaInscripcionEclesiastico, $fechaInscripcion, $fechaSubida, 0);
-                                                        if(count($resultado) == 0){
-                                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CURSO POR FAVOR INTENTE MÁS TARDE</div>';
-                                                        }else{ 
 
-                                                            $idBautismo = $resultado[0]['idBautismo'];
-                                                            $listaTipoPadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(1);
-                                                            $listaTipoMadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(2);
-                                                            $idTipoPadre = $listaTipoPadre[0]['idTipoPadre'];
-                                                            $idTipoMadre = $listaTipoMadre[0]['idTipoPadre'];
+                                                        $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
+                                                        $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
+                                                        if(count($listaConfigurarParroquiaCanton) == 0){
+                                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA DIRECCIÓN DEL LUGAR DE NACIMIENTO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                                        }else{
+                                                            $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+                                                            $hoy = getdate();
+                                                            $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                                                            $resultado = $objBautismo->IngresarBautismo($idPersona, $idSacerdote, $idConfigurarParroquiaCanton, $idIglesia,$idLugar, $numero, $fechaBautizo, $anoRegistroCivil, $tomo, $folio, $acta,$anoEclesiastico,$tomoEclesiastico,$folioEclesiastico,$actaEclesiastico,$fechaInscripcionEclesiastico, $fechaInscripcion, $fechaSubida, 0);
+                                                            if(count($resultado) == 0){
+                                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL BAUTIZO POR FAVOR INTENTE MÁS TARDE</div>';
+                                                            }else{ 
 
-                                                            $resultadoPadre = $objPadresBautismo->IngresarPadresBautismo($idTipoPadre, $idPadre, $idBautismo, $fechaSubida, 1);
-                                                            $resultadoMadre = $objPadresBautismo->IngresarPadresBautismo($idTipoMadre, $idMadre, $idBautismo, $fechaSubida, 1);
+                                                                $idBautismo = $resultado[0]['idBautismo'];
+                                                                $listaTipoPadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(1);
+                                                                $listaTipoMadre = $objTipoPadre->FiltrarTipoPadrePorIdentificador(2);
+                                                                $idTipoPadre = $listaTipoPadre[0]['idTipoPadre'];
+                                                                $idTipoMadre = $listaTipoMadre[0]['idTipoPadre'];
 
-                                                            $resultadoPadrino = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoPadre, $idPadrino, $idBautismo, $fechaSubida, 1);
-                                                            $resultadoMadrina = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoMadre, $idMadrina, $idBautismo, $fechaSubida, 1);
+                                                                $resultadoPadre = $objPadresBautismo->IngresarPadresBautismo($idTipoPadre, $idPadre, $idBautismo, $fechaSubida, 1);
+                                                                $resultadoMadre = $objPadresBautismo->IngresarPadresBautismo($idTipoMadre, $idMadre, $idBautismo, $fechaSubida, 1);
 
-                                                            $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
-                                                            $validar = TRUE;
+                                                                $resultadoPadrino = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoPadre, $idPadrino, $idBautismo, $fechaSubida, 1);
+                                                                $resultadoMadrina = $objPadrinosBautismo->IngresarPadrinosBautismo($idTipoMadre, $idMadrina, $idBautismo, $fechaSubida, 1);
+
+                                                                $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
+                                                                $validar = TRUE;
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -590,7 +609,7 @@ class BautismoController extends AbstractActionController
                                         }
                                     }
                                     $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el <b>'.$fechaBautismo.'</b> el 
-                                        Padre <b>'.$nombresSacerdote.'</b> bautizó solemnemente a: <b>'.$nombres.'</b> nacido en <b>'.$direccionNacimiento.'</b> el 
+                                        Padre <b>'.$nombresSacerdote.'</b> bautizó solemnemente a: <b>'.$nombres.'</b> nacido(a) en <b>'.$direccionNacimiento.'</b> el 
                                             <b>'.$fechaNacimiento.'</b> hijo legítimo de <b>'.$padre.'</b> y de <b>'.$madre.'.</b>
                                             </p>
                                             <p class="text-justify" style="line-height: 30px;font-size:15px"> Fueron sus Padrinos: <b>'.$padrino.'</b> y <b>'.$madrina.'.</b>
@@ -886,7 +905,7 @@ class BautismoController extends AbstractActionController
             $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 3);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 15);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
             else {
