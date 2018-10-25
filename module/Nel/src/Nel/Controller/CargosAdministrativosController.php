@@ -41,6 +41,7 @@ class CargosAdministrativosController extends AbstractActionController
             $idUsuario = $sesionUsuario->offsetGet('idUsuario');
             $objAsignarModulo = new AsignarModulo($this->dbAdapter);
             $objAdministrativos = new Administrativos($this->dbAdapter);
+            $objMetodos = new Metodos();
             $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 7);
             if (count($AsignarModulo)==0)
                 $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
@@ -55,9 +56,9 @@ class CargosAdministrativosController extends AbstractActionController
                     $cuerpoTabla ="";
                    
                     $utilizado="Sin asignar";
-                    $contador=1;
+                    $contador=0;
                     foreach ($listaCargosAdministrativos as $valueCargos) {
-                        
+                        $idCargoAdministrativoEncriptado = $objMetodos->encriptar( $valueCargos['idCargoAdministrativo']);
                         if($valueCargos['estadoCargoAdministrativo']==1)
                         { 
                             $botonCambiarEstado="";
@@ -66,17 +67,17 @@ class CargosAdministrativosController extends AbstractActionController
                             if(count($listaUtilizado)>0)
                                 $utilizado="Asignado";
                             else{
-                                $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="DESHABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$valueCargos['idCargoAdministrativo'].'\','.$contador.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="DESHABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$contador.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
                             }
                                 
                         }
                         else
-                            $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="HABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$valueCargos['idCargoAdministrativo'].'\','.$contador.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                            $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$contador.'" title="HABILITAR CARGO '.$valueCargos['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$contador.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
                         
                         
-                        
-                        $cuerpoTabla=$cuerpoTabla.'<tr>
-                                <td>'.$contador.'</td>
+                        $numero=$contador+1;
+                        $cuerpoTabla=$cuerpoTabla.'<tr id="numerofila'.$contador.'">
+                                <td  >'.$numero.'</td>
                                 <td>'.$valueCargos['descripcion'].'</td>
                                 <td>'.$utilizado.'</td>
                                 <td>'.$botonCambiarEstado.'</td>
@@ -85,8 +86,8 @@ class CargosAdministrativosController extends AbstractActionController
                     }
                     
                     
-                    $tabla = '<div table-responsive" >
-                            <h4>CARGOS ADMINISTRATIVOS REGISTRADOS</h4><table class="table">
+                    $tabla = '<div class="table-responsive" >
+                            <h4>CARGOS ADMINISTRATIVOS REGISTRADOS</h4><table class="table table-bordered table-hover">
                             <thead>
                             <tr  style="background-color:#eee">
                                 <td>#</td>
@@ -110,7 +111,7 @@ class CargosAdministrativosController extends AbstractActionController
     }
     
     
-     public function ingresarcargoadministrativoAction()
+    public function ingresarcargoadministrativoAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -177,6 +178,94 @@ class CargosAdministrativosController extends AbstractActionController
                                         $validar = TRUE;
                                     }
                                 }
+                        }
+                        }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+    public function modificarestadoAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 17);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 17, 2);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{
+                        $objMetodos = new Metodos();
+                        $objPersona = new Persona($this->dbAdapter);
+                        $objAdministrativo = new Administrativos($this->dbAdapter);
+                        $objCargosAdministrativos = new CargosAdministrativos($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        $idCargoAdministrativoEncriptado = $post['idCargoAdministrativoEncriptado'];
+                        $Nfila = $post['Nfila'];                        
+
+                        if(empty($idCargoAdministrativoEncriptado)|| $idCargoAdministrativoEncriptado=="0" || $idCargoAdministrativoEncriptado ==NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CARGO</div>';
+                        }if($Nfila ==NULL){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA LA FILA DE LA TABLA</div>';
+                        }else 
+                        { 
+                           $idCargoAdministrativo = $objMetodos->desencriptar($idCargoAdministrativoEncriptado);
+                           $listaCargoAdministrativo=$objCargosAdministrativos->FiltrarCargoAdministrativoSinImportarEstado($idCargoAdministrativo);
+                            
+                            if(count($listaCargoAdministrativo)==0) 
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCONTRÓ EL CARGO ADMINISTRATIVO REGISTRADO EN EL SISTEMA</div>';
+                             else{  
+                                if($listaCargoAdministrativo[0]['estadoCargoAdministrativo']==1){
+                                       $resultado = $objCargosAdministrativos->ModificarEstadoCargoAdministrativo($idCargoAdministrativo, 0);
+                                }else {
+                                       $resultado = $objCargosAdministrativos->ModificarEstadoCargoAdministrativo($idCargoAdministrativo, 1);
+                                   } 
+                                if(count($resultado) == 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO DEL CARGO, POR FAVOR INTENTE MÁS TARDE</div>';
+                                }else{
+
+                                    $listaUtilizado= $objAdministrativo->ObtenerAdministrativosPorCargoAdministrativo($resultado[0]['idCargoAdministrativo']);
+
+                                    if(count($listaUtilizado)==0)
+                                        $utilizado='Sin Asignar';
+                                    else
+                                        $utilizado='Asignado';
+                                    $botonCambiarEstado="";
+                                    if($resultado[0]['estadoCargoAdministrativo']==1)
+                                        $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$Nfila.'" title="DESHABILITAR CARGO '.$resultado[0]['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$Nfila.')" class="btn btn-danger btn-sm btn-flat"><i class="fa fa-times"></i></button>';
+                                    else
+                                         $botonCambiarEstado = '<button id="btnCambiarEstadoCargo'.$Nfila.'" title="HABILITAR CARGO '.$resultado[0]['descripcion'].'" onclick="CambiarEstadoCargo(\''.$idCargoAdministrativoEncriptado.'\','.$Nfila.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-check"></i></button>';
+                                    $numero=$Nfila+1;
+                                    $nuevaFila ='<td>'.$numero.'</td>
+                                                 <td>'.$resultado[0]['descripcion'].'</td>
+                                                 <td>'.$utilizado.'</td>
+                                                 <td>'.$botonCambiarEstado.'</td>';
+
+                                    $mensaje = '<div class="alert alert-success text-center" role="alert">ESTADO DEL CARGO ADMINISTRATIVO MODIFICADO CORRECTAMENTE</div>';
+                                    $validar = TRUE;
+                                     return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar, 'nuevafila'=>$nuevaFila, 'numeroFila'=>$Nfila));
+                                     }
+                                 }
                         }
                         }
                 }

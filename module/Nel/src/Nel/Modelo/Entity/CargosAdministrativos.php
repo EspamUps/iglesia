@@ -47,6 +47,16 @@ class CargosAdministrativos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCargoAdministrativoLast()", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+      public function ModificarEstadoCargoAdministrativo($idCargoAdministrativo, $nuevoEstado){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoCargoAdministrativo('{$idCargoAdministrativo}','{$nuevoEstado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+      public function FiltrarCargoAdministrativoSinImportarEstado($idCargoAdministrativo){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCargoAdministrativoSinImportarEstado('{$idCargoAdministrativo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
    
    
 }

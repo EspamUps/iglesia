@@ -287,7 +287,7 @@ class Administrativos2Controller extends AbstractActionController
             $contador++;
         }
         
-        $tabla = '<div class="col-lg-2"></div><div class="col-lg-8 table-responsive" > <h4>PERSONAS CON CARGOS ADMINISTRATIVOS ASIGNADOS</h4><table class="table">
+        $tabla = '<div class="col-lg-2"></div><div class="col-lg-8 table-responsive" > <h4>PERSONAS CON CARGOS ADMINISTRATIVOS ASIGNADOS</h4><table class="table table-bordered table-hover">
                  <thead>
                     <tr style="background-color:#eee">
                         <td>
@@ -352,7 +352,7 @@ class Administrativos2Controller extends AbstractActionController
                         $idAdministrativoEncriptado = trim($post['id']); 
                                                  
 
-                        if(empty($idAdministrativoEncriptado) || $idAdministrativoEncriptado == NULL){
+                        if(empty($idAdministrativoEncriptado) || $idAdministrativoEncriptado == NULL || $idAdministrativoEncriptado == "0"){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL ADMINISTRATIVO</div>';
                        }else 
                         { 
