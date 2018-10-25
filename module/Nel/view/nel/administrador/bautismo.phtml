@@ -23,7 +23,7 @@ $validacionPrivilegio = $this->validacionPrivilegio;
             <div class="row ">
                 <div class="col-lg-12 ">
                     <div id="mensajeFormIngresarBautismo"> </div>
-                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" method="post" action="<?php echo $this->basePath()?>/bautismo/ingresarbautismo" id="formIngresarBautismo">
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoBautismo(this)" method="post" action="<?php echo $this->basePath()?>/bautismo/ingresarbautismo" id="formIngresarBautismo">
                         <div class="col-lg-6 form-group">
                             <label for="nombres">APELLIDOS Y NOMBRES BAUTIZADO</label>
                             <input onchange="$('#contenedorRestoDelFormulario').html('');" list="buscado" id="nombres" autocomplete="off" name="nombres" type="text" class="form-control" placeholder="Buscar">

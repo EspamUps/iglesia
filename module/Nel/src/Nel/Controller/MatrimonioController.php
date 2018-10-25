@@ -28,6 +28,7 @@ use Nel\Modelo\Entity\Matrimonio;
 use Nel\Modelo\Entity\Sexo;
 use Nel\Modelo\Entity\PadresBautismo;
 use Nel\Modelo\Entity\PadrinosBautismo;
+use Nel\Modelo\Entity\Administrativos;
 use Nel\Modelo\Entity\TestigosMatrimonio;
 use Nel\Modelo\Entity\LugaresMisa;
 use Nel\Modelo\Entity\TipoPadre;
@@ -75,6 +76,7 @@ class MatrimonioController extends AbstractActionController
                         $objTipoPadre = new TipoPadre($this->dbAdapter);
                         $objMatrimonio = new Matrimonio($this->dbAdapter);
                         $objLugar = new LugaresMisa($this->dbAdapter);
+                        $objAdministrativos = new Administrativos($this->dbAdapter);
                         $objPadrinosMatrimonio = new PadrinosMatrimonio($this->dbAdapter);
                         $objTestigosMatrimonio = new TestigosMatrimonio($this->dbAdapter);
                         $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
@@ -211,56 +213,78 @@ class MatrimonioController extends AbstractActionController
                                         $idMadrina = $listaMadrina[0]['idPersona'];
                                         $idEsposo = $objMetodos->desencriptar($idEsposoEncriptado);
                                         $idEsposa = $objMetodos->desencriptar($idEsposaEncriptado);
-                                        $listaEsposo = $objPersona->FiltrarPersona($idEsposo);
-                                        $listaEsposa = $objPersona->FiltrarPersona($idEsposa);
-                                        $fechaNacimientoEsposo = new \DateTime($listaEsposo[0]['fechaNacimiento']);
-                                        $fechaNacimientoEsposa = new \DateTime($listaEsposa[0]['fechaNacimiento']);
-                                        $diffEsposo = $fechaActual->diff($fechaNacimientoEsposo);
-                                        $diffEsposa = $fechaActual->diff($fechaNacimientoEsposa);
-                                        if($diffEsposo->y < 18){
-                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL ESPOSO CON IDENTIFICACIÓN '.$identificacionTestigo1.' AÚN ES MENOR DE EDAD</div>';
-                                        }else  if($diffEsposa->y < 18){
-                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSA CON IDENTIFICACIÓN '.$identificacionTestigo2.' AÚN ES MENOR DE EDAD</div>';
+                                        if($idEsposo == $idTestigo1 || $idEsposo == $idTestigo2 ){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL ESPOSO NO PUEDE SER TESTIGO</div>';                        
+                                        }else if($idEsposo == $idPadrino || $idEsposo == $idMadrina){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL ESPOSO NO PUEDE SER PADRINO</div>';                        
+                                        }else if($idEsposo == $idEsposa){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL ESPOSO Y LA ESPOSA SON LA MISMA PERSONA</div>';                        
+                                        }else if($idEsposa == $idTestigo1 || $idEsposa == $idTestigo2 ){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSA NO PUEDE SER TESTIGO</div>';                        
+                                        }else if($idEsposa == $idPadrino || $idEsposa == $idMadrina){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSA NO PUEDE SER PADRINO</div>';                        
+                                        }else if($idTestigo1 == $idPadrino || $idTestigo1 == $idMadrina){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LOS TESTIGOS Y LOS PADRINOS NO PUEDEN SER LAS MISMAS PERSONAS</div>';                        
+                                        }else if($idTestigo2 == $idPadrino || $idTestigo2 == $idMadrina){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LOS TESTIGOS Y LOS PADRINOS NO PUEDEN SER LAS MISMAS PERSONAS</div>';                        
+                                        }else if($idTestigo2 == $idTestigo2){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL TESTIGO 1 Y EL TESTIGO 2 NO PUEDEN SER LA MISMA PERSONA</div>';                        
+                                        }else if($idPadrino == $idMadrina){
+                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">EL PADRINO Y LA MADRINA NO PUEDEN SER LA MISMA PERSONA</div>';                        
                                         }else{
-                                            if(count($listaEsposo) == 0){
-                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
-                                            }else if(count($listaEsposa) == 0){
-                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSA SELECCIONADA NO EXISTE EN LA BASE DE DATOS</div>';
+                                        
+                                        
+                                            $listaEsposo = $objPersona->FiltrarPersona($idEsposo);
+                                            $listaEsposa = $objPersona->FiltrarPersona($idEsposa);
+                                            $fechaNacimientoEsposo = new \DateTime($listaEsposo[0]['fechaNacimiento']);
+                                            $fechaNacimientoEsposa = new \DateTime($listaEsposa[0]['fechaNacimiento']);
+                                            $diffEsposo = $fechaActual->diff($fechaNacimientoEsposo);
+                                            $diffEsposa = $fechaActual->diff($fechaNacimientoEsposa);
+                                            if($diffEsposo->y < 18){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL ESPOSO CON IDENTIFICACIÓN '.$identificacionTestigo1.' AÚN ES MENOR DE EDAD</div>';
+                                            }else  if($diffEsposa->y < 18){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSA CON IDENTIFICACIÓN '.$identificacionTestigo2.' AÚN ES MENOR DE EDAD</div>';
                                             }else{
-                                                if(count ($objMatrimonio->FiltrarMatrimonioPorEsposoEsposa($idEsposo, $idEsposa)) > 0 ){
-                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LAS PERSONAS SELECCIONADAS YA ESTÁN CASADAS POR FAVOR RECARGUE LA PÁGINA</div>';
-                                                }else if(count($objMatrimonio->FiltrarMatrimonioPorEsposo($idEsposo)) > 0){
-                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SEÑOR '.$listaEsposo[0]['primerApellido'].' '.$listaEsposo[0]['primerNombre'].'  YA ESTÁ CASADO CON OTRA PERSONA</div>';
-                                                }else if(count($objMatrimonio->FiltrarMatrimonioPorEsposa($idEsposa)) > 0){
-                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA SEÑORA '.$listaEsposa[0]['primerApellido'].' '.$listaEsposa[0]['primerNombre'].'  YA ESTÁ CASADO CON OTRA PERSONA</div>';
+                                                if(count($listaEsposo) == 0){
+                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                                }else if(count($listaEsposa) == 0){
+                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA ESPOSA SELECCIONADA NO EXISTE EN LA BASE DE DATOS</div>';
                                                 }else{
-                                                    $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
-                                                    $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
-                                                    if(count($listaConfigurarParroquiaCanton) == 0){
-                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA DIRECCIÓN DEL LUGAR DE NACIMIENTO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
+                                                    if(count ($objMatrimonio->FiltrarMatrimonioPorEsposoEsposa($idEsposo, $idEsposa)) > 0 ){
+                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LAS PERSONAS SELECCIONADAS YA ESTÁN CASADAS POR FAVOR RECARGUE LA PÁGINA</div>';
+                                                    }else if(count($objMatrimonio->FiltrarMatrimonioPorEsposo($idEsposo)) > 0){
+                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SEÑOR '.$listaEsposo[0]['primerApellido'].' '.$listaEsposo[0]['primerNombre'].'  YA ESTÁ CASADO CON OTRA PERSONA</div>';
+                                                    }else if(count($objMatrimonio->FiltrarMatrimonioPorEsposa($idEsposa)) > 0){
+                                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA SEÑORA '.$listaEsposa[0]['primerApellido'].' '.$listaEsposa[0]['primerNombre'].'  YA ESTÁ CASADO CON OTRA PERSONA</div>';
                                                     }else{
-                                                        $idLugar = $objMetodos->desencriptar($idLugarEncriptado);
-                                                        $listaLugar = $objLugar->FiltrarLugaresMisa($idLugar);
-                                                        if(count($listaLugar) == 0){
-                                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA IGLESIA SELECCIONADA NO EXISTE</div>';
+                                                        $idConfigurarParroquiaCanton = $objMetodos->desencriptar($idConfigurarParroquiaCantonEncriptado);
+                                                        $listaConfigurarParroquiaCanton = $objConfigurarParroquiaCanton->FiltrarConfigurarParroquiaCanton($idConfigurarParroquiaCanton);
+                                                        if(count($listaConfigurarParroquiaCanton) == 0){
+                                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">LA DIRECCIÓN DEL LUGAR DE NACIMIENTO SELECCIONADO NO EXISTE EN LA BASE DE DATOS</div>';
                                                         }else{
-                                                            $idIglesia = $sesionUsuario->offsetGet('idIglesia');
-                                                            $hoy = getdate();
-                                                            $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
+                                                            $idLugar = $objMetodos->desencriptar($idLugarEncriptado);
+                                                            $listaLugar = $objLugar->FiltrarLugaresMisa($idLugar);
+                                                            if(count($listaLugar) == 0){
+                                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">LA IGLESIA SELECCIONADA NO EXISTE</div>';
+                                                            }else{
+                                                                $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+                                                                $hoy = getdate();
+                                                                $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
 
 
-                                                            $resultado = $objMatrimonio->IngresarMatrimonio($idEsposo, $idEsposa,$idIglesia, $idLugar, $idConfigurarParroquiaCanton, $anoRegistroCivil, $tomoRegistroCivil, $folioRegistroCivil, $actaRegistroCivil,$anoEclesiastico,$tomoEclesiastico, $numeroPagina, $numeroActaMatrimonial,$fechaInscripcionResgistroCivil,$fechaInscripcionEclesiastico, $fechaMatrimonio, $fechaSubida, 1);
-                                                            if(count($resultado) == 0){
-                                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL MATRIMONIO POR FAVOR INTENTE MÁS TARDE</div>';
-                                                            }else{ 
-                                                                $idMatrimonio = $resultado[0]['idMatrimonio'];
-                                                                $resultadoTestigo = $objTestigosMatrimonio->IngresarTestigosMatrimonio($idMatrimonio, $idTestigo1, 1);
-                                                                $resultadoTestigo2 = $objTestigosMatrimonio->IngresarTestigosMatrimonio($idMatrimonio, $idTestigo2, 1);
-                                                                $resultadoPadrino = $objPadrinosMatrimonio->IngresarPadrinosMatrimonio($idMatrimonio, $idPadrino, 1);
-                                                                $resultadoMadrina = $objPadrinosMatrimonio->IngresarPadrinosMatrimonio($idMatrimonio, $idMadrina, 1);
+                                                                $resultado = $objMatrimonio->IngresarMatrimonio($idEsposo, $idEsposa,$idIglesia, $idLugar, $idConfigurarParroquiaCanton, $anoRegistroCivil, $tomoRegistroCivil, $folioRegistroCivil, $actaRegistroCivil,$anoEclesiastico,$tomoEclesiastico, $numeroPagina, $numeroActaMatrimonial,$fechaInscripcionResgistroCivil,$fechaInscripcionEclesiastico, $fechaMatrimonio, $fechaSubida, 1);
+                                                                if(count($resultado) == 0){
+                                                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL MATRIMONIO POR FAVOR INTENTE MÁS TARDE</div>';
+                                                                }else{ 
+                                                                    $idMatrimonio = $resultado[0]['idMatrimonio'];
+                                                                    $resultadoTestigo = $objTestigosMatrimonio->IngresarTestigosMatrimonio($idMatrimonio, $idTestigo1, 1);
+                                                                    $resultadoTestigo2 = $objTestigosMatrimonio->IngresarTestigosMatrimonio($idMatrimonio, $idTestigo2, 1);
+                                                                    $resultadoPadrino = $objPadrinosMatrimonio->IngresarPadrinosMatrimonio($idMatrimonio, $idPadrino, 1);
+                                                                    $resultadoMadrina = $objPadrinosMatrimonio->IngresarPadrinosMatrimonio($idMatrimonio, $idMadrina, 1);
 
-                                                                $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
-                                                                $validar = TRUE;
+                                                                    $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
+                                                                    $validar = TRUE;
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -318,6 +342,7 @@ class MatrimonioController extends AbstractActionController
                         $objPadrinosBautismo = new PadrinosBautismo($this->dbAdapter);
                         $objPadrinosMatrimonio = new PadrinosMatrimonio($this->dbAdapter);
                         $objTestigosMatrimonio = new TestigosMatrimonio($this->dbAdapter);
+                        $objAdministrativo = new Administrativos($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -373,123 +398,135 @@ class MatrimonioController extends AbstractActionController
                                         $listaMatrimonioEsposoEsposa = $objMatrimonio->FiltrarMatrimonioPorEsposoEsposa($idEsposo, $idEsposa);
                                         $tabla = '';
                                         if(count($listaMatrimonioEsposoEsposa) > 0){
-                                            $listaPadrinos = $objPadrinosMatrimonio->FiltrarPadrinosMatrimonioPorMatrimonio($listaMatrimonioEsposoEsposa[0]['idMatrimonio']);
-                                            $nombresPadrino = '';
-                                            $nombresMadrina = '';
-                                            foreach ($listaPadrinos as $valuePadrinos) {
-                                               if($valuePadrinos['identificadorSexo'] == 1){
-                                                    $nombresPadrino = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
-                                               }else{
-                                                    $nombresMadrina = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
-                                               }
-                                            }
+                                            $listaAdministrativo = $objAdministrativo->FiltrarAdministrativosPorIdentificadorCargo(1);
+                                            if(count($listaAdministrativo) != 1){
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE UN PÁRROCO QUE FIRME EL DOCUMENTO POR FAVOR DIRÍGETE AL MENÚ <b>TALENTO HUMANO->ADMINISTRATIVOS</b>Y AGREGA UN PÁRROCO</div>';
+                                            }else{
                                             
                                             
-                                            $listaPadresBautismoEsposo = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($listaBautismoEsposo[0]['idBautismo']);
-                                            $listaPadresBautismoEsposa = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($listaBautismoEsposa[0]['idBautismo']);
-                                            $padreEsposo = '';
-                                            $madreEsposo = '';
-                                            foreach ($listaPadresBautismoEsposo as $valuePadresEsposo) {
-                                                if($valuePadresEsposo['identificadorTipoPadre'] == 1){
-                                                    $padreEsposo = $valuePadresEsposo['primerApellido'].' '.$valuePadresEsposo['segundoApellido'].' '.$valuePadresEsposo['primerNombre'].' '.$valuePadresEsposo['segundoNombre'];
-                                                }else{
-                                                    $madreEsposo = $valuePadresEsposo['primerApellido'].' '.$valuePadresEsposo['segundoApellido'].' '.$valuePadresEsposo['primerNombre'].' '.$valuePadresEsposo['segundoNombre'];
+                                                $listaPadrinos = $objPadrinosMatrimonio->FiltrarPadrinosMatrimonioPorMatrimonio($listaMatrimonioEsposoEsposa[0]['idMatrimonio']);
+                                                $nombresPadrino = '';
+                                                $nombresMadrina = '';
+                                                foreach ($listaPadrinos as $valuePadrinos) {
+                                                   if($valuePadrinos['identificadorSexo'] == 1){
+                                                        $nombresPadrino = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
+                                                   }else{
+                                                        $nombresMadrina = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
+                                                   }
                                                 }
-                                            }
-                                            $padreEsposa = '';
-                                            $madreEsposa = '';
-                                             foreach ($listaPadresBautismoEsposa as $valuePadresEsposa) {
-                                                if($valuePadresEsposa['identificadorTipoPadre'] == 1){
-                                                    $padreEsposa = $valuePadresEsposa['primerApellido'].' '.$valuePadresEsposa['segundoApellido'].' '.$valuePadresEsposa['primerNombre'].' '.$valuePadresEsposa['segundoNombre'];
-                                                }else{
-                                                    $madreEsposa = $valuePadresEsposa['primerApellido'].' '.$valuePadresEsposa['segundoApellido'].' '.$valuePadresEsposa['primerNombre'].' '.$valuePadresEsposa['segundoNombre'];
+
+
+                                                $listaPadresBautismoEsposo = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($listaBautismoEsposo[0]['idBautismo']);
+                                                $listaPadresBautismoEsposa = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($listaBautismoEsposa[0]['idBautismo']);
+                                                $padreEsposo = '';
+                                                $madreEsposo = '';
+                                                foreach ($listaPadresBautismoEsposo as $valuePadresEsposo) {
+                                                    if($valuePadresEsposo['identificadorTipoPadre'] == 1){
+                                                        $padreEsposo = $valuePadresEsposo['primerApellido'].' '.$valuePadresEsposo['segundoApellido'].' '.$valuePadresEsposo['primerNombre'].' '.$valuePadresEsposo['segundoNombre'];
+                                                    }else{
+                                                        $madreEsposo = $valuePadresEsposo['primerApellido'].' '.$valuePadresEsposo['segundoApellido'].' '.$valuePadresEsposo['primerNombre'].' '.$valuePadresEsposo['segundoNombre'];
+                                                    }
                                                 }
+                                                $padreEsposa = '';
+                                                $madreEsposa = '';
+                                                 foreach ($listaPadresBautismoEsposa as $valuePadresEsposa) {
+                                                    if($valuePadresEsposa['identificadorTipoPadre'] == 1){
+                                                        $padreEsposa = $valuePadresEsposa['primerApellido'].' '.$valuePadresEsposa['segundoApellido'].' '.$valuePadresEsposa['primerNombre'].' '.$valuePadresEsposa['segundoNombre'];
+                                                    }else{
+                                                        $madreEsposa = $valuePadresEsposa['primerApellido'].' '.$valuePadresEsposa['segundoApellido'].' '.$valuePadresEsposa['primerNombre'].' '.$valuePadresEsposa['segundoNombre'];
+                                                    }
+                                                }
+
+
+    //                                            $listaTestigosMatrimonio = $objTestigosMatrimonio->FiltrarTestigosMatrimonioPorMatrimonio($listaMatrimonioEsposoEsposa[0]['idMatrimonio']);
+    //                                            $nombesTestigo1 = $listaTestigosMatrimonio[0]['primerApellido'].' '.$listaTestigosMatrimonio[0]['segundoApellido'].' '.$listaTestigosMatrimonio[0]['primerNombre'].' '.$listaTestigosMatrimonio[0]['segundoNombre'];
+    //                                            $nombesTestigo2 = $listaTestigosMatrimonio[1]['primerApellido'].' '.$listaTestigosMatrimonio[1]['segundoApellido'].' '.$listaTestigosMatrimonio[1]['primerNombre'].' '.$listaTestigosMatrimonio[1]['segundoNombre'];
+
+
+                                                $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
+
+                                                $listaLugar = $objLugaresMisa->FiltrarLugaresMisa($listaMatrimonioEsposoEsposa[0]['idLugar']);
+                                                $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
+                                                $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
+                                                $fechaMatrimonio = $objMetodos->obtenerFechaEnLetraSinHora($listaMatrimonioEsposoEsposa[0]['fechaMatrimonio']);
+                                                $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el día <b>'.$fechaMatrimonio.'</b>, cumplido 
+                                                    los requisitos canónicos, y debida preparación se presenció y bendijo el matrimonio eclesiástico del señor <b>'.$nombresEsposo.'</b> hijo de <b>'.$padreEsposo.'</b> y de <b>'.$madreEsposo.'</b> con  
+                                                        la señorita <b>'.$nombresEsposa.'</b> hija de <b>'.$padreEsposa.'</b> y de <b>'.$madreEsposa.'.</b> 
+
+                                                        </p>
+                                                        <p class="text-justify" style="line-height: 30px;font-size:15px"> Fueron sus Padrinos:  <b>'.$nombresPadrino.'</b> y <b>'.$nombresMadrina.'.</b>
+                                                        </p>';
+
+                                                $tablaCaabecera = '<table class="table" style="width:100%">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th> 
+                                                                        <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
+                                                                        <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'<br>'.$direccionIglesia.'</label>
+                                                                        <br> <label>Sistema Web de Gestión Parroquial</label>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th> 
+                                                                        <h3>PARTIDA MATRIMONIAL</h3>
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>';
+                                                $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
+                                                            <thead>
+                                                                <tr> 
+                                                                    <th colspan="2">PÁGINA</th>
+                                                                    <th colspan="2"> '.$listaMatrimonioEsposoEsposa[0]['paginaActaMatrimonial'].'</th>
+                                                                </tr> 
+                                                                <tr> 
+                                                                    <th colspan="2">REGISTRO CIVIL</th>
+                                                                    <th colspan="2">REGISTRO MATRIMONIAL</th>
+                                                                </tr> 
+                                                                <tr> 
+                                                                    <th><b>AÑO</b> '.$listaMatrimonioEsposoEsposa[0]['anoRegistroCivil'].'</th>
+                                                                    <th><b>TOMO</b> '.$listaMatrimonioEsposoEsposa[0]['tomoRegistroCivil'].'</th>
+                                                                    <th><b>AÑO</b> '.$listaMatrimonioEsposoEsposa[0]['anoEcleciastico'].'</th>
+                                                                    <th><b>TOMO</b> '.$listaMatrimonioEsposoEsposa[0]['tomoEcleciastico'].'</th>
+
+                                                                </tr>
+                                                                <tr> 
+
+                                                                    <th><b>PÁGINA</b> '.$listaMatrimonioEsposoEsposa[0]['paginaRegistroCivil'].'</th>
+                                                                    <th><b>ACTA</b> '.$listaMatrimonioEsposoEsposa[0]['numeroRegistroCivil'].'</th>
+                                                                    <th><b>PÁGINA</b> '.$listaMatrimonioEsposoEsposa[0]['paginaActaMatrimonial'].'</th>
+                                                                    <th><b>ACTA</b> '.$listaMatrimonioEsposoEsposa[0]['actaMatrimonial'].'</th>
+                                                                </tr>
+                                                                <tr> 
+                                                                    <th>FECHA INSCRIPCIÓN</th>
+                                                                    <th>'.$listaMatrimonioEsposoEsposa[0]['fechaInscripcionRegistroCivil'].'</th>
+                                                                    <th>FECHA INSCRIPCIÓN</th>
+                                                                    <th>'.$listaMatrimonioEsposoEsposa[0]['fechaInsciripcionEclesiastico'].'</th>
+                                                                </tr> 
+                                                            </thead>
+                                                        </table>';
+
+
+
+
+                                                        $listaPersonaFirma = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
+                                                        $tablaFirma = '<table class="table text-center" style="width:100%" > 
+                                                            <thead>
+                                                                <tr> 
+                                                                    <th>_________________________________________<br>
+                                                                    '.$listaPersonaFirma[0]['primerNombre'].' '.$listaPersonaFirma[0]['segundoNombre'].' '.$listaPersonaFirma[0]['primerApellido'].' '.$listaPersonaFirma[0]['segundoApellido'].'
+                                                                    <br>'.$listaAdministrativo[0]['descripcion'].'</th>
+                                                                </tr> 
+                                                            </thead>
+                                                        </table>';
+
+
+
+
+                                                $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br><br><br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br><br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
+                                                $mensaje = '';
+                                                $validar = TRUE;
                                             }
-
-
-//                                            $listaTestigosMatrimonio = $objTestigosMatrimonio->FiltrarTestigosMatrimonioPorMatrimonio($listaMatrimonioEsposoEsposa[0]['idMatrimonio']);
-//                                            $nombesTestigo1 = $listaTestigosMatrimonio[0]['primerApellido'].' '.$listaTestigosMatrimonio[0]['segundoApellido'].' '.$listaTestigosMatrimonio[0]['primerNombre'].' '.$listaTestigosMatrimonio[0]['segundoNombre'];
-//                                            $nombesTestigo2 = $listaTestigosMatrimonio[1]['primerApellido'].' '.$listaTestigosMatrimonio[1]['segundoApellido'].' '.$listaTestigosMatrimonio[1]['primerNombre'].' '.$listaTestigosMatrimonio[1]['segundoNombre'];
-
-
-                                            $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
-
-                                            $listaLugar = $objLugaresMisa->FiltrarLugaresMisa($listaMatrimonioEsposoEsposa[0]['idLugar']);
-                                            $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
-                                            $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
-                                            $fechaMatrimonio = $objMetodos->obtenerFechaEnLetraSinHora($listaMatrimonioEsposoEsposa[0]['fechaMatrimonio']);
-                                            $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el día <b>'.$fechaMatrimonio.'</b>, cumplido 
-                                                los requisitos canónicos, y debida preparación se presenció y bendijo el matrimonio eclesiástico del señor <b>'.$nombresEsposo.'</b> hijo de <b>'.$padreEsposo.'</b> y de <b>'.$madreEsposo.'</b> con  
-                                                    la señorita <b>'.$nombresEsposa.'</b> hija de <b>'.$padreEsposa.'</b> y de <b>'.$madreEsposa.'.</b> 
-
-                                                    </p>
-                                                    <p class="text-justify" style="line-height: 30px;font-size:15px"> Fueron sus Padrinos:  <b>'.$nombresPadrino.'</b> y <b>'.$nombresMadrina.'.</b>
-                                                    </p>';
-
-                                            $tablaCaabecera = '<table class="table" style="width:100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> 
-                                                                    <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-                                                                    <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'<br>'.$direccionIglesia.'</label>
-                                                                    <br> <label>Sistema Web de Gestión Parroquial</label>
-                                                                </th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th> 
-                                                                    <h3>PARTIDA MATRIMONIAL</h3>
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                    </table>';
-                                            $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
-                                                        <thead>
-                                                            <tr> 
-                                                                <th colspan="2">PÁGINA</th>
-                                                                <th colspan="2"> '.$listaMatrimonioEsposoEsposa[0]['paginaActaMatrimonial'].'</th>
-                                                            </tr> 
-                                                            <tr> 
-                                                                <th colspan="2">REGISTRO CIVIL</th>
-                                                                <th colspan="2">REGISTRO MATRIMONIAL</th>
-                                                            </tr> 
-                                                            <tr> 
-                                                                <th><b>AÑO</b> '.$listaMatrimonioEsposoEsposa[0]['anoRegistroCivil'].'</th>
-                                                                <th><b>TOMO</b> '.$listaMatrimonioEsposoEsposa[0]['tomoRegistroCivil'].'</th>
-                                                                <th><b>AÑO</b> '.$listaMatrimonioEsposoEsposa[0]['anoEcleciastico'].'</th>
-                                                                <th><b>TOMO</b> '.$listaMatrimonioEsposoEsposa[0]['tomoEcleciastico'].'</th>
-                                                                
-                                                            </tr>
-                                                            <tr> 
-                                                                
-                                                                <th><b>PÁGINA</b> '.$listaMatrimonioEsposoEsposa[0]['paginaRegistroCivil'].'</th>
-                                                                <th><b>ACTA</b> '.$listaMatrimonioEsposoEsposa[0]['numeroRegistroCivil'].'</th>
-                                                                <th><b>PÁGINA</b> '.$listaMatrimonioEsposoEsposa[0]['paginaActaMatrimonial'].'</th>
-                                                                <th><b>ACTA</b> '.$listaMatrimonioEsposoEsposa[0]['actaMatrimonial'].'</th>
-                                                            </tr>
-                                                            <tr> 
-                                                                <th>FECHA INSCRIPCIÓN</th>
-                                                                <th>'.$listaMatrimonioEsposoEsposa[0]['fechaInscripcionRegistroCivil'].'</th>
-                                                                <th>FECHA INSCRIPCIÓN</th>
-                                                                <th>'.$listaMatrimonioEsposoEsposa[0]['fechaInsciripcionEclesiastico'].'</th>
-                                                            </tr> 
-                                                        </thead>
-                                                    </table>';
-
-
-                                             $tablaFirma = '<table class="table text-center" style="width:100%" > 
-                                                        <thead>
-                                                            <tr> 
-                                                                <th>EL PÁRROCO QUE CERTIFICA: _________________________________</th>
-                                                            </tr> 
-                                                        </thead>
-                                                    </table>';
-
-
-
-
-                                            $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br><br><br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br><br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
-                                            $mensaje = '';
-                                            $validar = TRUE;
                                         }else{
 
                                             $listaMatrimonioEsposo = $objMatrimonio->FiltrarMatrimonioPorEsposo($idEsposo);
@@ -643,29 +680,7 @@ class MatrimonioController extends AbstractActionController
     }
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     public function obtenermatrimoniosAction()
     {
@@ -702,7 +717,7 @@ class MatrimonioController extends AbstractActionController
     }
 //    
 //    
-     function CargarTablaMatrimonios($idUsuario,$adaptador,$listaMatrimonios, $i, $j)
+    function CargarTablaMatrimonios($idUsuario,$adaptador,$listaMatrimonios, $i, $j)
     {
 //        $objConfigurarCurso = new ConfigurarCurso($adaptador);
         $objMetodos = new Metodos();
@@ -712,13 +727,21 @@ class MatrimonioController extends AbstractActionController
 //        $validarprivilegioModificar = $objMetodosC->ValidarPrivilegioAction($adaptador,$idUsuario, 15, 2);
         $array1 = array();
         foreach ($listaMatrimonios as $value) {
+            $identificacionEsposo = '';
+            if($value['identificacionEsposo'] != NULL){
+                $identificacionEsposo = $value['identificacionEsposo'];
+            }
+            $identificacionEsposa = '';
+            if($value['identificacionEsposa'] != NULL){
+                $identificacionEsposa = $value['identificacionEsposa'];
+            }
+            
             $idMatrimonioEncriptado = $objMetodos->encriptar($value['idMatrimonio']);
             $nombresEsposo = $value['primerApellidoEsposo'].' '.$value['segundoApellidoEsposo'].' '.$value['primerNombreEsposo'].' '.$value['segundoNombreEsposo'];
             $nombresEsposa = $value['primerApellidoEsposa'].' '.$value['segundoApellidoEsposa'].' '.$value['primerNombreEsposa'].' '.$value['segundoNombreEsposa'];
-            $nombresMatrimonio = '<input type="hidden" id="estadoMatrimonioA'.$i.'" name="estadoMatrimonioA'.$i.'" value="'.$value['estadoMatrimonio'].'">'.$nombresEsposo.'<br>'.$nombresEsposa;
+//            $nombresMatrimonio = '<input type="hidden" id="estadoMatrimonioA'.$i.'" name="estadoMatrimonioA'.$i.'" value="'.$value['estadoMatrimonio'].'">'.$nombresEsposo.'<br>'.$nombresEsposa;
             $fechaNacimientoEsposo = $value['fechaNacimientoEsposo'];
             $fechaNacimientoEsposa = $value['fechaNacimientoEsposa'];
-            $fechasNacimientoMatrimonio = $fechaNacimientoEsposo.'<br>'.$fechaNacimientoEsposa;
             $botonEliminarMatrimonio = '';
             $botonDeshabilitarMatrimonio = '';
 //            if($validarprivilegioEliminar == TRUE){
@@ -739,8 +762,12 @@ class MatrimonioController extends AbstractActionController
             $botones =  $botonDeshabilitarMatrimonio.' '.$botonEliminarMatrimonio;     
             $array1[$i] = array(
                 '_j'=>$j,
-                'nombresMatrimonio'=>$nombresMatrimonio,
-                'fechasNacimientoMatrimonio'=>$fechasNacimientoMatrimonio,
+                'identificacionEsposo'=>$identificacionEsposo,
+                'nombresEsposo'=>$nombresEsposo,
+                'fechasNacimientoEsposo'=>$fechaNacimientoEsposo,
+                'identificacionEsposa'=>$identificacionEsposa,
+                'nombresEsposa'=>$nombresEsposa,
+                'fechasNacimientoEsposa'=>$fechaNacimientoEsposa,
                 'opciones'=>$botones,
             );
             $j--;
@@ -749,199 +776,7 @@ class MatrimonioController extends AbstractActionController
         
         return $array1;
     }
-//    
-//    
-//    
-
-    
-    
-    
-    
-    
-//    public function filtrarpersonapornombresAction()
-//    {
-//        $this->layout("layout/administrador");
-//        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
-//        $validar = false;
-//        $sesionUsuario = new Container('sesionparroquia');
-//        if(!$sesionUsuario->offsetExists('idUsuario')){
-//            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
-//        }else{
-//            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-//            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
-//            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-//            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 15);
-//            if (count($AsignarModulo)==0)
-//                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-//            else {
-//                $objMetodosC = new MetodosControladores();
-//                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 15, 3);
-//                if ($validarprivilegio==false)
-//                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE INGRESAR DATOS PARA ESTE MÓDULO</div>';
-//                else{
-//                    $request=$this->getRequest();
-//                    if(!$request->isPost()){
-//                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-//                    }else{
-//                        $objMetodos = new Metodos();
-//                        $objPersona = new Persona($this->dbAdapter);
-//                        $objSacerdotes = new Sacerdotes($this->dbAdapter);
-//                        $objProvincias = new Provincias($this->dbAdapter);
-//                        $objBautismo = new Bautismo($this->dbAdapter);
-//                        $objPadresBautismo = new PadresBautismo($this->dbAdapter);
-//                        $post = array_merge_recursive(
-//                            $request->getPost()->toArray(),
-//                            $request->getFiles()->toArray()
-//                        );
-//                         $primerApellido = strtoupper(trim($post['primerApellido']));
-//                         $segundoApellido = strtoupper(trim($post['segundoApellido']));
-//                         $primerNombre = strtoupper(trim($post['primerNombre']));
-//                         $segundoNombre = strtoupper(trim($post['segundoNombre']));
-//                         $fechaNacimiento = $post['fechaNacimiento'];
-////                        if(empty($primerApellido) || strlen($primerApellido) > 80){
-////                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL PRIMER APELLIDO MÁXIMO 80 CARACTERES</div>';
-////                        }else if(empty ($segundoApellido) ||  strlen($segundoApellido) > 80){
-////                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL SEGUNDO APELLIDO MÁXIMO 80 CARACTERES</div>';
-////                        }else if(empty ($primerNombre) || strlen($primerNombre) > 80){
-////                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL PRIMER NOMBRE MÁXIMO 80 CARACTERES</div>';
-////                        }else if(empty ($segundoNombre) ||  strlen($segundoNombre) > 80){
-////                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL SEGUNDO NOMBRE MÁXIMO 80 CARACTERES</div>';
-////                        }else 
-//                            if(empty ($fechaNacimiento)){
-//                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA DE NACIMIENTO</div>';
-//                        }else{
-//                            $listaPersona = $objPersona->FiltrarPersonaPorApellidosNombres($primerApellido,$segundoApellido,$primerNombre,$segundoNombre,$fechaNacimiento);
-//                            if(count($listaPersona) == 0){
-//                                $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE LA PERSONA '.$primerApellido.' '.$segundoApellido.' '.$primerNombre.' '.$segundoNombre.' POR FAVOR DIRÍJASE AL MÓDULO DE PERSONAS Y REGISTRELA</div>';
-//                            }else if($listaPersona[0]['estadoPersona'] == FALSE){
-//                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA HA SIDO DESHABILITADA POR LO TANTO NO PUEDE SER UTILIZADA HASTA QUE SEA HABILITADA</div>';
-//                            } else{
-//                                $tabla = '';
-//                                $idPersona = $listaPersona[0]['idPersona'];
-//                                $listaBautismo = $objBautismo->FiltrarBautismoPorPersona($idPersona);
-//                                if(count($listaBautismo) == 0){
-//                                    $identificacion = 'SIN IDENTIFICACIÓN';
-//                                    if($listaPersona[0]['identificacion'] != NULL){
-//                                        $identificacion = $listaPersona[0]['identificacion'] ;
-//                                    }
-//                                    
-//                                    $idPersonaEncriptado = $objMetodos->encriptar($listaPersona[0]['idPersona']);
-//                                    $botonGuardar = '<button data-loading-text="GUARDANDO..." id="btnGuardarBautismo" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>';
-//                                    $botonCancelar = '<button id="btnCancelar" onclick="limpiarFormularioBautismo();" type="button" class="btn btn-danger pull-right"><i class="fa fa-times"></i>CANCELAR</button>';
-//
-//                                    $listaSacerdote = $objSacerdotes->ObtenerSacerdotesEstado(1); 
-//                                    $optionSelectSacerdote = '<option value="0">SELECCIONE UN SACERDOTE</option>';
-//                                    foreach ($listaSacerdote as $valueSacerdote) {
-//                                        $idSacerdoteEncriptado = $objMetodos->encriptar($valueSacerdote['idSacerdote']);
-//                                        $listaPersona = $objPersona->FiltrarPersona($valueSacerdote['idPersona']);
-//                                        $nombres = $listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].' '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
-//
-//                                        $optionSelectSacerdote =$optionSelectSacerdote.'<option value="'.$idSacerdoteEncriptado.'">'.$nombres.'</option>';
-//                                    }
-//                                    $listaProvincias = $objProvincias->ObtenerProvinciasEstado(1);
-//                                    $optionSelectProvincias = '<option value="0">SELECCIONE UNA PROVINCIA</option>';
-//                                    foreach ($listaProvincias as $valueProvincias) {
-//                                        $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
-//                                        $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
-//                                    }
-//                                    $tabla = '<div class="form-group col-lg-4">
-//                                            <h4 class="text-center">DATOS DEL BAUTIZO</h4>
-//                                            <input type="hidden" value="'.$idPersonaEncriptado.'" name="idPersonaEncriptado" id="idPersonaEncriptado">
-//                                            <label for="numero">NÚMERO</label>
-//                                            
-//                                            <input onkeydown="validarNumeros(\'numero\');" maxlength="10" autocomplete="off" autofocus="" type="text" id="numero" name="numero" class="form-control">
-//                                            <label for="sacerdote">SACERDOTE</label>
-//                                            <select class="form-control" id="selectSacerdote" name="selectSacerdote">
-//                                                '.$optionSelectSacerdote.'
-//                                            </select>
-//                                            <label for="fechaBautizo">FECHA BAUTIZO</label>
-//                                            <input type="date" class="form-control" id="fechaBautizo" name="fechaBautizo">
-//                                        </div>
-//                                        <div class="col-lg-4">
-//                                            <h4 class="text-center">LUGAR DE NACIMIENTO</h4>
-//                                            <label for="selectProvincias">PROVINCIAS</label>
-//                                            <select class="form-control" onchange="filtrarCantonesPorProvincia()" id="selectProvincias" name="selectProvincias">
-//                                                '.$optionSelectProvincias.'
-//                                            </select>
-//                                            <label for="selectCantones">CANTÓN</label>
-//                                            <select class="form-control" onchange="filtrarParroquiasPorProvinciaCanton()" id="selectCantones" name="selectCantones">
-//                                                <option value="0">SELECCIONE UN CANTÓN</option>
-//                                            </select>
-//                                            <label for="selectParróquia">PARRÓQUIA</label>
-//                                            <select class="form-control" id="selectParroquias" name="selectParroquias">
-//                                                <option value="0">SELECCIONE UNA PARRÓQUIA</option>
-//                                            </select>
-//                                        </div>
-//                                        <div class="form-group col-lg-4">
-//                                            <h4 class="text-center">REGISTRO CIVIL</h4>
-//                                            <label for="ano">AÑO</label>
-//                                            <input onkeydown="validarNumeros(\'ano\');" maxlength="10" autocomplete="off" autofocus="" type="text" id="ano" name="ano" class="form-control">
-//                                            <label for="tomo">TOMO</label>
-//                                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="tomo" name="tomo" class="form-control">
-//                                            <label for="folio">FOLIO</label>
-//                                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="folio" name="folio" class="form-control">
-//                                            <label for="acta">ACTA</label>
-//                                            <input maxlength="10" autocomplete="off" autofocus="" type="text" id="acta" name="acta" class="form-control">
-//                                            <label for="fechaInscripcion">FECHA DE INSCRIPCIÓN</label>
-//                                            <input type="date" class="form-control" id="fechaInscripcion" name="fechaInscripcion">
-//
-//                                        </div>
-//                                        <div class="form-group col-lg-12">
-//                                            '.$botonCancelar.' '.$botonGuardar.'
-//                                        </div>';
-//                                    $mensaje = '';
-//                                    $validar = TRUE;
-//                                }else{
-//                                    $nombres = $listaBautismo[0]['primerApellido'].' '.$listaBautismo[0]['segundoApellido'].' '.$listaBautismo[0]['primerNombre'].' '.$listaBautismo[0]['segundoNombre'];
-//                                    $tablaIzquierda = '<div class="table-responsive">
-//                                            <table class="table"> 
-//                                                <tbody>
-//                                                    <tr> 
-//                                                        <th>N°</th>
-//                                                        <td>'.$listaBautismo[0]['numero'].'</td>
-//                                                    </tr> 
-//                                                    <tr> 
-//                                                        <th colspan="2">NOMBRE</th>
-//                                                    </tr>
-//                                                    <tr> 
-//                                                        <td colspan="2">'.$nombres.'</td>
-//                                                    </tr>
-//                                                    <tr> 
-//                                                        <th colspan="2">REGISTRO CIVIL</th>
-//                                                    </tr>
-//                                                    <tr> 
-//                                                        <td><b>AÑO</b> '.$listaBautismo[0]['anoRegistroCivil'].'</td>
-//                                                        <td><b>TOMO</b> '.$listaBautismo[0]['tomo'].'</td>
-//                                                    </tr>
-//                                                     <tr> 
-//                                                        <td><b>FOLIO</b> '.$listaBautismo[0]['folio'].'</td>
-//                                                        <td><b>ACTA</b> '.$listaBautismo[0]['acta'].'</td>
-//                                                    </tr>
-//                                                </tbody>
-//                                            </table>
-//                                            </div>';
-//                                            
-//                                    $tabla = '<div class="col-lg-4">'.$tablaIzquierda.'</div>';
-//                                    
-//                                    $mensaje = '';
-//
-////                                    $tabla = '<div class="alert alert-warning text-center" role="alert">ESTA PERSONA YA TIENE UN BAUTIZO AGREGADO POR FAVOR BÚSCALO(A) EN LA TABLA DE ABAJO</div>';
-//                                    $validar = TRUE;
-//                                }
-//                                
-//                                return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
-//                                
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-//    }
-//    
-    
-    
+ 
     
     
     

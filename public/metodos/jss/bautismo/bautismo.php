@@ -1,109 +1,11 @@
 <script type="text/javascript">
-//function deshabilitarCurso(vari, ID,ID2){
-//    var _estado = $("#estadoCursoA"+ID).val();
-//    var _mensaje = "HABILITAR";
-//    if(_estado == true){
-//        _mensaje = "DESHABILITAR";
-//    }
-//    if (confirm('¿DESEAS '+_mensaje+' '+$("#nombreCurso"+ID).text()+'?')) {
-//        var _nombreClase = $("#btnDeshabilitarCurso" + ID + " i").attr('class');
-//        var url = $("#rutaBase").text();
-//        $.ajax({
-//            url : url+'/cursos/modificarestadocurso',
-//            type: 'post',
-//            dataType: 'JSON',
-//            data: { id: vari, numeroFila: ID,numeroFila2: ID2 },
-//            beforeSend: function () {
-//                $("#btnDeshabilitarCurso" + ID).html('<i class="fa fa-spinner"></i>');
-//                $("#mensajeTablaCurso").html('');
-//            },
-//            uploadProgress: function (event, position, total, percentComplete) {
-//            },
-//            success: function (data) {
-//                if (data.validar == true) {
-//                    var table = $('#tablaCruso').DataTable();
-//                    table.row(data.numeroFila).data(data.tabla[data.numeroFila]).draw();
-//                    
-//                } else {
-//                    $("#btnDeshabilitarCurso" + ID).html('<i class="' + _nombreClase + '"></i>');
-//                }
-//                $("#mensajeTablaCurso").html(data.mensaje);
-//            },
-//            complete: function () {
-//            },
-//            error: function (xhr, textStatus, errorThrown) {
-//                $("#btnDeshabilitarCurso" + ID).html('<i class="' + _nombreClase + '"></i>');
-//                if (xhr.status === 0) {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//                } else if (xhr.status == 404) {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//                } else if (xhr.status == 500) {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//                } else if (errorThrown === 'parsererror') {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//                } else if (errorThrown === 'timeout') {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//                } else if (errorThrown === 'abort') {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//                } else {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//                }
-//            }
-//        });
-//    }
-//}         
-//function eliminarCurso(vari, ID){
-//    if (confirm('¿DESEAS ELIMINAR '+$("#nombreCurso"+ID).text()+'?')) {
-//        var url = $("#rutaBase").text();
-//        $.ajax({
-//            url : url+'/cursos/eliminarcurso',
-//            type: 'post',
-//            dataType: 'JSON',
-//            data: { id: vari, numeroFila: ID },
-//            beforeSend: function () {
-//                $("#btnEliminarCurso" + ID).html('<i class="fa fa-spinner"></i>');
-//                $("#mensajeTablaCurso").html('');
-//            },
-//            uploadProgress: function (event, position, total, percentComplete) {
-//            },
-//            success: function (data) {
-//                if (data.validar == true) {
-//                    
-//                    $("#filaTablaCurso"+data.numeroFila).remove();
-//                    if (data.numeroFila == 0) {
-//                        seleccionarFila(data.numeroFila + 1);
-//                    } else {
-//                        seleccionarFila(data.numeroFila - 1);
-//                    }
-//                } else {
-//                    $("#btnEliminarCurso" + ID).html('<i class="fa fa-times"></i>');
-//                }
-//                $("#mensajeTablaCurso").html(data.mensaje);
-//            },
-//            complete: function () {
-//            },
-//            error: function (xhr, textStatus, errorThrown) {
-//                $("#btnEliminarCurso" + ID).html('<i class="fa fa-times"></i>');
-//                if (xhr.status === 0) {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-//                } else if (xhr.status == 404) {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-//                } else if (xhr.status == 500) {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-//                } else if (errorThrown === 'parsererror') {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-//                } else if (errorThrown === 'timeout') {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-//                } else if (errorThrown === 'abort') {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-//                } else {
-//                    $("#mensajeTablaCurso").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-//                }
-//            }
-//        });
-//    }
-//}   
-
+function validarIngresoBautismo(f){
+    var _validar = false;
+    if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTE BAUTIZO, VERIFIQUE QUE LOS DATOS INGRESADOS SEAN LOS CORRECTOS UNA VEZ INGRESADOS NO PODRÁN ELIMINARSE O MODIFICARSE?")){
+        _validar = true;
+    }
+    return _validar;
+}
 function limpiarFormularioBautismo()
 {
 //    $('#formIngresarBautismo').each(function () {
@@ -267,6 +169,10 @@ function obtenerBautismos(){
                             data: '_j'
                         },
                         {
+                            title: 'IDENTIFICACIÓN',
+                            data: 'identificacion'
+                        },
+                        {
                             title: 'NOMBRES',
                             data: 'nombresPersona'
                         },
@@ -349,6 +255,64 @@ $(function(){
         }
     });    
 }); 
+
+
+
+
+function filtrarPersonaPorIdentificacion(event,idDom,contenedor){
+    var codigo = event.which || event.keyCode;
+    if (codigo==13){
+        return false;
+    }else{
+        var url = $("#rutaBase").text();
+        var identificacion = $("#"+idDom).val();
+        if(identificacion.length < 10){
+            $("#"+contenedor).html('');
+        }else{
+            $.ajax({
+                url : url+'/bautismo/filtrarpersonaporidentificacion',
+                type: 'post',
+                dataType: 'JSON',
+                data: {identificacion:identificacion},
+                beforeSend: function(){
+
+                    cargandoBautismo("#"+contenedor);
+                },
+                uploadProgress: function(event,position,total,percentComplete){
+                },
+                success: function(data){  
+                    if(data.validar == true){
+                        $("#"+contenedor).html(data.tabla);
+                    }else{
+                       $("#"+contenedor).html(data.mensaje);
+                    }
+                },
+                complete: function(){
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    $("#"+contenedor).html('');
+                    if(xhr.status === 0){
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+                    }else if(xhr.status == 404){
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+                    }else if(xhr.status == 500){
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+                    }else if(errorThrown === 'parsererror'){
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+                    }else if(errorThrown === 'timeout'){
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+                    }else if(errorThrown === 'abort'){
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+                    }else{
+                        $("#"+contenedor).html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+                    }
+                }
+            }); 
+        }
+    }
+}
+
+
 
 function cargandoBautismo(contenedor){
     var url = $("#rutaBase").text();

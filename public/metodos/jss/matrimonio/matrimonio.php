@@ -1,4 +1,11 @@
 <script type="text/javascript">
+ function validarIngresoMatrimonio(f){
+    var _validar = false;
+    if(confirm("¿ESTAS SEGURO DE GUARDAR A ESTE MATRIMONIO, VERIFIQUE QUE LOS DATOS INGRESADOS SEAN LOS CORRECTOS UNA VEZ INGRESADOS NO PODRÁN ELIMINARSE O MODIFICARSE?")){
+        _validar = true;
+    }
+    return _validar;
+}
 function filtrarPersonaPorIdentificacion(event,idDom,contenedor){
     var codigo = event.which || event.keyCode;
     if (codigo==13){
@@ -155,12 +162,28 @@ function obtenerMatrimonios(){
                             data: '_j'
                         },
                         {
-                            title: 'MATRIMONIO',
-                            data: 'nombresMatrimonio'
+                            title: 'IDENTIFICACIÓN ESPOSO',
+                            data: 'identificacionEsposo'
                         },
                         {
-                            title: 'FECHAS DE NACIMIENTO',
-                            data: 'fechasNacimientoMatrimonio'
+                            title: 'ESPOSO',
+                            data: 'nombresEsposo'
+                        },
+                        {
+                            title: 'FECHA NACIMIENTO ESPOSO',
+                            data: 'fechasNacimientoEsposo'
+                        },
+                        {
+                            title: 'IDENTIFICACIÓN ESPOSA',
+                            data: 'identificacionEsposa'
+                        },
+                        {
+                            title: 'ESPOSA',
+                            data: 'nombresEsposa'
+                        },
+                        {
+                            title: 'FECHA NACIMIENTO ESPOSA',
+                            data: 'fechasNacimientoEsposa'
                         },
                         {
                             title: 'OPC.',

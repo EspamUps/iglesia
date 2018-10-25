@@ -22,7 +22,7 @@ $validacionPrivilegio = $this->validacionPrivilegio;
             <div class="row ">
                 <div class="col-lg-12 ">
                     <div id="mensajeFormIngresarMatrimonio"> </div>
-                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" method="post" action="<?php echo $this->basePath()?>/matrimonio/ingresarmatrimonio" id="formIngresarMatrimonio">
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;" onsubmit="return validarIngresoMatrimonio(this)" method="post" action="<?php echo $this->basePath()?>/matrimonio/ingresarmatrimonio" id="formIngresarMatrimonio">
                         <h4>DATOS DE LOS ESPOSOS</h4>
                         <div class="col-lg-6 form-group">
                             <label for="identificacionEsposo">IDENTIFICACIÓN DEL ESPOSO</label>
