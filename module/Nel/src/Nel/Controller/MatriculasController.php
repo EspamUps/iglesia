@@ -29,6 +29,8 @@ use Nel\Modelo\Entity\AdjuntoMatricula;
 use Nel\Modelo\Entity\HorarioCurso;
 use Nel\Modelo\Entity\ConfigurarCurso;
 use Nel\Modelo\Entity\NombreIglesia;
+use Nel\Modelo\Entity\CargosAdministrativos;
+use Nel\Modelo\Entity\Administrativos;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
@@ -1107,6 +1109,7 @@ class MatriculasController extends AbstractActionController
         $objNombreIglesia = new NombreIglesia($this->dbAdapter);
         $objHorarioCurso = new HorarioCurso($this->dbAdapter);
         $objPeriodo = new Periodos($this->dbAdapter);
+        $objPersona = new Persona($this->dbAdapter);
         $listaIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($idIglesia, 1);
         $idMatriculaEncriptado = $this->params()->fromQuery('id');
 
@@ -1117,6 +1120,23 @@ class MatriculasController extends AbstractActionController
         $listaConfCurso = $objConfCurso->FiltrarConfigurarCurso($resultado[0]['idConfigurarCurso']);
          $listaPeriodo = $objPeriodo->FiltrarPeriodo($listaConfCurso[0]['idPeriodo']);
         
+        $objAdministrativos = new Administrativos($this->dbAdapter);
+        $objCargosAd = new CargosAdministrativos($this->dbAdapter);
+        $cuerpoTablaAdm ='';
+        foreach ($objCargosAd->ObtenerCargosAdministrativos() as $valueCargos) {
+            $listaAdministrativo = $objAdministrativos->ObtenerAdministrativosPorCargoAdministrativo($valueCargos['idCargoAdministrativo']);
+            if(count($listaAdministrativo)>0)
+            {
+                $listaPersona = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
+                $cuerpoTablaAdm = $cuerpoTablaAdm.'<tr> 
+                            <th>_________________________________________<br>
+                            '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'].' '.$listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].'
+                            <br>'.$valueCargos['descripcion'].'</th>
+                             </tr>';
+            }
+            
+        }
+         
 	
         $listaHorarioCurso = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($resultado[0]['idConfigurarCurso']);
          $cuerpoTablaHorario = '';
@@ -1139,6 +1159,12 @@ class MatriculasController extends AbstractActionController
                                 '.$cuerpoTablaHorario.'
                             </tbody>
                          </table>';
+    
+        $estado='HABILITADA';
+        if($resultado[0]['estadoMatricula']==0)
+            $estado='DESHABILITADA';
+        
+        
         
         $tabla = '<br><br><br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
@@ -1157,6 +1183,10 @@ class MatriculasController extends AbstractActionController
                 <tr>
                     <td><b>Código de matrícula:</b></td>
                     <td style="text-align:left;">'.$resultado[0]['idMatricula'].' </td>
+                 </tr>
+                 <tr>
+                    <td><b>Estado de matrícula:</b></td>
+                    <td style="text-align:left;">'.$estado.' </td>
                  </tr>
                 <tr>
                     <td><b>Estudiante:</b></td>
@@ -1213,7 +1243,10 @@ class MatriculasController extends AbstractActionController
             </div>
             <!-- /.box-body -->
             <div class="box-footer text-center"  style="text-align:center; width:100%">
-             <p style=" padding-top:55%"> <i> Comprobante de matrícula generado automáticamente por el Sistema Web de Gestión Parroquial.</i> </p>
+           <table class="table text-center" style="width:100%; padding-top:20%" > 
+               '.$cuerpoTablaAdm.'                               
+            </table>
+             <p> <i> Comprobante de matrícula generado automáticamente por el Sistema Web de Gestión Parroquial.</i> </p>
             </div>
           </div>';
         
