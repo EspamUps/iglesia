@@ -10,7 +10,6 @@ $(function(){
         },
         success: function(data){
             if(data.validar==true){
-//                console.log(data.tabla)
                 var table = $('#tablaPersonas').DataTable();
                 table.row(data.numeroFila).data(data.tabla[data.numeroFila]).draw();
                 setTimeout(function() {$("#mensajeModifcarTelefono").html('');},1500);

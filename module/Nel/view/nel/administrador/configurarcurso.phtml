@@ -39,7 +39,7 @@ $validarRangoAsistencia = $this->validarRangoAsistencia;
                             </select>
                         </div> 
                         <div class="col-lg-4 form-group">
-                            <label for="selectDocente">SELECCIONE UN DOCENTE</label>
+                            <label for="selectDocente">SELECCIONE UN CATEQUISTA</label>
                             <select class="form-control" id="selectDocente" name="selectDocente">
                                 <?php echo $optionSelectDocentes;?>
                             </select>
@@ -103,6 +103,40 @@ $validarRangoAsistencia = $this->validarRangoAsistencia;
         </div>
     </section>
 </div>
+
+ <div class="example-modal">
+        <div class="modal " id="modalModificarFechaFin">
+          <div class="modal-dialog modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">MODIFICAR FECHA DE FIN DEL CURSO</h4>
+              </div>
+              <div class="modal-body">
+                  <div id="mensajeModificarFechaFin">
+                      
+                  </div>
+                  <form method="post" action="<?php echo $this->basePath();?>/configurarcurso/modificarfechafin" id="formModificarFechaFin">
+                      <div class="form-group">
+                          <input type="hidden" id="numeroFilaT" name="numeroFilaT">
+                          <input type="hidden" id="numeroFila2T" name="numeroFila2T">
+                          <input type="hidden" id="idConfigurarCursoEncriptado" name="idConfigurarCursoEncriptado">
+                          <label for="fechaActual">FECHA ACTUAL FIN DE CURSO</label>
+                          <input class="form-control" type="text"  name="fechaActual" id="fechaActual">
+                          <label for="nuevaFecha">NUEVA FECHA FIN DE CURSO</label>
+                          <input class="form-control" type="date" onkeydown="nuevaFecha" name="nuevaFecha" id="nuevaFecha">
+                          <br><button id="btnModificarFechaFinDeCurso" data-loading-text="GUARDANDO..." type="submit" class="btn btn-primary btn-flat pull-right"><i class="fa fa-save"></i>GUARDAR</button>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 <script type="text/javascript">
 $(document).ready(function(){
     cargandoConfigurarCurso('#contenedorTablaConfigurarCurso');

@@ -99,28 +99,12 @@ class ConfigurarCurso extends TableGateway
         return $resultado;
     }
     
-//    
-//    
-//    
-//    public function FiltrarPersona($idPersona){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function FiltrarPersonaPorIdentificacion($identificacion){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//
-//    
-//    public function EliminarLugarMisa($idLugarMisa){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarLugarMisa('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+      public function ModificarConfigurarCursoFechaFin($idConfigurarCurso,$nuevaFechaFin){
+        $resultado = $this->getAdapter()->query("CALL Sp_ModificarConfigurarCursoFechaFin('{$idConfigurarCurso}','{$nuevaFechaFin}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
-    
-   
+
 
 
 

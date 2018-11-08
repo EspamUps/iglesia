@@ -157,6 +157,48 @@ function seleccionarFila(ID)
     $("#filaTablaConfigurarCurso" + ID + " td").removeAttr("style");
     $("#filaTablaConfigurarCurso" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
 }
+
+$(function(){
+    $("#formModificarFechaFin").ajaxForm({
+        beforeSend: function(){
+            $("#mensajeModificarFechaFin").html('');
+            $("#btnModificarFechaFinDeCurso").button('loading');
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+
+        },
+        success: function(data){console.log(data.validar)
+            if(data.validar==true){
+                
+                var table = $('#tablaConfigurarCurso').DataTable();
+                table.row(data.numeroFila).data(data.tabla[data.numeroFila]).draw();
+                setTimeout(function() {$("#mensajeModificarFechaFin").html('');},1500);
+            }
+            $("#btnModificarFechaFinDeCurso").button('reset');
+            $("#mensajeModificarFechaFin").html(data.mensaje);
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#btnModificarFechaFinDeCurso").button('reset');
+            if(xhr.status === 0){
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeModificarFechaFin").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    });    
+}); 
 function obtenerConfigurarCurso(){
     var url = $("#rutaBase").text();
     $.ajax({
@@ -196,6 +238,16 @@ function obtenerConfigurarCurso(){
                            'createdCell':  function (td, cellData, rowData, row, col) {
                                 $(td).attr('id','nombreCurso'+row); 
                            },
+                        },
+                        {
+                           'targets': 5,
+                           'createdCell':  function (td, cellData, rowData, row, col) {
+                                $(td).attr('id','fechafincurso'+row); 
+                                $(td).attr('onclick','obtenerCambiarFechaFinCursoModal('+row+','+rowData._j+',\''+rowData.idConfigurarCursoEncriptado+'\')'); 
+                                $(td).attr('data-target','#modalModificarFechaFin'); 
+                                $(td).attr('data-toggle','modal'); 
+                                
+                           }
                         }
                         
                      ],
@@ -209,7 +261,7 @@ function obtenerConfigurarCurso(){
                             data: 'nombreCurso'
                         },
                         {
-                            title: 'DOCENTE',
+                            title: 'CATEQUISTA',
                             data: 'docente'
                         },
                         {
@@ -221,7 +273,7 @@ function obtenerConfigurarCurso(){
                             data: 'fechaInicio'
                         },
                         {
-                            title: 'FECHA FÍN',
+                            title: 'FECHA FIN',
                             data: 'fechaFin'
                         },
                         {
@@ -271,6 +323,15 @@ function obtenerConfigurarCurso(){
             }
         }
     }); 
+}
+
+function obtenerCambiarFechaFinCursoModal(ID,ID2,_idConfigurarCursoEncriptado){
+    var fechafincurso = $("#fechafincurso"+ID).text();
+    $("#fechaActual").val(fechafincurso);
+    $("#numeroFilaT").val(ID);
+    $("#numeroFila2T").val(ID2);
+    $("#idConfigurarCursoEncriptado").val(_idConfigurarCursoEncriptado);
+    $("#mensajeModificarFechaFin").html('');
 }
   
 function limpiarFormIngresarConfigurarCurso()

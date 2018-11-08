@@ -1151,7 +1151,7 @@ class MatriculasController extends AbstractActionController
         $tablahorarios= '<table style="text-align:center; width:100%"  class="table " >
                         <thead>
                                 <tr>
-                                    <th style=" width:50%" colspan="2" >HORARIO DE CLASES</td>
+                                    <th style=" width:50%" colspan="2" >HORARIO DE CATEQUESIS</td>
                                 </tr>
                                
                         </thead>
@@ -1201,20 +1201,16 @@ class MatriculasController extends AbstractActionController
                     <td style="text-align:left;">'.$resultado[0]['fechaMatricula'].' </td>
                  </tr>
                   <tr>
-                    <td><b>Periodo lectivo:</b></td>
+                    <td><b>Periodo de catequesis:</b></td>
                     <td style="text-align:left;">'.$listaPeriodo[0]['nombrePeriodo'].' </td>
                  </tr>
                
                  <tr>
-                    <td><b>Nombre del curso:</b></td>
+                    <td><b>Nivel del curso:</b></td>
                     <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
                  </tr>
-                 <tr>
-                    <td><b>Nivel del curso:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
-                 </tr>
                 <tr>
-                    <td><b>Docente:</b></td>
+                    <td><b>Catequista:</b></td>
                     <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
                  </tr>
                  
@@ -1225,10 +1221,6 @@ class MatriculasController extends AbstractActionController
                   <tr>
                     <td><b>Fecha de fin de clases:</b></td>
                     <td style="text-align:left;">'.$listaConfCurso[0]['fechaFin'].' </td>
-                 </tr>
-                  <tr>
-                    <td><b>Precio del curso:</b></td>
-                    <td style="text-align:left;">$ '.$listaConfCurso[0]['precio'].' </td>
                  </tr>
 
                </tbody>

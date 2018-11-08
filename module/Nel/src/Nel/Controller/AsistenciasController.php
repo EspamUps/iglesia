@@ -568,8 +568,8 @@ class AsistenciasController extends AbstractActionController
                                 $i=0;
                                 foreach ($listaAsistencias as $valueAsistencia) {
 
-                                   if($fechaActual==$fechaAsistencia)
-                                   {
+//                                   if($fechaActual==$fechaAsistencia)
+//                                   {
                                         if($valueAsistencia['estadoAsistenciaTomada']==0)
                                         {
                                             $optionAsistencia = '<option selected value="0">No asistió</option>';
@@ -582,12 +582,12 @@ class AsistenciasController extends AbstractActionController
                                         $idAsistenciaEncriptado = $objMetodos->encriptar( $valueAsistencia['idAsistencia']);
                                         $selectAsistencia = '<select onchange="cambiarAsistenciaHoy(\''.$idAsistenciaEncriptado.'\','.$i.')" id="selectAsistenciaDiaria" name="selectAsistenciaDiaria">
                                                             '.$optionAsistencia.'</select>';
-                                   }
-                                   else{
-                                        $selectAsistencia = '<small style="color:green">Sí</small>';
-                                        if($valueAsistencia['estadoAsistenciaTomada']==0)
-                                           $selectAsistencia='<small style="color:red" small>No</small>';                                       
-                                   }
+//                                   }
+//                                   else{
+//                                        $selectAsistencia = '<small style="color:green">Sí</small>';
+//                                        if($valueAsistencia['estadoAsistenciaTomada']==0)
+//                                           $selectAsistencia='<small style="color:red" small>No</small>';                                       
+//                                   }
                                 
                                        
                                    

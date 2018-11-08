@@ -114,7 +114,98 @@ class ConfigurarCursoController extends AbstractActionController
     
     
     
-    public function modificarestadoconfigurarcursoAction()
+    public function modificarfechafinAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 13);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 13, 2);
+                if ($validarprivilegio==false)
+                    $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PRIVILEGIOS DE MODIFICAR DATOS PARA ESTE MÓDULO</div>';
+                else{
+                    $request=$this->getRequest();
+                    if(!$request->isPost()){
+                        $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                    }else{               
+                        $objMetodos = new Metodos();
+                        $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
+                        $post = array_merge_recursive(
+                            $request->getPost()->toArray(),
+                            $request->getFiles()->toArray()
+                        );
+                        
+                        
+                        $idConfigurarCursoEncriptado = $post['idConfigurarCursoEncriptado'];
+                        $nuevaFecha = $post['nuevaFecha'];
+                        $numeroFila = $post['numeroFilaT'];
+                        $numeroFila2 = $post['numeroFila2T'];
+                        if($idConfigurarCursoEncriptado == NULL || $idConfigurarCursoEncriptado == ""){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DEL CURSO</div>';
+                        }else if(empty($nuevaFecha)  || $nuevaFecha=="" ){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">DEBE COMPLETAR LOS CAMPOS FECHA ACTUAL Y NUEVA FECHA</div>';
+                        }else if(!is_numeric($numeroFila)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else  if(!is_numeric($numeroFila2)){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL NÚMERO DE LA FILA</div>';
+                        }else{
+                            $idConfigurarCurso = $objMetodos->desencriptar($idConfigurarCursoEncriptado);
+                            $listaConfigurarCurso = $objConfigurarCurso->FiltrarConfigurarCurso($idConfigurarCurso);
+                            if(count($listaConfigurarCurso) == 0){
+                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO NO EXISTE</div>';
+                            }else {
+                                 $mensaje = '<div class="alert alert-success text-center" role="alert">EL CURSO SELECCIONADO NO EXISTE</div>';
+                                 ini_set('date.timezone','America/Bogota'); 
+                                
+                                $fechaHoy = strtotime(date("d-m-Y"));
+                                $fechaFinPeriodo = strtotime($listaConfigurarCurso[0]['fechaFinPeriodo']);
+                                $nuevaFechaComp = strtotime($nuevaFecha);
+                                $fechaFinActual = strtotime($listaConfigurarCurso[0]['fechaFin']);
+                                
+                                if($fechaHoy>$nuevaFechaComp)
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA NUEVA FECHA DE FIN DE CURSO DEBE SER MAYOR O IGUAL  A LA FECHA DE HOY</div>';
+                                else if ($nuevaFechaComp>$fechaFinPeriodo)
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA NUEVA FECHA DE FIN DE CURSO DEBE SER MENOR O IGUAL A LA FECHA DE FIN DE PERIODO</div>';
+                                else if ($nuevaFechaComp<$fechaFinActual)
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA NUEVA FECHA DEBE SER MAYOR A LA FECHA DE FIN DE CURSO REGISTRADO</div>';
+                                else if ($nuevaFechaComp==$fechaFinActual)
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA NO HA CAMBIADO</div>';
+                                else {
+                                    
+                                    $resultado =$objConfigurarCurso->ModificarConfigurarCursoFechaFin($idConfigurarCurso, $nuevaFecha);
+                                    
+                                    if(count($resultado)==0)
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR. NO SE PUDO MODIFICAR LA FECHA DE FIN DE CURSO. INTÉNTELO MÁS TARDE.</div>';
+                                    else
+                                        {
+                                            $mensaje = '<div class="alert alert-success text-center" role="alert">REGISTRO ACTUALIZADO CORRECTAMENTE</div>';
+                                            $tabla = $this->CargarTablaConfigurarCrusosAction($idUsuario, $this->dbAdapter, $resultado, $numeroFila, $numeroFila2);
+                                            $validar = TRUE;
+                                            return new JsonModel(array('tabla'=>$tabla,'numeroFila'=>$numeroFila,'numeroFila2'=>$numeroFila2,'mensaje'=>$mensaje,'validar'=>$validar));
+                                        }
+                                   }
+                            }
+                        }   
+                    }
+                }
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+    
+    
+     public function modificarestadoconfigurarcursoAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
@@ -501,15 +592,15 @@ class ConfigurarCursoController extends AbstractActionController
                         }else if(empty($idCursoEncriptado) || $idCursoEncriptado == NULL || $idCursoEncriptado == "0"){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UN CURSO</div>';
                         }else if(empty($idDocenteEncriptado) || $idDocenteEncriptado == NULL || $idDocenteEncriptado == "0"){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UN DOCENTE</div>';
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">SELECCIONE UN CATEQUISTA</div>';
                         }else if(empty($fechaInicioMatricula)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA INICIO DE LAS MATRÍCULAS</div>';
                         }else if(empty($fechaFinMatricula)){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA FÍN DE LAS MATRÍCULAS</div>';
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA FIN DE LAS MATRÍCULAS</div>';
                         }else if(empty($fechaInicio)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA INICIO</div>';
                         }else if(empty($fechaFin)){
-                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA FÍN</div>';
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA FECHA FIN</div>';
                         }else if(empty($cupos)){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LOS CUPOS</div>';
                         }else if(!is_numeric($valor)){
@@ -544,13 +635,13 @@ class ConfigurarCursoController extends AbstractActionController
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA FIN DEL CURSO NO ESTÁ EN EL RANGO DE FECHAS DEL
                                     PERIODO '.$objMetodos->obtenerFechaEnLetraSinHora($listaPeriodo[0]['fechaInicio']).' hasta '.$objMetodos->obtenerFechaEnLetraSinHora($listaPeriodo[0]['fechaFin']).'</div>';                                   
                                 }else if($fechaFinMatriculaCom < $fechaInicioMatriculaCom){
-                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA FÍN DE LAS MATRÍCULAS NO DEBE SER MENOR A LA FECHA DE INICIO DE LAS MATRÍCULAS</div>';                        
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA FIN DE LAS MATRÍCULAS NO DEBE SER MENOR A LA FECHA DE INICIO DE LAS MATRÍCULAS</div>';                        
                                 }else if($fechaInicioMatriculaCom < $fechaActualCom){
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INICIO DE LAS MATRÍCULAS NO DEBE SER MENOR A LA FECHA ACTUAL</div>';                        
                                 }else if($fechaInicioCom < $fechaFinMatriculaCom){
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA DE INICIO DEL CURSO NO DEBE SER MENOR A LA FECHA DE FINALIZACIÓN DE MATRÍCULAS</div>';                        
                                 }else if($fechaFinCom < $fechaInicioCom){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA FÍN DEL CURSO NO DEBE SER MENOR A LA FECHA DE INICIO DEL CURSO</div>';                        
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA FIN DEL CURSO NO DEBE SER MENOR A LA FECHA DE INICIO DEL CURSO</div>';                        
                                 }else {
                                     $idCurso = $objMetodos->desencriptar($idCursoEncriptado);
                                     $listaCurso = $objCursos->FiltrarCurso($idCurso);
@@ -573,9 +664,9 @@ class ConfigurarCursoController extends AbstractActionController
                                             $idDocente = $objMetodos->desencriptar($idDocenteEncriptado);
                                             $listaDocente = $objDocentes->FiltrarDocente($idDocente);
                                             if(count($listaDocente) == 0){
-                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL DOCENTE SELECCIONADO NO EXISTE</div>';
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CATEQUISTA SELECCIONADO NO EXISTE</div>';
                                             }else if($listaDocente[0]['estadoDocente'] == FALSE){
-                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL DOCENTE SELECCIONADO HA SIDO DESHABILITADO POR LO TANTO NO PUEDE SER UTILIZADO HASTA QUE SEA HABILITADO</div>';
+                                                $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CATEQUISTA SELECCIONADO HA SIDO DESHABILITADO POR LO TANTO NO PUEDE SER UTILIZADO HASTA QUE SEA HABILITADO</div>';
                                             } else{
                                                 
                                                 $hoy = getdate();

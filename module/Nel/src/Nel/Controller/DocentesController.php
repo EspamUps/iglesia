@@ -144,14 +144,14 @@ class DocentesController extends AbstractActionController
                             }else{ 
                                 $listaDocente = $objDocentes->FiltrarDocentePorPersona($listaPersona[0]['idPersona']);
                                 if(count($listaDocente) > 0){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN DOCENTE CON LA IDENTIFICACIÓN '.$listaPersona[0]['identificacion'].'</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN CATEQUISTA CON LA IDENTIFICACIÓN '.$listaPersona[0]['identificacion'].'</div>';
                                 }else{
                                     ini_set('date.timezone','America/Bogota'); 
                                     $hoy = getdate();
                                     $fechaSubida = $hoy['year']."-".$hoy['mon']."-".$hoy['mday']." ".$hoy['hours'].":".$hoy['minutes'].":".$hoy['seconds'];
                                     $resultado = $objDocentes->IngresarDocente($idPersona, $fechaSubida, 1);
                                     if(count($resultado) == 0){
-                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL DOCENTE POR FAVOR INTENTE MÁS TARDE</div>';
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE INGRESÓ EL CATEQUISTA POR FAVOR INTENTE MÁS TARDE</div>';
                                     }else{
                                         $mensaje = '<div class="alert alert-success text-center" role="alert">INGRESADO CORRECTAMENTE</div>';
                                         $validar = TRUE;
@@ -212,7 +212,7 @@ class DocentesController extends AbstractActionController
 
                                 $listaDocente = $objDocentes->FiltrarDocentePorPersona($listaPersona[0]['idPersona']);
                                 if(count($listaDocente) > 0){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN DOCENTE CON LA IDENTIFICACIÓN '.$identificacion.'</div>';
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">YA EXISTE UN CATEQUISTA CON LA IDENTIFICACIÓN '.$identificacion.'</div>';
                                 }else{
                                     $idPersonaEncriptado = $objMetodos->encriptar($listaPersona[0]['idPersona']);
                                     $nombres = $listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'];
