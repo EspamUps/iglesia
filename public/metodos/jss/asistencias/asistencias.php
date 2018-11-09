@@ -232,6 +232,7 @@ function GenerarAsistencia(){
        $("#contenderListaFechaAsistencia").html("");
         
     }else{
+        
         $.ajax({
             url : url+'/asistencias/generarasistencia',
             type: 'post',

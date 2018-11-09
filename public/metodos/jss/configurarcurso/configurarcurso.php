@@ -167,7 +167,7 @@ $(function(){
         uploadProgress: function(event,position,total,percentComplete){
 
         },
-        success: function(data){console.log(data.validar)
+        success: function(data){console.log(data)
             if(data.validar==true){
                 
                 var table = $('#tablaConfigurarCurso').DataTable();

@@ -24,6 +24,8 @@ use Nel\Modelo\Entity\ConfigurarCurso;
 use Nel\Modelo\Entity\Periodos;
 use Nel\Modelo\Entity\Docentes;
 use Nel\Modelo\Entity\RangoAsistencia;
+use Nel\Modelo\Entity\FechaAsistencia;
+use Nel\Modelo\Entity\Asistencia;
 use Nel\Modelo\Entity\Cursos;
 use Nel\Modelo\Entity\HorarioCurso;
 use Zend\Session\Container;
@@ -165,30 +167,40 @@ class ConfigurarCursoController extends AbstractActionController
                             if(count($listaConfigurarCurso) == 0){
                                 $mensaje = '<div class="alert alert-danger text-center" role="alert">EL CURSO SELECCIONADO NO EXISTE</div>';
                             }else {
+                                
+                                $objFechaAsistencia = new FechaAsistencia($this->dbAdapter);
+                                $objMatricula = new Matricula($this->dbAdapter);
+                                $objAsistencia = new Asistencia($this->dbAdapter);
+                                 $objHorarioCurso= new HorarioCurso($this->dbAdapter);
                                  $mensaje = '<div class="alert alert-success text-center" role="alert">EL CURSO SELECCIONADO NO EXISTE</div>';
                                  ini_set('date.timezone','America/Bogota'); 
                                 
                                 $fechaHoy = strtotime(date("d-m-Y"));
                                 $fechaFinPeriodo = strtotime($listaConfigurarCurso[0]['fechaFinPeriodo']);
                                 $nuevaFechaComp = strtotime($nuevaFecha);
-                                $fechaFinActual = strtotime($listaConfigurarCurso[0]['fechaFin']);
+                                $fechaFinActual = $listaConfigurarCurso[0]['fechaFin'];
+                                $fechaFinActualComp = strtotime($fechaFinActual);
                                 
                                 if($fechaHoy>$nuevaFechaComp)
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA NUEVA FECHA DE FIN DE CURSO DEBE SER MAYOR O IGUAL  A LA FECHA DE HOY</div>';
                                 else if ($nuevaFechaComp>$fechaFinPeriodo)
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA NUEVA FECHA DE FIN DE CURSO DEBE SER MENOR O IGUAL A LA FECHA DE FIN DE PERIODO</div>';
-                                else if ($nuevaFechaComp<$fechaFinActual)
+                                else if ($nuevaFechaComp<$fechaFinActualComp)
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA NUEVA FECHA DEBE SER MAYOR A LA FECHA DE FIN DE CURSO REGISTRADO</div>';
-                                else if ($nuevaFechaComp==$fechaFinActual)
+                                else if ($nuevaFechaComp==$fechaFinActualComp)
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">LA FECHA NO HA CAMBIADO</div>';
                                 else {
                                     
                                     $resultado =$objConfigurarCurso->ModificarConfigurarCursoFechaFin($idConfigurarCurso, $nuevaFecha);
-                                    
+//                                    
                                     if(count($resultado)==0)
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR. NO SE PUDO MODIFICAR LA FECHA DE FIN DE CURSO. INTÉNTELO MÁS TARDE.</div>';
                                     else
                                         {
+                                            $nuevaFechaFinIngresada = $resultado[0]['fechaFin'];
+                                            $listaHorarioRegistrado =$objHorarioCurso->FiltrarHorarioCursoPorConfiguCursoDistinctIdentificadorDia($idConfigurarCurso);
+                                            $listaMatriculadosEnElCurso= $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso,1);
+                                            $this->generarRegistrosAsistenciaAction($idConfigurarCurso,$fechaFinActual,$nuevaFechaFinIngresada,$listaHorarioRegistrado,$listaMatriculadosEnElCurso,$objAsistencia, $objFechaAsistencia);
                                             $mensaje = '<div class="alert alert-success text-center" role="alert">REGISTRO ACTUALIZADO CORRECTAMENTE</div>';
                                             $tabla = $this->CargarTablaConfigurarCrusosAction($idUsuario, $this->dbAdapter, $resultado, $numeroFila, $numeroFila2);
                                             $validar = TRUE;
@@ -204,8 +216,41 @@ class ConfigurarCursoController extends AbstractActionController
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
+    function  generarRegistrosAsistenciaAction($idConfigurarCurso,$fechaInicio,$fechaFin,$listaHorarioRegistrado,$listaMatriculadosEnElCurso,$objAsistencia, $objFechaAsistencia)
+    {
+        
+        for($i=$fechaInicio;$i<=$fechaFin;$i = date("Y-m-d", strtotime($i ."+ 1 days")))
+        {
+
+            $fechaAsistencia= strtotime($i);
+            $numeroDia =date("w",$fechaAsistencia);
+            foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
+            {
+                if($valueDiaHorarioR['identificadorDia']==$numeroDia)
+                    {
+                    $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
+                    $idFechaAsistencia = $resultado[0]['idFechaAsistencia'];
+                    $this->generarasistenciascompletasAction($listaMatriculadosEnElCurso,$idFechaAsistencia,$objAsistencia);
+                    }
+                }
+        }
+        
+        
+    }
     
-     public function modificarestadoconfigurarcursoAction()
+    function  generarasistenciascompletasAction($listaMatriculadosEnElCurso, $idFechaAsistencia, $objAsistencia)
+    {
+        ini_set('date.timezone','America/Bogota'); 
+        $hoy = getdate();
+        $fechaActual = $hoy['year']."-".$hoy['mon']."-".$hoy['mday'];
+
+        foreach ($listaMatriculadosEnElCurso as $valueMatriculado) {
+            $resultado = $objAsistencia->IngresarAsistenciaHoy($idFechaAsistencia, $valueMatriculado['idMatricula'], 1, $fechaActual, 1);
+        }
+    }
+    
+    
+    function modificarestadoconfigurarcursoAction()
     {
         $this->layout("layout/administrador");
         $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';

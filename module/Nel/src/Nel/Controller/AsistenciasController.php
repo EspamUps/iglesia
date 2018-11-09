@@ -453,29 +453,16 @@ class AsistenciasController extends AbstractActionController
                             }else{
                                
                             
-                                $listaHorarioRegistrado =$objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($idConfigurarCurso);
+                                $listaHorarioRegistrado =$objHorarioCurso->FiltrarHorarioCursoPorConfiguCursoDistinctIdentificadorDia($idConfigurarCurso);
                                 $listaMatriculadosEnElCurso= $objMatricula->FiltrarMatriculaPorConfigurarCursoYEstado($idConfigurarCurso,1);
                                 if(count($listaMatriculadosEnElCurso)==0)
                                   $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HAY MATRICULADOS EN ESTE CURSO</div>';
                                 else{
-                                    $fechaInicioClases =$listaConfigurarCurso[0]['fechaInicio'];
-                                    $fechaFinClases = $listaConfigurarCurso[0]['fechaFin'];
-                                    for($i=$fechaInicioClases;$i<=$fechaFinClases;$i = date("Y-m-d", strtotime($i ."+ 1 days"))){
-
-                                       $fechaAsistencia= strtotime($i);
-                                       $numeroDia =date("w",$fechaAsistencia);
-                                       foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
-                                       {
-                                           if($valueDiaHorarioR['identificadorDia']==$numeroDia)
-                                           {
-                                              $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
-                                              $idFechaAsistencia = $resultado[0]['idFechaAsistencia'];
-                                              $this->generarasistenciascompletasAction($listaMatriculadosEnElCurso,$idFechaAsistencia,$objAsistencia);
-                                           }
-                                               
-
-                                       }
-                                    }
+                                    
+                                    $fechaInicio =$listaConfigurarCurso[0]['fechaInicio'];
+                                    $fechaFin = $listaConfigurarCurso[0]['fechaFin'];
+                                    $this->generarRegistrosAsistenciaAction($idConfigurarCurso,$fechaInicio,$fechaFin,$listaHorarioRegistrado,$listaMatriculadosEnElCurso,$objAsistencia, $objFechaAsistencia);
+                                   
                                     
                                     $listaFechasIngresadas = $objFechaAsistencia->FiltrarFechaAsistenciaPorIdConfCurso($idConfigurarCurso, 1);
                                     
@@ -501,6 +488,28 @@ class AsistenciasController extends AbstractActionController
         return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
     }
     
+    function  generarRegistrosAsistenciaAction($idConfigurarCurso,$fechaInicio,$fechaFin,$listaHorarioRegistrado,$listaMatriculadosEnElCurso,$objAsistencia, $objFechaAsistencia)
+    {
+        
+        for($i=$fechaInicio;$i<=$fechaFin;$i = date("Y-m-d", strtotime($i ."+ 1 days")))
+        {
+
+            $fechaAsistencia= strtotime($i);
+            $numeroDia =date("w",$fechaAsistencia);
+            foreach ($listaHorarioRegistrado as $valueDiaHorarioR)
+            {
+                if($valueDiaHorarioR['identificadorDia']==$numeroDia)
+                    {
+                    $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
+                    $idFechaAsistencia = $resultado[0]['idFechaAsistencia'];
+                    $this->generarasistenciascompletasAction($listaMatriculadosEnElCurso,$idFechaAsistencia,$objAsistencia);
+                    }
+                }
+        }
+        
+        
+    }
+    
     function  generarasistenciascompletasAction($listaMatriculadosEnElCurso, $idFechaAsistencia, $objAsistencia)
     {
         ini_set('date.timezone','America/Bogota'); 
@@ -511,6 +520,8 @@ class AsistenciasController extends AbstractActionController
             $resultado = $objAsistencia->IngresarAsistenciaHoy($idFechaAsistencia, $valueMatriculado['idMatricula'], 1, $fechaActual, 1);
         }
     }
+    
+    
     
     public function obtenerasistenciasAction()
     {
