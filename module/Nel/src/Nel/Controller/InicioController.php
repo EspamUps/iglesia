@@ -127,7 +127,8 @@ class InicioController extends AbstractActionController
                                         </li>';
                                     }
                                     if($valueAsignarM['identificadorModulo'] == 15 || 
-                                       $valueAsignarM['identificadorModulo'] == 18){
+                                       $valueAsignarM['identificadorModulo'] == 18 ||
+                                            $valueAsignarM['identificadorModulo'] == 20){
                                         $subMenuCertificados=$subMenuCertificados.'
                                         <li>
                                             <a href="'.$this->getRequest()->getBaseUrl().'/'.$valueAsignarM['link'].'"><i class="'.$valueAsignarM['icon'].'"></i><span>'.$valueAsignarM['nombreModulo'].'</span></a>

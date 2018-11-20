@@ -605,11 +605,11 @@ class BautismoController extends AbstractActionController
                                             $madrina = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
                                         }
                                     }
-                                    $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el <b>'.$fechaBautismo.'</b> el 
+                                    $tablaDerecha = '<p style="text-align: justify; line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el <b>'.$fechaBautismo.'</b> el 
                                         Padre <b>'.$nombresSacerdote.'</b> bautizó solemnemente a: <b>'.$nombres.'</b> nacido(a) en <b>'.$direccionNacimiento.'</b> el 
                                             <b>'.$fechaNacimiento.'</b> hijo(a) legítimo de <b>'.$padre.'</b> y de <b>'.$madre.'.</b>
                                             </p>
-                                            <p class="text-justify" style="line-height: 30px;font-size:15px"> Fueron sus Padrinos: <b>'.$padrino.'</b> y <b>'.$madrina.'.</b>
+                                            <p style="text-align: justify; line-height: 30px;font-size:15px"> Fueron sus Padrinos: <b>'.$padrino.'</b> y <b>'.$madrina.'.</b>
                                             </p>';
 
                                     $tablaCaabecera = '<table class="table" style="width:100%">

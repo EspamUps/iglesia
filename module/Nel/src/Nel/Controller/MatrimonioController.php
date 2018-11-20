@@ -405,11 +405,11 @@ class MatrimonioController extends AbstractActionController
                                                 $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
                                                 $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
                                                 $fechaMatrimonio = $objMetodos->obtenerFechaEnLetraSinHora($listaMatrimonioEsposoEsposa[0]['fechaMatrimonio']);
-                                                $tablaDerecha = '<p class="text-justify" style="line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el día <b>'.$fechaMatrimonio.'</b>, cumplido 
+                                                $tablaDerecha = '<p style="text-align: justify; line-height: 30px;font-size:15px">En la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> el día <b>'.$fechaMatrimonio.'</b>, cumplido 
                                                     los requisitos canónicos, y debida preparación se presenció y bendijo el matrimonio eclesiástico del señor <b>'.$nombresEsposo.'</b> hijo de <b>'.$padreEsposo.'</b> y de <b>'.$madreEsposo.'</b> con  
                                                         la señorita <b>'.$nombresEsposa.'</b> hija de <b>'.$padreEsposa.'</b> y de <b>'.$madreEsposa.'.</b> 
                                                         </p>
-                                                        <p class="text-justify" style="line-height: 30px;font-size:15px"> Fueron sus Padrinos:  <b>'.$nombresPadrino.'</b> y <b>'.$nombresMadrina.'.</b>
+                                                        <p style="text-align: justify; line-height: 30px;font-size:15px"> Fueron sus Padrinos:  <b>'.$nombresPadrino.'</b> y <b>'.$nombresMadrina.'.</b>
                                                         </p>';
                                                 $tablaCaabecera = '<table class="table" style="width:100%">
                                                             <thead>

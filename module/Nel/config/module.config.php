@@ -90,6 +90,7 @@ return array(
             'Nel\Controller\Matrimonio' => 'Nel\Controller\MatrimonioController',
             'Nel\Controller\CargosAdministrativos' => 'Nel\Controller\CargosAdministrativosController',
             'Nel\Controller\CertificadosCursos' => 'Nel\Controller\CertificadosCursosController',
+            'Nel\Controller\Confirmacion' => 'Nel\Controller\ConfirmacionController',
         ),
     ),
     'view_manager' => array(
