@@ -47,9 +47,11 @@ class Cursos extends TableGateway
         return $resultado;
     }
     
+    public function FiltrarCursoSiguiente($nivelActual, $estadoCurso){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarCursoSiguiente('{$nivelActual}','{$estadoCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
-    
-//    
     public function EliminarCurso($idCurso){
         $resultado = $this->getAdapter()->query("CALL Sp_EliminarCurso('{$idCurso}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
@@ -59,26 +61,6 @@ class Cursos extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_ModificarEstadoCurso('{$idCurso}','{$estado}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-    
-//    
-//    
-//    
-//    public function FiltrarPersona($idPersona){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//    public function FiltrarPersonaPorIdentificacion($identificacion){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPersonaPorIdentificacion('{$identificacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//    
-//
-//    
-//    public function EliminarLugarMisa($idLugarMisa){
-//        $resultado = $this->getAdapter()->query("CALL Sp_EliminarLugarMisa('{$idLugarMisa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
     
     
    

@@ -512,6 +512,7 @@ class CertificadosCursosController extends AbstractActionController
         
         $objMetodos = new Metodos();
         $objConfCurso = new ConfigurarCurso($this->dbAdapter);
+        $objCurso = new Cursos($this->dbAdapter);
         $objNombreIglesia = new NombreIglesia($this->dbAdapter);
         $objHorarioCurso = new HorarioCurso($this->dbAdapter);
         $objPeriodo = new Periodos($this->dbAdapter);
@@ -525,21 +526,29 @@ class CertificadosCursosController extends AbstractActionController
         $objMat = new Matricula($this->dbAdapter);
         $resultado = $objMat->FiltrarMatricula($idMatricula);
         $listaConfCurso = $objConfCurso->FiltrarConfigurarCurso($resultado[0]['idConfigurarCurso']);
+        $siguienteCurso = $objCurso->FiltrarCursoSiguiente($listaConfCurso[0]['nivelCurso'], 1);
          $listaPeriodo = $objPeriodo->FiltrarPeriodo($listaConfCurso[0]['idPeriodo']);
         
         $objAdministrativos = new Administrativos($this->dbAdapter);
         $cuerpoTablaAdm ='';
+        //firma del catequista
+        $cuerpoTablaAdm = $cuerpoTablaAdm.' 
+                            <td>_________________________________________<br>
+                            '.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'
+                            <br>CATEQUISTA</td>
+                             ';
         //el id 1 pertenece al parroco
         $listaAdministrativo = $objAdministrativos->FiltrarAdministrativosPorIdentificadorCargo(1);
             if(count($listaAdministrativo)>0)
             {
                 $listaPersona = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
-                $cuerpoTablaAdm = $cuerpoTablaAdm.'<tr> 
-                            <th>_________________________________________<br>
+                $cuerpoTablaAdm = $cuerpoTablaAdm.'
+                            <td>_________________________________________<br>
                             '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'].' '.$listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].'
-                            <br>'.$listaAdministrativo[0]['descripcion'].'</th>
-                             </tr>';
+                            <br>'.$listaAdministrativo[0]['descripcion'].'</td>
+                             ';
             }
+             
         ini_set('date.timezone','America/Bogota'); 
         $hoy = getdate();
         $mes =date("m");
@@ -547,30 +556,30 @@ class CertificadosCursosController extends AbstractActionController
          $fechaHoy = $objMetodos->obtenerFechaEnLetraSinHora($fechaActual);
         
         
-        $tabla = '<br><br><br><div class="box box-success">
+        $tabla = '<br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
               <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
              <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'<br>'.$direccionIglesia.'</label>
              <br> <label>Sistema Web de Gestión Parroquial</label>
             </div>
             <hr>
-            <div class="box-body text-center"   >
+            <div  style="text-align:center; width:100%;" class="box-body text-center"   >
               <!-- Minimal style -->
-              <br><br>
-              <h4>Confiere el presente certificado a:</h4>
+             
+              <h2><u>PASE DE NIVEL</u></h2>
               
-              <h3  style="text-align:center; width:100%; color:#265c7b" ><b>'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</b></h3>
-              <h4>Por haber asistido y aprobado el curso de '.$listaConfCurso[0]['nombreCurso'].' que se dictó en esta institución
-                  del '.$listaConfCurso[0]['fechaInicio'].' al '.$listaConfCurso[0]['fechaFin'].'.  </h4>
-               <br><br>
+              <h3  style="text-align:center; width:100%;" >NOMBRE: '.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</h3>
+              <h3 style="text-align:center; width:100%;" >ES PROMOVIDA/O A: '.$siguienteCurso[0]['nombreCurso'].'</h3>
+               <br>
               <p> Dado y firmado el '.$fechaHoy.'</p>
               
             </div>
             <!-- /.box-body -->
             <div class="box-footer text-center"  style="text-align:center; width:100%">
-           <table class="table text-center" style="width:100%; padding-top:20%" > 
-               '.$cuerpoTablaAdm.'                               
+           <table class="table text-center" style="width:100%; padding-top:5%" > 
+               <tbody><tr>'.$cuerpoTablaAdm.'</tr></tbody>                               
             </table>
+            <br>
              <p> <i> Comprobante de matrícula generado automáticamente por el Sistema Web de Gestión Parroquial.</i> </p>
             </div>
           </div>';
