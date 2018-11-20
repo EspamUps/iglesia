@@ -555,22 +555,23 @@ class CertificadosCursosController extends AbstractActionController
 	$fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
          $fechaHoy = $objMetodos->obtenerFechaEnLetraSinHora($fechaActual);
         
-        
+        if(count($siguienteCurso)>0)
         $tabla = '<br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
               <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
              <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'<br>'.$direccionIglesia.'</label>
              <br> <label>Sistema Web de Gestión Parroquial</label>
             </div>
-            <hr>
+            <hr><br>
             <div  style="text-align:center; width:100%;" class="box-body text-center"   >
               <!-- Minimal style -->
              
               <h2><u>PASE DE NIVEL</u></h2>
               
-              <h3  style="text-align:center; width:100%;" >NOMBRE: '.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</h3>
-              <h3 style="text-align:center; width:100%;" >ES PROMOVIDA/O A: '.$siguienteCurso[0]['nombreCurso'].'</h3>
-               <br>
+              <label  style="text-align:center; width:100%; font-size:20px;" >NOMBRE: '.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</label>
+              <br>
+                <label style="text-align:center; width:100%;font-size:20px;" >ES PROMOVIDA/O A: '.$siguienteCurso[0]['nombreCurso'].'</label>
+               <br><br><br>
               <p> Dado y firmado el '.$fechaHoy.'</p>
               
             </div>
