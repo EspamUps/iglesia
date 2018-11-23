@@ -24,10 +24,10 @@ class PadrinosConfirmacion extends TableGateway
         return $resultado;
     }
 //    
-//     public function FiltrarPadrinosBautismoPorBautismo($idBautismo){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPadrinosBautismoPorBautismo('{$idBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
+     public function FiltrarPadrinosConfirmacionPorConfirmacion($idConfirmacion){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarPadrinosConfirmacionPorConfirmacion('{$idConfirmacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
     
    

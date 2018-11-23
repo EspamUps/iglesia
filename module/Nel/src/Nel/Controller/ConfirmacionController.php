@@ -14,18 +14,12 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Nel\Metodos\Metodos;
 use Nel\Metodos\MetodosControladores;
-use Nel\Metodos\Correo;
 use Nel\Modelo\Entity\Persona;
 use Nel\Modelo\Entity\Sacerdotes;
-use Nel\Modelo\Entity\Cantones;
-use Nel\Modelo\Entity\Parroquias;
-use Nel\Modelo\Entity\Provincias;
-use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\AsignarModulo;
 use Nel\Modelo\Entity\Bautismo;
 use Nel\Modelo\Entity\LugaresMisa;
-use Nel\Modelo\Entity\Sexo;
 use Nel\Modelo\Entity\PadresBautismo;
 use Nel\Modelo\Entity\PadrinosBautismo;
 use Nel\Modelo\Entity\PadrinosConfirmacion;
@@ -64,12 +58,10 @@ class ConfirmacionController extends AbstractActionController
                     $objMetodos = new Metodos();
                     $objPersona = new Persona($this->dbAdapter);
                     $objSacerdotes = new Sacerdotes($this->dbAdapter);
-                    $objProvincias = new Provincias($this->dbAdapter);
                     $objBautismo = new Bautismo($this->dbAdapter);
-                    $objSexo = new Sexo($this->dbAdapter);
                     $objConfigurarParroquiaCanton = new ConfigurarParroquiaCanton($this->dbAdapter);
                     $objPadresBautismo = new PadresBautismo($this->dbAdapter);
-                    $objPadrinosBautismo = new PadrinosBautismo($this->dbAdapter);
+                    $objPadrinosConfirmacion = new PadrinosConfirmacion($this->dbAdapter);
                     $objLugaresMisa = new LugaresMisa($this->dbAdapter);
                     $objConfirmacion = new Confirmacion($this->dbAdapter);
                     $post = array_merge_recursive(
@@ -184,13 +176,11 @@ class ConfirmacionController extends AbstractActionController
                                     if(count($listaAdministrativo) != 1){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE UN PÁRROCO QUE FIRME EL DOCUMENTO POR FAVOR DIRÍGETE AL MENÚ <b>TALENTO HUMANO->ADMINISTRATIVOS</b>Y AGREGA UN PÁRROCO</div>';
                                     }else{
+                                        $idConfirmacion = $listaConfirmacion[0]['idConfirmacion'];
                                         $nombres = $listaBautismo[0]['primerApellido'].' '.$listaBautismo[0]['segundoApellido'].' '.$listaBautismo[0]['primerNombre'].' '.$listaBautismo[0]['segundoNombre'];
-//
                                         $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
-//
                                         $listaLugar = $objLugaresMisa->FiltrarLugaresMisa($listaConfirmacion[0]['idLugarConfirmacion']);
                                         $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
-//
                                         $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
                                         $fechaConfirmacion = $objMetodos->obtenerFechaEnLetraSinHora($listaConfirmacion[0]['fechaConfirmacion']);
                                         $listaSacerdote = $objSacerdotes->FiltrarSacerdote($listaConfirmacion[0]['idSacerdoteConfirmacion']);
@@ -209,25 +199,28 @@ class ConfirmacionController extends AbstractActionController
                                                 $madre = $valuePadres['primerApellido'].' '.$valuePadres['segundoApellido'].' '.$valuePadres['primerNombre'].' '.$valuePadres['segundoNombre'];
                                             }
                                         }
-////                                        $listaPadrinos = $objPadrinosBautismo->FiltrarPadrinosBautismoPorBautismo($listaBautismo[0]['idBautismo']);
-//                                        $padrino = '';
-//                                        $madrina = '';
-////                                        foreach ($listaPadrinos as $valuePadrinos) {
-////                                            if($valuePadrinos['identificadorTipoPadre'] == 1){
-////                                                $padrino = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
-////                                            }else{
-////                                                $madrina = $valuePadrinos['primerApellido'].' '.$valuePadrinos['segundoApellido'].' '.$valuePadrinos['primerNombre'].' '.$valuePadrinos['segundoNombre'];
-////                                            }
-////                                        }
-
                                         
-                                        
+                                        $listaPadrinos = $objPadrinosConfirmacion->FiltrarPadrinosConfirmacionPorConfirmacion($idConfirmacion);
+                                        $padrino1 = '';
+                                        $padrino2 = '';
+                                        $padrinos = '';
+                                        if(count($listaPadrinos) == 1){
+                                            $padrino1 = $listaPadrinos[0]['primerApellido'].' '.$listaPadrinos[0]['segundoApellido'].' '.$listaPadrinos[0]['primerNombre'].' '.$listaPadrinos[0]['segundoNombre'];
+                                            $padrinos = $padrino1;
+                                            
+                                        }else if(count($listaPadrinos) == 2){
+                                            $padrino1 = $listaPadrinos[0]['primerApellido'].' '.$listaPadrinos[0]['segundoApellido'].' '.$listaPadrinos[0]['primerNombre'].' '.$listaPadrinos[0]['segundoNombre'];
+                                            $padrino2 = $listaPadrinos[1]['primerApellido'].' '.$listaPadrinos[1]['segundoApellido'].' '.$listaPadrinos[1]['primerNombre'].' '.$listaPadrinos[1]['segundoNombre'];
+                                            $padrinos = '<b>'.$padrino1.'</b> y <b>'.$padrino2.'</b>';
+                                            
+                                        }
                                             $tablaDerecha = '<p style="text-align: justify; line-height: 30px;font-size:15px">El día '.$fechaConfirmacion.' en la Iglesia Parroquial de <b>'.$nombreIglesia2.'</b> recibió el Sacramento de la Confirmación '
-                                                    . '<b>'.$nombres.'</b> nacido(a) en <b>'.$direccionNacimiento.'</b> el día <b>'.$fechaNacimiento.'</b> son su Padres <b>'.$padre.'</b> y <b>'.$madre.'.</b>
+                                                    . '<b>'.$nombres.'</b> nacido(a) en <b>'.$direccionNacimiento.'</b> el día <b>'.$fechaNacimiento.'</b>, son su Padres <b>'.$padre.'</b> y <b>'.$madre.'.</b>
                                                 </p>
-                                                <p style="text-align: justify; line-height: 30px;font-size:15px"> Fueron sus Padrinos: <b>Padrino 1</b> y <b>Padrino 2</b>
+                                                <p style="text-align: justify; line-height: 30px;font-size:15px"> Fueron sus Padrinos: '.$padrinos.'
+                                                </p> 
+                                                <p style="text-align: justify; line-height: 30px;font-size:15px"> Confirmó: <b>'.$nombresSacerdote.'</b>
                                                 </p>';
-//
                                         $tablaCaabecera = '<table class="table" style="width:100%">
                                                     <thead>
                                                         <tr>
@@ -284,10 +277,6 @@ class ConfirmacionController extends AbstractActionController
                                                         </tr> 
                                                     </thead>
                                                 </table>';
-//
-//
-//
-//
                                         $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br><br><br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br><br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
                                         $mensaje = '';
                                         $validar = TRUE;
@@ -327,76 +316,72 @@ class ConfirmacionController extends AbstractActionController
     
     
     
-//    public function obtenerbautismosAction()
-//    {
-//        $this->layout("layout/administrador");
-//        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
-//        $validar = false;
-//        $sesionUsuario = new Container('sesionparroquia');
-//        if(!$sesionUsuario->offsetExists('idUsuario')){
-//            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
-//        }else{
-//            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-//            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
-//            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
-//            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 15);
-//            if (count($AsignarModulo)==0)
-//                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
-//            else {
-//                $request=$this->getRequest();
-//                if(!$request->isPost()){
-//                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
-//                }else{
-//                    $objBautismo = new Bautismo($this->dbAdapter);
-//                    ini_set('date.timezone','America/Bogota'); 
-//                    $listaBautismos = $objBautismo->ObtenerBautismos();
-//                    $tabla = $this->CargarTablaBautismos($idUsuario, $this->dbAdapter, $listaBautismos, 0, count($listaBautismos));
-//                    $mensaje = '';
-//                    $validar = TRUE;
-//                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
-//                }
-//            
-//            }
-//        }
-//        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
-//    }
-//    
-//    
-//     function CargarTablaBautismos($idUsuario,$adaptador,$listaBautismo, $i, $j)
-//    {
-//        $objMetodos = new Metodos();
-//        ini_set('date.timezone','America/Bogota'); 
-//        $objMetodosC = new MetodosControladores();
-//        $array1 = array();
-//        foreach ($listaBautismo as $value) {
-//            $identificacion = '';
-//            if($value['identificacion'] != NULL){
-//                $identificacion = $value['identificacion'];
-//            }
-//            $idBautismoEncriptado = $objMetodos->encriptar($value['idBautismo']);
-//            $nombres = $value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'];
-//            $nombresPersona = '<input type="hidden" id="estadoBautismoA'.$i.'" name="estadoBautismoA'.$i.'" value="'.$value['estadoBautismo'].'">'.$nombres;
-//            $fechaNacimiento = $value['fechaNacimiento'];
-//            $botonEliminarBautismo = '';
-//            $botonDeshabilitarBautismo = '';
-//
-//            $botones =  $botonDeshabilitarBautismo.' '.$botonEliminarBautismo;     
-//            $array1[$i] = array(
-//                '_j'=>$j,
-//                'identificacion'=>$identificacion,
-//                'nombresPersona'=>$nombresPersona,
-//                'fechaNacimiento'=>$fechaNacimiento,
-//                'opciones'=>$botones,
-//            );
-//            $j--;
-//            $i++;
-//        }
-//        
-//        return $array1;
-//    }
-//    
-//    
-//    
+    public function obtenerconfirmacionAction()
+    {
+        $this->layout("layout/administrador");
+        $mensaje = '<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>';
+        $validar = false;
+        $sesionUsuario = new Container('sesionparroquia');
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO HA INICIADO SESIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 20);
+            if (count($AsignarModulo)==0)
+                $mensaje = '<div class="alert alert-danger text-center" role="alert">USTED NO TIENE PERMISOS PARA ESTE MÓDULO</div>';
+            else {
+                $request=$this->getRequest();
+                if(!$request->isPost()){
+                    $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+                }else{
+                    $objConfirmacion = new Confirmacion($this->dbAdapter);
+                    ini_set('date.timezone','America/Bogota'); 
+                    $listaConfirmacion = $objConfirmacion->ObtenerConfirmacion();
+                    $tabla = $this->CargarTablaConfirmacion($idUsuario, $this->dbAdapter, $listaConfirmacion, 0, count($listaConfirmacion));
+                    $mensaje = '';
+                    $validar = TRUE;
+                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                }
+            
+            }
+        }
+        return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar));
+    }
+   
+     function CargarTablaConfirmacion($idUsuario,$adaptador,$listaConfirmacion, $i, $j)
+    {
+        $objMetodos = new Metodos();
+        ini_set('date.timezone','America/Bogota'); 
+        $objMetodosC = new MetodosControladores();
+        $array1 = array();
+        foreach ($listaConfirmacion as $value) {
+            $identificacion = '';
+            if($value['identificacion'] != NULL){
+                $identificacion = $value['identificacion'];
+            }
+            $idConfirmacionEncriptado = $objMetodos->encriptar($value['idConfirmacion']);
+            $nombres = $value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'];
+            $nombresPersona = '<input type="hidden" id="estadoConfirmacionA'.$i.'" name="estadoConfirmacionA'.$i.'" value="'.$value['estadoConfirmacion'].'">'.$nombres;
+            $fechaNacimiento = $value['fechaNacimiento'];
+            $botonEliminarConfirmacion = '';
+            $botonDeshabilitarConfirmacion = '';
+
+            $botones =  $botonEliminarConfirmacion.' '.$botonDeshabilitarConfirmacion;     
+            $array1[$i] = array(
+                '_j'=>$j,
+                'identificacion'=>$identificacion,
+                'nombresPersona'=>$nombresPersona,
+                'fechaNacimiento'=>$fechaNacimiento,
+                'opciones'=>$botones,
+            );
+            $j--;
+            $i++;
+        }
+        
+        return $array1;
+    }   
     public function ingresarconfirmacionAction()
     {
         $this->layout("layout/administrador");

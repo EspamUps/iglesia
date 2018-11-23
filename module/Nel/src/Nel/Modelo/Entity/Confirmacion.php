@@ -22,11 +22,10 @@ class Confirmacion extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfirmacionPorBautismo('{$idBautismo}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    public function ObtenerBautismos(){
-//        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerBautismos()", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-//
+    public function ObtenerConfirmacion(){
+        $resultado = $this->getAdapter()->query("CALL Sp_ObtenerConfirmacion()", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     public function IngresarConfirmacion($idBautismo, $idSacerdoteConfirmacion,
     $fechaConfirmacion,$idLugarConfirmacion,$numeroConfirmacion,$anoConfirmacion,$tomoConfirmacion,
     $folioConfirmacion,$actaConfirmacion,$fechaInscripcionConfirmacion,$fechaRegistro,
@@ -36,18 +35,9 @@ class Confirmacion extends TableGateway
         '{$fechaInscripcionConfirmacion}','{$fechaRegistro}','{$estadoConfirmacion}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//    public function FiltrarBautismoPorPersona($idPersona){
-//        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarBautismoPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
-//        return $resultado;
-//    }
-// 
-    
     public function FiltrarConfirmacionPorNumero($numero){
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarConfirmacionPorNumero('{$numero}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
-//
-//
-
 
 }

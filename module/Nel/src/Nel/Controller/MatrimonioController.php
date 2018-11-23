@@ -31,6 +31,7 @@ use Nel\Modelo\Entity\PadrinosBautismo;
 use Nel\Modelo\Entity\Administrativos;
 use Nel\Modelo\Entity\TestigosMatrimonio;
 use Nel\Modelo\Entity\LugaresMisa;
+use Nel\Modelo\Entity\Confirmacion;
 use Nel\Modelo\Entity\TipoPadre;
 use Nel\Modelo\Entity\PadrinosMatrimonio;
 use Zend\Session\Container;
@@ -315,6 +316,7 @@ class MatrimonioController extends AbstractActionController
                         $objPadrinosMatrimonio = new PadrinosMatrimonio($this->dbAdapter);
                         $objTestigosMatrimonio = new TestigosMatrimonio($this->dbAdapter);
                         $objAdministrativo = new Administrativos($this->dbAdapter);
+                        $objConfirmacion = new Confirmacion($this->dbAdapter);
                         $post = array_merge_recursive(
                             $request->getPost()->toArray(),
                             $request->getFiles()->toArray()
@@ -358,10 +360,15 @@ class MatrimonioController extends AbstractActionController
                                     $idEsposa = $listaPersonaEsposa[0]['idPersona'];
                                     $listaBautismoEsposo  = $objBautismo->FiltrarBautismoPorPersona($idEsposo);
                                     $listaBautismoEsposa = $objBautismo->FiltrarBautismoPorPersona($idEsposa);
+                                    
                                     if(count($listaBautismoEsposo) == 0){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SEÑOR '.$nombresEsposo.' NO CUENTA COMO BAUTIZADO EN EL SISTEMA</div>';
                                     }else if(count($listaBautismoEsposa) == 0){
                                         $mensaje = '<div class="alert alert-danger text-center" role="alert">LA SEÑORITA '.$nombresEsposa.' NO CUENTA COMO BAUTIZADA EN EL SISTEMA</div>';
+                                    }else  if(count($objConfirmacion->FiltrarConfirmacionPorBautismo($listaBautismoEsposo[0]['idBautismo'])) == 0){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">EL SEÑOR '.$nombresEsposo.' NO CUENTA COMO CONFIRMADO EN EL SISTEMA</div>';
+                                    }else if(count($objConfirmacion->FiltrarConfirmacionPorBautismo($listaBautismoEsposa[0]['idBautismo'])) == 0){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">LA SEÑORITA '.$nombresEsposa.' NO CUENTA COMO CONFIRMADO EN EL SISTEMA</div>';
                                     }else{
                                         $listaMatrimonioEsposoEsposa = $objMatrimonio->FiltrarMatrimonioPorEsposoEsposa($idEsposo, $idEsposa);
                                         $tabla = '';

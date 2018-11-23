@@ -91,6 +91,7 @@ return array(
             'Nel\Controller\CargosAdministrativos' => 'Nel\Controller\CargosAdministrativosController',
             'Nel\Controller\CertificadosCursos' => 'Nel\Controller\CertificadosCursosController',
             'Nel\Controller\Confirmacion' => 'Nel\Controller\ConfirmacionController',
+            'Nel\Controller\Defuncion' => 'Nel\Controller\DefuncionController',
         ),
     ),
     'view_manager' => array(

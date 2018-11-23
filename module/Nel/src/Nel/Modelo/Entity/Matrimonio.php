@@ -54,6 +54,13 @@ class Matrimonio extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatrimonioPorEsposa('{$idEsposa}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+     public function FiltrarMatrimonioPorPersona($idPersona){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarMatrimonioPorPersona('{$idPersona}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
+    
+    
 ////    
 ////    
     public function FiltrarMatrimonioPorNumeroActaMatrimonial($actaMatrimonial){

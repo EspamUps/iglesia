@@ -34,6 +34,49 @@ class AdministradorController extends AbstractActionController
 {
     public $dbAdapter;
     
+    public function defuncionAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }
+        else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $objPersonas = new Persona($this->dbAdapter);
+            $objMetodos = new Metodos();
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 21);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else{
+                
+                $objMetodosC = new MetodosControladores();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 21, 3);
+                if($validarprivilegio == TRUE){
+                    $listaPersonas = $objPersonas->ObtenerPersonas();
+                    $optionPersona ='';
+                    foreach ($listaPersonas as $value){
+                        $optionPersona = $optionPersona.'<option value="'.$value['primerApellido'].' '.$value['segundoApellido'].' '.$value['primerNombre'].' '.$value['segundoNombre'].'"></option>';
+                    }
+                    $array = array(
+                        'validacionPrivilegio' =>  $validarprivilegio,
+                        'optionPersona'=>$optionPersona,
+                    );
+                }else{
+                    $array = array(
+                        'validacionPrivilegio' =>  $validarprivilegio
+                    );
+                }
+                
+            }
+            
+        }
+        return new ViewModel($array);
+    }
+    
     public function confirmacionAction()
     {
         $this->layout("layout/administrador");

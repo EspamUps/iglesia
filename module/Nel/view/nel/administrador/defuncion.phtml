@@ -1,13 +1,13 @@
 <?php
 $validacionPrivilegio = $this->validacionPrivilegio;
-// include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/confirmacion/obtenerdireccionesselect.php');
- include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/confirmacion/confirmacion.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/defuncion/obtenerdireccionesselect.php');
+ include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/defuncion/defuncion.php');
  ?>
 <div class="content-wrapper" style="min-height: 1123px;">
     <br><br>
     <section class="content-header">
         <h1>
-            CONFIRMACIÓN
+            DEFUNCIÓN
             <small>SWGP</small>
         </h1>
     </section>
@@ -15,17 +15,15 @@ $validacionPrivilegio = $this->validacionPrivilegio;
         if($validacionPrivilegio==true)
         {
             $optionPersona = $this->optionPersona;
-            $optionHombres = $this->optionHombres;
-            $optionMujeres = $this->optionMujeres;
         ?>
     <section class="content">
         <div class="box-body nav-tabs-custom">
             <div class="row ">
                 <div class="col-lg-12 ">
-                    <div id="mensajeFormIngresarConfirmacion"> </div>
-                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoConfirmacion(this)" method="post" action="<?php echo $this->basePath()?>/confirmacion/ingresarconfirmacion" id="formIngresarConfirmacion">
+                    <div id="mensajeFormIngresarDefuncion"> </div>
+                    <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoDefuncion(this)" method="post" action="<?php echo $this->basePath()?>/defuncion/ingresardefuncion" id="formIngresarDefuncion">
                         <div class="col-lg-6 form-group">
-                            <label for="nombres">APELLIDOS Y NOMBRES CONFIRMADO</label>
+                            <label for="nombres">APELLIDOS Y NOMBRES</label>
                             <input onchange="$('#contenedorRestoDelFormulario').html('');" list="buscado" id="nombres" autocomplete="off" name="nombres" type="text" class="form-control" placeholder="Buscar">
                             <datalist id="buscado">
                                 <?php echo $optionPersona; ?>
@@ -54,8 +52,8 @@ $validacionPrivilegio = $this->validacionPrivilegio;
         <div class="box-body nav-tabs-custom">
             <div class="row ">
                 <div class="col-lg-12 ">
-                    <div id="mensajeTablaConfirmacion"> </div>
-                    <div id="contenedorTablaConfirmacion"></div>
+                    <div id="mensajeTablaDefuncion"> </div>
+                    <div id="contenedorTablaDefuncion"></div>
                 </div>
             </div>
         </div>
@@ -66,8 +64,8 @@ $validacionPrivilegio = $this->validacionPrivilegio;
 
 <script type="text/javascript">  
 $(document).ready(function(){
-    cargandoConfirmacion("#contenedorTablaConfirmacion");
-   obtenerConfirmaciones(); 
+    cargandoDefuncion("#contenedorTablaDefuncion");
+   obtenerDefuncion(); 
 });
 
 
