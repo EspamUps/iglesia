@@ -28,6 +28,7 @@ use Nel\Modelo\Entity\ConfigurarParroquiaCanton;
 use Nel\Modelo\Entity\ConfigurarCantonProvincia;
 use Nel\Modelo\Entity\Sacerdotes;
 use Nel\Modelo\Entity\Docentes;
+use Nel\Modelo\Entity\Defuncion;
 use Nel\Modelo\Entity\Administrativos;
 use Nel\Modelo\Entity\Bautismo;
 use Zend\Session\Container;
@@ -570,6 +571,7 @@ class PersonaController extends AbstractActionController
         $objDocente = new Docentes($adaptador);
         $objBautismo = new Bautismo($adaptador);
         $objAdministrativo = new Administrativos($adaptador);
+        $objDifuncion = new Defuncion($adaptador);
         
         $objMetodos = new Metodos();
         ini_set('date.timezone','America/Bogota'); 
@@ -615,9 +617,17 @@ class PersonaController extends AbstractActionController
             $nombres = $value['primerNombre'].' '.$value['segundoNombre'];
             $apellidos = $value['primerApellido'].' '.$value['segundoApellido'];
             $fechaRegistro = $objMetodos->obtenerFechaEnLetra($value['fechaRegistro']);
-            $fechaNacimiento2 = new \DateTime($value['fechaNacimiento']);
+            
+            $listaDefuncion = $objDifuncion->FiltrarDefuncionPorPersona($value['idPersona']);
             $fechaActual = new \DateTime(date("d-m-Y"));
+            $fechaFallecimiento = '';
+            if(count($listaDefuncion) > 0){
+                $fechaActual = new \DateTime( $listaDefuncion[0]['fechaFallecimiento']);
+                $fechaFallecimiento = $listaDefuncion[0]['fechaFallecimiento'];
+            }
+            $fechaNacimiento2 = new \DateTime($value['fechaNacimiento']);
             $diff = $fechaActual->diff($fechaNacimiento2);
+            $edad = $diff->y;
             $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($value['fechaNacimiento']);
              $botones = $botonEliminarPersona .' '.$botonModificar;  
              
@@ -629,7 +639,8 @@ class PersonaController extends AbstractActionController
                 'nombres'=>$nombres,
                 'apellidos'=>$apellidos,
                 'fechaNacimiento'=>$fechaNacimiento,
-                'edad'=>$diff->y,
+                'fechaFallecimiento'=>$fechaFallecimiento,
+                'edad'=>$edad,
                 'numeroTelefono'=>$numeroTelefono,
                 'botonVerDireccion'=>$botonDireccion,
                 'fechaRegistro'=>$fechaRegistro,

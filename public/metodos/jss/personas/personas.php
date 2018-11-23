@@ -293,6 +293,10 @@ function obtenerPersonas(){
                             data: 'fechaNacimiento'
                         },
                         {
+                            title: 'FECHA DE FALLECIDO',
+                            data: 'fechaFallecimiento'
+                        },
+                        {
                             title: 'EDAD',
                             data: 'edad'
                         },
