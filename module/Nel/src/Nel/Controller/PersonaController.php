@@ -508,11 +508,8 @@ class PersonaController extends AbstractActionController
                                     }
                                     $mensaje = '';
                                     $validar = TRUE;
-                                    return new JsonModel(array('val'=>$validarprivilegio,'mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
-
-        //                               
+                                    return new JsonModel(array('val'=>$validarprivilegio,'mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));       
                                 }
-                            
                         }
                     }
 
