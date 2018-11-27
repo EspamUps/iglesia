@@ -90,7 +90,7 @@ class DefuncionController extends AbstractActionController
                         $folioRegistroCivil = strtoupper(trim($post['folioRegistroCivil']));
                         $actaRegistroCivil = strtoupper(trim($post['actaRegistroCivil']));
                         $fechaInscripcionRegistroCivil = $post['fechaInscripcionRegistroCivil'];
-                        
+                        $cantidadHijos = $post['cantidadHijos'];
                         $anoEclesiastico = trim($post['anoEclesiastico']);
                         $tomoEclesiastico = strtoupper(trim($post['tomoEclesiastico']));
                         $folioEclesiastico = strtoupper(trim($post['folioEclesiastico']));
@@ -119,6 +119,8 @@ class DefuncionController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LOS APELLIDOS Y NOMBRES DEL CONYUGUE MÁXIMO 200 CARACTERES</div>';
                         }else  if(($post['estadoCivil'] != "2" && (!isset($post['casadoEclesiastico']))) && (!empty ($nombreConyugue))){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">SI LA PERSONA NO ESTUVO CASADA DEJE EL CAMPO DE CONYUGUE VACÍO</div>';
+                        }else if(!is_numeric ($cantidadHijos) || strlen($cantidadHijos) > 4){
+                            $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE LA CANITDAD DE HIJOS (SI NO TIENE INGRESE EL 0)</div>';
                         }else if(!is_numeric ($anoRegistroCivil) || strlen($anoRegistroCivil) > 4){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">INGRESE EL AÑO DEL REGISTRO CIVIL 4 DÍGITOS</div>';
                         }else if(empty ($tomoRegistroCivil)){
@@ -214,7 +216,7 @@ class DefuncionController extends AbstractActionController
 
                                                     $resultado = $objDefuncion->IngresarDefuncion($idPersona, $estadoCivil, $nacionalidad, 
                                                             $fechaFallecimiento,$idConfigurarParroquiaCanton, $causaMuerte, $sacramentoDefuncion, 
-                                                            $nombresPadre, $nombreMadre,$nombreConyugue, $casadoEcleciastico, 
+                                                            $nombresPadre, $nombreMadre,$nombreConyugue,$cantidadHijos, $casadoEcleciastico, 
                                                             $anoRegistroCivil, $tomoRegistroCivil, $folioRegistroCivil,$actaRegistroCivil, $fechaInscripcionRegistroCivil, 
                                                             $anoEclesiastico, $tomoEclesiastico, $folioEclesiastico,$actaEclesiastico, $fechaInscripcionEclesiastico, 
                                                             $idSacerdote, $idLugarMisa, $fechaSubida);
@@ -456,8 +458,12 @@ class DefuncionController extends AbstractActionController
                                                     
                                                             $nombrePadre.
                                                             $nombreMadre.
-                                                            $nombreConyugue
-                                                    .'</div>
+                                                            '<div class="col-lg-8">'.$nombreConyugue.'</div>
+                                                            <div class="col-lg-4">
+                                                                <label for="cantidadHijos">CANT. HIJOS</label>
+                                                                <input class="form-control" type="number" value="0" step="1"  name="cantidadHijos" id="cantidadHijos">
+                                                            </div>
+                                                    </div>
                                                     <div class="form-group col-lg-6">
                                                         '.$selectProvincias.'
                                                     </div>
@@ -534,10 +540,28 @@ class DefuncionController extends AbstractActionController
 //                                            
                                             $causaMuerte =  $listaDefuncion[0]['causaMuerte'];
                                             
+                                            $auxiliosEspirituales = "SI";
+                                            if($listaDefuncion[0]['sacramentoDefuncion'] == 0){
+                                                $auxiliosEspirituales = "NO";
+                                            }
+                                            
+                                            $estadoEclesiastico = 'SI';
+                                            if($listaDefuncion[0]['casadoEcleciastico'] == 0){
+                                                $estadoEclesiastico = 'NO';
+                                            }
+                                            
+                                            $cantidadHijos = $listaDefuncion[0]['cantidadHijos'];
+                                            
                                                 $tablaDerecha = '<p style="text-align: justify; line-height: 30px;font-size:15px">En el día '.$fechaFallecimiento.' falleció <b>'.$nombres.'</b>'
-                                                        . ' a los <b>'.$edad.'</b> años de edad, de nacionalidad <b>'.$nacionalidad.'</b>.<br>
-                                                         Causa de su muerte: <b>'.$causaMuerte.'</b>.<br> Hijo(a) de <b>'.$padre.'</b> y <b>'.$madre.'.</b>'.$conyugue.' 
+                                                        . ' a los <b>'.$edad.'</b> años de edad, de nacionalidad <b>'.$nacionalidad.'</b>, <br>
+                                                        Hijo(a) de <b>'.$padre.'</b> y <b>'.$madre.'.</b>'.$conyugue.' <br>
+                                                        Causa del deceso: <b>'.$causaMuerte.'</b>
                                                     </p> 
+                                                    
+                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Auxilios espirituales: <b>'.$auxiliosEspirituales.'</b>
+                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Estado Civil: <b>'. $listaDefuncion[0]['estadoCivil'].'</b>
+                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Matrimonio Eclesiástico: <b>'.$estadoEclesiastico.'</b>
+                                                        <p style="text-align: justify; line-height: 30px;font-size:15px"> Cantidad de hijos: <b>'.$cantidadHijos.'</b>
                                                     <p style="text-align: justify; line-height: 30px;font-size:15px"> Celebró la misa el Sacerdote <b>'.$nombresSacerdote.'</b>
                                                     </p>';
                                             $tablaCaabecera = '<table class="table" style="width:100%">
@@ -557,7 +581,7 @@ class DefuncionController extends AbstractActionController
                                                         </thead>
                                                     </table>';
                                             
-//
+
                                             $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
                                                 <thead>
                                                     <tr> 
@@ -602,7 +626,7 @@ class DefuncionController extends AbstractActionController
                                                     </tr> 
                                                 </thead>
                                             </table>';
-                                            $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br><br><br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br><br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
+                                            $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
                                             $mensaje = '';
                                             $validar = TRUE;
                                         }

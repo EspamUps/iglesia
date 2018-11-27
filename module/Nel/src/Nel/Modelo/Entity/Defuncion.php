@@ -29,7 +29,7 @@ class Defuncion extends TableGateway
     }
     public function IngresarDefuncion($idPersona, $estadoCivil, $nacionalidad,
     $fechaFallecimiento,$idConfigurarParroquiaCanton, $causaMuerte, $sacramentoDefuncion, 
-    $nombrePadre, $nombreMadre,$nombreConyuge,$casadoEcleciastico,
+    $nombrePadre, $nombreMadre,$nombreConyuge,$cantidadHijos,$casadoEcleciastico,
     $anoRegistroCivil, $tomoRegistroCivil, $folioRegistroCivil, $actaRegistroCivil, $fechaInscripcionRegistroCivil, 
     $anoEclesiastico, $tomoEclesiastico, $folioEclesiastico, $actaEclesiastico, $fechaInscripcionEclesiastico,
     $idSacerdote,$idLugar, $fechaRegistro){
@@ -37,7 +37,7 @@ class Defuncion extends TableGateway
         
         $resultado = $this->getAdapter()->query("CALL Sp_IngresarDefuncion('{$idPersona}','{$estadoCivil}','{$nacionalidad}',
         '{$fechaFallecimiento}','{$idConfigurarParroquiaCanton}','{$causaMuerte}','{$sacramentoDefuncion}',
-        '{$nombrePadre}','{$nombreMadre}','{$nombreConyuge}','{$casadoEcleciastico}',
+        '{$nombrePadre}','{$nombreMadre}','{$nombreConyuge}','{$cantidadHijos}','{$casadoEcleciastico}',
         '{$anoRegistroCivil}','{$tomoRegistroCivil}','{$folioRegistroCivil}','{$actaRegistroCivil}','{$fechaInscripcionRegistroCivil}',
         '{$anoEclesiastico}','{$tomoEclesiastico}','{$folioEclesiastico}','{$actaEclesiastico}','{$fechaInscripcionEclesiastico}',
         '{$idSacerdote}','{$idLugar}','{$fechaRegistro}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
