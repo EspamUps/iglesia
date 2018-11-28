@@ -99,6 +99,7 @@ class DefuncionController extends AbstractActionController
                         
                         $idLugarMisaEncriptado = $post['lugarMisa'];
                         $idSacerdoteEncriptado = $post['selectSacerdote'];
+                       
                         if(empty ($idPersonaEncriptado) || $idPersonaEncriptado == NULL ){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE ENCUENTRA EL ÍNDICE DE LA PERSONA</div>';
                         }else if(empty($post['estadoCivil'])){
@@ -156,11 +157,11 @@ class DefuncionController extends AbstractActionController
                                 if(count($listaDefuncion) > 0){
                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA YA TIENE LA DEFUNCIÓN POR FAVOR RECARGUE LA PÁGINA</div>';
                                 }else{
-                                    $estadoCivil ='SOLTERO';
+                                    $estadoCivil ='SOLTERO(A)';
                                     if($post['estadoCivil'] == "2"){
-                                        $estadoCivil ='CASADO';
+                                        $estadoCivil ='CASADO(A)';
                                     }else if($post['estadoCivil'] == "3"){
-                                        $estadoCivil ='DIVORCIADO';
+                                        $estadoCivil ='DIVORCIADO(A)';
                                     }else if($post['estadoCivil'] == "4"){
                                         $estadoCivil ='UNIÓN LIBRE';
                                     }
@@ -286,6 +287,7 @@ class DefuncionController extends AbstractActionController
                     );
                      $nombres = strtoupper(trim($post['nombres']));
                      $fechaNacimiento = $post['fechaNacimiento'];
+                      $sinRequisitos = $post['sinRequisitos'];
                     if(empty ($nombres)){
                         $mensaje = '';
                     }else if(empty ($fechaNacimiento)){
@@ -298,21 +300,18 @@ class DefuncionController extends AbstractActionController
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">POR FAVOR INGRESE LOS DATOS CORRECTAMENTE O EXISTE MÁS DE UNA PERSONA CON LOS MISMOS NOMBRES APELLIDOS Y FECHA DE NACIMIENTO</div>';
                         }else if($listaPersona[0]['estadoPersona'] == FALSE){
                             $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA HA SIDO DESHABILITADA POR LO TANTO NO PUEDE SER UTILIZADA HASTA QUE SEA HABILITADA</div>';
-                        } else{
-                            
+                        }else{
                             $idPersona = $listaPersona[0]['idPersona'];
-                            $listaBautismo = $objBautismo->FiltrarBautismoPorPersona($idPersona);
-                            if(count($listaBautismo) == 0){
-                                $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA NO HA SIDO BAUTIZADA POR LO TANTO NO PUEDE RECIBIR EL SACRAMENTO DE LA DEFUNCIÓN</div>';
-                            }else{
-                                $idBautismo = $listaBautismo[0]['idBautismo'];
-                                $listaConfirmacion = $objConfirmacion->FiltrarConfirmacionPorBautismo($idBautismo);
-                                if(count($listaConfirmacion) == 0){
-                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA NO HA SIDO CONFIRMADA POR LO TANTO NO PUEDE RECIBIR EL SACRAMENTO DE LA DEFUNCIÓN</div>';
+                            $tabla = '';
+                            $listaDefuncion = $objDefuncion->FiltrarDefuncionPorPersona($idPersona);
+                            if(count($listaDefuncion) == 0){
+                                 $listaBautismo = $objBautismo->FiltrarBautismoPorPersona($idPersona);
+                                if($sinRequisitos == "1" && count($listaBautismo) == 0){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA NO HA SIDO BAUTIZADA POR LO TANTO NO PUEDE RECIBIR EL SACRAMENTO DE LA DEFUNCIÓN</div>';
                                 }else{
-                                    $tabla = '';
-                                    $listaDefuncion = $objDefuncion->FiltrarDefuncionPorPersona($idPersona);
-                                    if(count($listaDefuncion) == 0){
+                                    if($sinRequisitos == "1" && count($objConfirmacion->FiltrarConfirmacionPorBautismo($listaBautismo[0]['idBautismo'])) == 0){
+                                        $mensaje = '<div class="alert alert-danger text-center" role="alert">ESTA PERSONA NO HA SIDO CONFIRMADA POR LO TANTO NO PUEDE RECIBIR EL SACRAMENTO DE LA DEFUNCIÓN</div>';
+                                    }else{
                                         $objMetodosC = new MetodosControladores();
                                         $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 21, 3);
                                         if ($validarprivilegio==false)
@@ -325,7 +324,7 @@ class DefuncionController extends AbstractActionController
                                             $idPersonaEncriptado = $objMetodos->encriptar($listaPersona[0]['idPersona']);
                                             $botonGuardar = '<button data-loading-text="GUARDANDO..." id="btnGuardarDefuncion" type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i>GUARDAR</button>';
                                             $botonCancelar = '<button id="btnCancelar" onclick="limpiarFormularioDefuncion();" type="button" class="btn btn-danger pull-right"><i class="fa fa-times"></i>CANCELAR</button>';
-                                            
+
                                             $checkCasadoEclesiastico = '<h6><b>CASADO ECLESIÁSTICO</b></h6><input style="width:35px;height:18px; cursor: pointer;" type="checkbox" name="casadoEclesiastico" value="5">';
                                             $checkSacramentoDefuncion = '<h6><b>RECIBIÓ EL SACRAMENTO DE DEFUNCIÓN</b></h6><input style="width:35px;height:18px; cursor: pointer;" type="checkbox" name="sacramentoDefuncion" value="4">';
                                             $listaMatrimonio = $objMatrimonio->FiltrarMatrimonioPorPersona($idPersona);
@@ -343,7 +342,7 @@ class DefuncionController extends AbstractActionController
                                                 }
                                                 $nombreConyugue = '<label for="nombreConyugue">NOMBRES DEL CONYUGUE</label><input type="text" name="nombreConyugue" id="nombreConyugue" class="form-control" value="'.$nombresC.'">';
                                             }
-                                            
+
                                             $estadoCivil = '<div class="col-lg-2"><h6><b>SOLTERO</b></h6><input style="width:35px;height:18px; cursor: pointer;" type="radio" name="estadoCivil" value="1"></div> 
                                                     <div class="col-lg-2"><h6><b>CASADO</b></h6><input style="width:35px;height:18px; cursor: pointer;" type="radio" name="estadoCivil" value="2"></div>
                                                     <div class="col-lg-2"><h6><b>DIVORCIADO</b></h6><input style="width:35px;height:18px; cursor: pointer;" type="radio" name="estadoCivil" value="3"></div>
@@ -362,7 +361,7 @@ class DefuncionController extends AbstractActionController
                                                 $idProvinciaEncriptado = $objMetodos->encriptar($valueProvincias['idProvincia']);
                                                 $optionSelectProvincias = $optionSelectProvincias.'<option value="'.$idProvinciaEncriptado.'">'.$valueProvincias['nombreProvincia'].'</option>';
                                             }
-                                            
+
                                             $selectProvincias = '<h4 class="text-center">LUGAR DE FALLECIMIENTO</h4>
                                                 <label for="selectProvincias">PROVINCIAS</label>
                                                 <select class="form-control" onchange="filtrarCantonesPorProvincia()" id="selectProvincias" name="selectProvincias">
@@ -379,26 +378,32 @@ class DefuncionController extends AbstractActionController
 
                                             $causaMuerte = '<label for="causaMuerte">CAUSA DE LA MUERTE</label>
                                                         <input maxlength="300" type="text" id="causaMuerte" name="causaMuerte" class="form-control"> ';
-                                            
-                                            
-                                            $listaPadresBautismo = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($idBautismo);
+
                                             $nombrePadre = '<label for="nombresPadre">NOMBRES DEL PADRE</label>
                                                         <input maxlength="300" type="text" id="nombresPadre" name="nombresPadre" class="form-control">';
                                             $nombreMadre = '<label for="nombresMadre">NOMBRES DE LA MADRE</label>
                                                         <input maxlength="300" type="text" id="nombresMadre" name="nombresMadre" class="form-control">';
-                                            if(count($listaPadresBautismo) > 0){
-                                                foreach ($listaPadresBautismo as $valuePadresBautismo) {
-                                                    $nombres = $valuePadresBautismo['primerApellido'].' '.$valuePadresBautismo['segundoApellido'].' '.$valuePadresBautismo['primerNombre'].' '.$valuePadresBautismo['segundoNombre'];
-                                                    if($valuePadresBautismo['identificadorTipoPadre'] == 1){
-                                                        $nombrePadre = '<label for="nombresPadre">NOMBRES DEL PADRE</label><input  type="text" name="nombresPadre" id="nombresPadre" class="form-control" value="'.$nombres.'">';
-                                                    }else{
-                                                         $nombreMadre = '<label for="nombresMadre">NOMBRES DE LA MADRE</label><input  type="text" name="nombresMadre" id="nombresPadre" class="form-control" value="'.$nombres.'">';
+
+                                            if($sinRequisitos == "1"){
+                                                $listaPadresBautismo = $objPadresBautismo->FiltrarPadreBautismoPorBautismo($idBautismo);
+                                                if(count($listaPadresBautismo) > 0){
+                                                    foreach ($listaPadresBautismo as $valuePadresBautismo) {
+                                                        $nombres = $valuePadresBautismo['primerApellido'].' '.$valuePadresBautismo['segundoApellido'].' '.$valuePadresBautismo['primerNombre'].' '.$valuePadresBautismo['segundoNombre'];
+                                                        if($valuePadresBautismo['identificadorTipoPadre'] == 1){
+                                                            $nombrePadre = '<label for="nombresPadre">NOMBRES DEL PADRE</label><input  type="text" name="nombresPadre" id="nombresPadre" class="form-control" value="'.$nombres.'">';
+                                                        }else{
+                                                             $nombreMadre = '<label for="nombresMadre">NOMBRES DE LA MADRE</label><input  type="text" name="nombresMadre" id="nombresPadre" class="form-control" value="'.$nombres.'">';
+                                                        }
                                                     }
+
                                                 }
-                                                
                                             }
-                                            
-                                            
+
+
+
+
+
+
                                             $inscripcionRegistroCivil = '<h4 class="text-center">REGISTRO CIVIL</h4>
                                             <label for="anoRegistroCivil">AÑO</label>
                                             <input onkeydown="validarNumeros(\'anoRegistroCivil\');" maxlength="10" autocomplete="off"  type="text" id="anoRegistroCivil" name="anoRegistroCivil" class="form-control">
@@ -410,7 +415,7 @@ class DefuncionController extends AbstractActionController
                                             <input maxlength="10" autocomplete="off"  type="text" id="actaRegistroCivil" name="actaRegistroCivil" class="form-control">
                                             <label for="fechaInscripcionRegistroCivil">FECHA DE INSCRIPCIÓN</label>
                                             <input type="date" class="form-control" id="fechaInscripcionRegistroCivil" name="fechaInscripcionRegistroCivil">';
-                                            
+
                                             $inscripcionEclesiastica = '<h4 class="text-center">REGISTRO ECLESIÁSTICO</h4>
                                             <label for="anoEclesiastico">AÑO</label>
                                             <input onkeydown="validarNumeros(\'anoEclesiastico\');" maxlength="10" autocomplete="off"  type="text" id="anoEclesiastico" name="anoEclesiastico" class="form-control">
@@ -422,10 +427,10 @@ class DefuncionController extends AbstractActionController
                                             <input maxlength="10" autocomplete="off"  type="text" id="actaEclesiastico" name="actaEclesiastico" class="form-control">
                                             <label for="fechaInscripcionEclesiastico">FECHA DE INSCRIPCIÓN</label>
                                             <input type="date" class="form-control" id="fechaInscripcionEclesiastico" name="fechaInscripcionEclesiastico">';
-                                            
-                                            
-                                            
-                                            
+
+
+
+
                                             $listaSacerdote = $objSacerdotes->ObtenerSacerdotesEstado(1); 
                                             $optionSelectSacerdote = '<option value="0">SELECCIONE UN SACERDOTE</option>';
                                             foreach ($listaSacerdote as $valueSacerdote) {
@@ -435,13 +440,13 @@ class DefuncionController extends AbstractActionController
 
                                                 $optionSelectSacerdote =$optionSelectSacerdote.'<option value="'.$idSacerdoteEncriptado.'">'.$nombres.'</option>';
                                             }
-                                            
-                                            
+
+
                                             $selectSacerdote = '<label for="sacerdote">SACERDOTE</label>
                                             <select class="form-control" id="selectSacerdote" name="selectSacerdote">
                                                 '.$optionSelectSacerdote.'
                                             </select>';    
-                                            
+
                                             $listaLugares = $objLugaresMisa->ObtenerObtenerLugaresMisa();
                                             $optionLugares  = '<option value="0">SELECCIONE UNA IGLESIA</option>';
                                             foreach ( $listaLugares as $valuesLugares  ){
@@ -450,12 +455,12 @@ class DefuncionController extends AbstractActionController
                                             }
 
                                             $selectLugares = '<label for="lugarMisa">SELECCIONE LA IGLESIA</label><select class="form-control" id="lugarMisa" name="lugarMisa">'.$optionLugares.'</select>';
-                                            
-                                            
+
+
                                             $tabla = '<div class="form-group col-lg-6">
                                                         <input type="hidden" value="'.$idPersonaEncriptado.'" name="idPersonaEncriptado" id="idPersonaEncriptado">
                                                         <h4 class="text-center">DATOS DE LA FAMILIA</h4>'.
-                                                    
+
                                                             $nombrePadre.
                                                             $nombreMadre.
                                                             '<div class="col-lg-8">'.$nombreConyugue.'</div>
@@ -495,145 +500,146 @@ class DefuncionController extends AbstractActionController
                                                            $checkSacramentoDefuncion.
                                                         '</div>
                                                     </div>
-                                                    
+
                                             <div class="form-group col-lg-12">
                                                 '.$botonCancelar.' '.$botonGuardar.'
                                             </div>';       
                                             $mensaje = '';
                                             $validar = TRUE;
                                         }
-                                    }else{
-                                        $objAdministrativo = new Administrativos($this->dbAdapter);
-                                        $listaAdministrativo = $objAdministrativo->FiltrarAdministrativosPorIdentificadorCargo(1);
-                                        if(count($listaAdministrativo) != 1){
-                                            $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE UN PÁRROCO QUE FIRME EL DOCUMENTO POR FAVOR DIRÍGETE AL MENÚ <b>TALENTO HUMANO->ADMINISTRATIVOS</b>Y AGREGA UN PÁRROCO</div>';
-                                        }else{
-                                            $idDefuncion = $listaDefuncion[0]['idDefuncion'];
-                                            $nombres = $listaDefuncion[0]['primerApellido'].' '.$listaDefuncion[0]['segundoApellido'].' '.$listaDefuncion[0]['primerNombre'].' '.$listaDefuncion[0]['segundoNombre'];
-                                            $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
-                                            $listaLugar = $objLugaresMisa->FiltrarLugaresMisa($listaDefuncion[0]['idLugar']);
-                                            $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
-                                            $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
-                                            $fechaFallecimiento = $objMetodos->obtenerFechaEnLetraSinHora($listaDefuncion[0]['fechaFallecimiento']);
-                                            $listaSacerdote = $objSacerdotes->FiltrarSacerdote($listaDefuncion[0]['idSacerdote']);
-                                            $listaPersonaSacerdote = $objPersona->FiltrarPersona($listaSacerdote[0]['idPersona']);
-                                            $nombresSacerdote = $listaPersonaSacerdote[0]['primerApellido'].' '.$listaPersonaSacerdote[0]['segundoApellido'].' '.$listaPersonaSacerdote[0]['primerNombre'].' '.$listaPersonaSacerdote[0]['segundoNombre'];
-                                            $listaDireccion = $objConfigurarParroquiaCanton->FitrarDireccionesPorConfigurarParroquiaCanton($listaDefuncion[0]['idConfigurarParroquiaCanton']);
-                                            $direccionFallecimiento = $listaDireccion[0]['nombreParroquia'].' - '.$listaDireccion[0]['nombreCanton'].' - '.$listaDireccion[0]['nombreProvincia'];
-                                            $fechaNacimientoR = $fechaNacimiento;
-                                            $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($fechaNacimiento);
-                                            $padre = $listaDefuncion[0]['nombrePadre'];
-                                            $madre = $listaDefuncion[0]['nombreMadre'];
-                                            $nacionalidad = $listaDefuncion[0]['nacionalidad'];
-                                            
-                                            $fechaNacimiento2 = new \DateTime($fechaNacimientoR);
-                                            $fechaFallecimiento2 = new \DateTime($listaDefuncion[0]['fechaFallecimiento']);
-                                            $diff = $fechaFallecimiento2->diff($fechaNacimiento2);
-                                            $edad = $diff->y;
-                                            
-                                            $conyugue = '.';
-                                            
-                                            if($listaDefuncion[0]['nombreConyuge'] != "" && $listaDefuncion[0]['nombreConyuge'] != NULL)
-                                            {
-                                                $conyugue = ' siendo Esposo(a) de <b>'.$listaDefuncion[0]['nombreConyuge'].'.</b>';
-                                            }
-//                                            
-                                            $causaMuerte =  $listaDefuncion[0]['causaMuerte'];
-                                            
-                                            $auxiliosEspirituales = "SI";
-                                            if($listaDefuncion[0]['sacramentoDefuncion'] == 0){
-                                                $auxiliosEspirituales = "NO";
-                                            }
-                                            
-                                            $estadoEclesiastico = 'SI';
-                                            if($listaDefuncion[0]['casadoEcleciastico'] == 0){
-                                                $estadoEclesiastico = 'NO';
-                                            }
-                                            
-                                            $cantidadHijos = $listaDefuncion[0]['cantidadHijos'];
-                                            
-                                                $tablaDerecha = '<p style="text-align: justify; line-height: 30px;font-size:15px">En el día '.$fechaFallecimiento.' falleció <b>'.$nombres.'</b>'
-                                                        . ' a los <b>'.$edad.'</b> años de edad, de nacionalidad <b>'.$nacionalidad.'</b>, <br>
-                                                        Hijo(a) de <b>'.$padre.'</b> y <b>'.$madre.'.</b>'.$conyugue.' <br>
-                                                        Causa del deceso: <b>'.$causaMuerte.'</b>
-                                                    </p> 
-                                                    
-                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Auxilios espirituales: <b>'.$auxiliosEspirituales.'</b>
-                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Estado Civil: <b>'. $listaDefuncion[0]['estadoCivil'].'</b>
-                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Matrimonio Eclesiástico: <b>'.$estadoEclesiastico.'</b>
-                                                        <p style="text-align: justify; line-height: 30px;font-size:15px"> Cantidad de hijos: <b>'.$cantidadHijos.'</b>
-                                                    <p style="text-align: justify; line-height: 30px;font-size:15px"> Celebró la misa el Sacerdote <b>'.$nombresSacerdote.'</b>
-                                                    </p>';
-                                            $tablaCaabecera = '<table class="table" style="width:100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> 
-                                                                    <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-                                                                    <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'<br>'.$direccionIglesia.'</label>
-                                                                    <br> <label>Sistema Web de Gestión Parroquial</label>
-                                                                </th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th> 
-                                                                    <h3>CERTIFICADO DE DEFUNCIÓN</h3>
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                    </table>';
-                                            
-
-                                            $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
-                                                <thead>
-                                                    <tr> 
-                                                        <th colspan="4" >NOMBRE</th>
-                                                    </tr>
-                                                    <tr> 
-                                                        <th colspan="4" >'.$nombres.'</th>
-                                                    </tr>
-                                                    <tr> 
-                                                        <th colspan="2">REGISTRO CIVIL</th>
-                                                        <th colspan="2">REGISTRO ECLESIÁSTICO</th>
-                                                    </tr>
-                                                    <tr> 
-                                                        <th><b>AÑO</b> '.$listaDefuncion[0]['anoRegistroCivil'].'</th>
-                                                        <th><b>TOMO</b> '.$listaDefuncion[0]['tomoRegistroCivil'].'</th>
-                                                        <th><b>AÑO</b> '.$listaDefuncion[0]['anoEclesiastico'].'</th>
-                                                        <th><b>TOMO</b> '.$listaDefuncion[0]['tomoEclesiastico'].'</th>
-
-                                                    </tr>
-                                                     <tr> 
-                                                        <th><b>FOLIO</b> '.$listaDefuncion[0]['folioRegistroCivil'].'</th>
-                                                        <th><b>ACTA</b> '.$listaDefuncion[0]['actaRegistroCivil'].'</th> 
-                                                        <th><b>FOLIO</b> '.$listaDefuncion[0]['folioEclesiastico'].'</th>
-                                                        <th><b>ACTA</b> '.$listaDefuncion[0]['actaEclesiastico'].'</th> 
-                                                    </tr>
-                                                    <tr> 
-                                                        <th>FECHA INSCRIPCIÓN</th>
-                                                        <th> '.$listaDefuncion[0]['fechaInscripcionRegistroCivil'].'</th>
-                                                        <th>FECHA INSCRIPCIÓN</th>
-                                                        <th> '.$listaDefuncion[0]['fechaInscripcionEclesiastico'].'</th>
-                                                    </tr> 
-
-                                                </thead>
-                                            </table>';
-                                            $listaPersonaFirma = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
-                                            $tablaFirma = '<table class="table text-center" style="width:100%" > 
-                                                <thead>
-                                                    <tr> 
-                                                        <th>_________________________________________<br>
-                                                        '.$listaPersonaFirma[0]['primerNombre'].' '.$listaPersonaFirma[0]['segundoNombre'].' '.$listaPersonaFirma[0]['primerApellido'].' '.$listaPersonaFirma[0]['segundoApellido'].'
-                                                        <br>'.$listaAdministrativo[0]['descripcion'].'</th>
-                                                    </tr> 
-                                                </thead>
-                                            </table>';
-                                            $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
-                                            $mensaje = '';
-                                            $validar = TRUE;
-                                        }
                                     }
-                                    return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+                                }
+                            }else{
+                                $objAdministrativo = new Administrativos($this->dbAdapter);
+                                $listaAdministrativo = $objAdministrativo->FiltrarAdministrativosPorIdentificadorCargo(1);
+                                if(count($listaAdministrativo) != 1){
+                                    $mensaje = '<div class="alert alert-danger text-center" role="alert">NO EXISTE UN PÁRROCO QUE FIRME EL DOCUMENTO POR FAVOR DIRÍGETE AL MENÚ <b>TALENTO HUMANO->ADMINISTRATIVOS</b>Y AGREGA UN PÁRROCO</div>';
+                                }else{
+                                    $idDefuncion = $listaDefuncion[0]['idDefuncion'];
+                                    $nombres = $listaDefuncion[0]['primerApellido'].' '.$listaDefuncion[0]['segundoApellido'].' '.$listaDefuncion[0]['primerNombre'].' '.$listaDefuncion[0]['segundoNombre'];
+                                    $nombreIglesia = $sesionUsuario->offsetGet('nombreIglesia');
+                                    $listaLugar = $objLugaresMisa->FiltrarLugaresMisa($listaDefuncion[0]['idLugar']);
+                                    $nombreIglesia2 = $listaLugar[0]['nombreLugar'];
+                                    $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
+                                    $fechaFallecimiento = $objMetodos->obtenerFechaEnLetraSinHora($listaDefuncion[0]['fechaFallecimiento']);
+                                    $listaSacerdote = $objSacerdotes->FiltrarSacerdote($listaDefuncion[0]['idSacerdote']);
+                                    $listaPersonaSacerdote = $objPersona->FiltrarPersona($listaSacerdote[0]['idPersona']);
+                                    $nombresSacerdote = $listaPersonaSacerdote[0]['primerApellido'].' '.$listaPersonaSacerdote[0]['segundoApellido'].' '.$listaPersonaSacerdote[0]['primerNombre'].' '.$listaPersonaSacerdote[0]['segundoNombre'];
+                                    $listaDireccion = $objConfigurarParroquiaCanton->FitrarDireccionesPorConfigurarParroquiaCanton($listaDefuncion[0]['idConfigurarParroquiaCanton']);
+                                    $direccionFallecimiento = $listaDireccion[0]['nombreParroquia'].' - '.$listaDireccion[0]['nombreCanton'].' - '.$listaDireccion[0]['nombreProvincia'];
+                                    $fechaNacimientoR = $fechaNacimiento;
+                                    $fechaNacimiento = $objMetodos->obtenerFechaEnLetraSinHora($fechaNacimiento);
+                                    $padre = $listaDefuncion[0]['nombrePadre'];
+                                    $madre = $listaDefuncion[0]['nombreMadre'];
+                                    $nacionalidad = $listaDefuncion[0]['nacionalidad'];
+
+                                    $fechaNacimiento2 = new \DateTime($fechaNacimientoR);
+                                    $fechaFallecimiento2 = new \DateTime($listaDefuncion[0]['fechaFallecimiento']);
+                                    $diff = $fechaFallecimiento2->diff($fechaNacimiento2);
+                                    $edad = $diff->y;
+
+                                    $conyugue = '<b>.</b>';
+
+                                    if($listaDefuncion[0]['nombreConyuge'] != "" && $listaDefuncion[0]['nombreConyuge'] != NULL)
+                                    {
+                                        $conyugue = ' siendo Esposo(a) de <b>'.$listaDefuncion[0]['nombreConyuge'].'.</b>';
+                                    }
+//                                            
+                                    $causaMuerte =  $listaDefuncion[0]['causaMuerte'];
+
+                                    $auxiliosEspirituales = "SI";
+                                    if($listaDefuncion[0]['sacramentoDefuncion'] == 0){
+                                        $auxiliosEspirituales = "NO";
+                                    }
+
+                                    $estadoEclesiastico = 'SI';
+                                    if($listaDefuncion[0]['casadoEcleciastico'] == 0){
+                                        $estadoEclesiastico = 'NO';
+                                    }
+
+                                    $cantidadHijos = $listaDefuncion[0]['cantidadHijos'];
+
+                                        $tablaDerecha = '<p style="text-align: justify; line-height: 30px;font-size:15px">En el día '.$fechaFallecimiento.' falleció <b>'.$nombres.'</b>'
+                                                . ' a los <b>'.$edad.'</b> años de edad, de nacionalidad <b>'.$nacionalidad.'</b>, <br>
+                                                Hijo(a) de <b>'.$padre.'</b> y <b>'.$madre.'</b>'.$conyugue.' <br>
+                                                Causa del deceso: <b>'.$causaMuerte.'</b>
+                                            </p> 
+
+                                            <p style="text-align: justify; line-height: 30px;font-size:15px"> Auxilios espirituales: <b>'.$auxiliosEspirituales.'</b>
+                                            <p style="text-align: justify; line-height: 30px;font-size:15px"> Estado Civil: <b>'. $listaDefuncion[0]['estadoCivil'].'</b>
+                                            <p style="text-align: justify; line-height: 30px;font-size:15px"> Matrimonio Eclesiástico: <b>'.$estadoEclesiastico.'</b>
+                                                <p style="text-align: justify; line-height: 30px;font-size:15px"> Cantidad de hijos: <b>'.$cantidadHijos.'</b>
+                                            <p style="text-align: justify; line-height: 30px;font-size:15px"> Celebró la misa el Sacerdote <b>'.$nombresSacerdote.'</b>
+                                            </p>';
+                                    $tablaCaabecera = '<table class="table" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th> 
+                                                            <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
+                                                            <br><label style="font-size:24px" class="box-title ">'.$nombreIglesia.'<br>'.$direccionIglesia.'</label>
+                                                            <br> <label>Sistema Web de Gestión Parroquial</label>
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th> 
+                                                            <h3>CERTIFICADO DE DEFUNCIÓN</h3>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                            </table>';
+
+
+                                    $tablaIzquierda = '<table border="1" class="table text-center" style="width:100%" > 
+                                        <thead>
+                                            <tr> 
+                                                <th colspan="4" >NOMBRE</th>
+                                            </tr>
+                                            <tr> 
+                                                <th colspan="4" >'.$nombres.'</th>
+                                            </tr>
+                                            <tr> 
+                                                <th colspan="2">REGISTRO CIVIL</th>
+                                                <th colspan="2">REGISTRO ECLESIÁSTICO</th>
+                                            </tr>
+                                            <tr> 
+                                                <th><b>AÑO</b> '.$listaDefuncion[0]['anoRegistroCivil'].'</th>
+                                                <th><b>TOMO</b> '.$listaDefuncion[0]['tomoRegistroCivil'].'</th>
+                                                <th><b>AÑO</b> '.$listaDefuncion[0]['anoEclesiastico'].'</th>
+                                                <th><b>TOMO</b> '.$listaDefuncion[0]['tomoEclesiastico'].'</th>
+
+                                            </tr>
+                                             <tr> 
+                                                <th><b>FOLIO</b> '.$listaDefuncion[0]['folioRegistroCivil'].'</th>
+                                                <th><b>ACTA</b> '.$listaDefuncion[0]['actaRegistroCivil'].'</th> 
+                                                <th><b>FOLIO</b> '.$listaDefuncion[0]['folioEclesiastico'].'</th>
+                                                <th><b>ACTA</b> '.$listaDefuncion[0]['actaEclesiastico'].'</th> 
+                                            </tr>
+                                            <tr> 
+                                                <th>FECHA INSCRIPCIÓN</th>
+                                                <th> '.$listaDefuncion[0]['fechaInscripcionRegistroCivil'].'</th>
+                                                <th>FECHA INSCRIPCIÓN</th>
+                                                <th> '.$listaDefuncion[0]['fechaInscripcionEclesiastico'].'</th>
+                                            </tr> 
+
+                                        </thead>
+                                    </table>';
+                                    $listaPersonaFirma = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
+                                    $tablaFirma = '<table class="table text-center" style="width:100%" > 
+                                        <thead>
+                                            <tr> 
+                                                <th>_________________________________________<br>
+                                                '.$listaPersonaFirma[0]['primerNombre'].' '.$listaPersonaFirma[0]['segundoNombre'].' '.$listaPersonaFirma[0]['primerApellido'].' '.$listaPersonaFirma[0]['segundoApellido'].'
+                                                <br>'.$listaAdministrativo[0]['descripcion'].'</th>
+                                            </tr> 
+                                        </thead>
+                                    </table>';
+                                    $tabla = '<div class="col-lg-3"></div><div class="col-lg-6"><div id="contenedorImprimirReporte">'.$tablaCaabecera.'<br>'.$tablaDerecha.'<br><br>'.$tablaIzquierda.'<br><br>'.$tablaFirma.'</div></div><div class="col-lg-3"></div><button type="button" onclick="imprimir(\'contenedorImprimirReporte\')" class="btn btn-warning btn-flat pull-right"><i class="fa fa-print"></i>Imprimir</button>';
+                                    $mensaje = '';
+                                    $validar = TRUE;
                                 }
                             }
+                            return new JsonModel(array('mensaje'=>$mensaje,'validar'=>$validar,'tabla'=>$tabla));
+
                         }
                         
                     }

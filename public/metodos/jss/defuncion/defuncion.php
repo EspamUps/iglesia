@@ -15,11 +15,16 @@ function filtrarPersonaPorNombres(){
         var url = $("#rutaBase").text();
         var nombres = $("#nombres").val();
         var fechaNacimiento = $("#fechaNacimiento").val();
+        var sinRequisitos = 1;
+        if($('#sinRequisitos').is(':checked') ) {
+            sinRequisitos = 2;
+        }
+
         $.ajax({
             url : url+'/defuncion/filtrarpersonapornombres',
             type: 'post',
             dataType: 'JSON',
-            data: {nombres:nombres,fechaNacimiento:fechaNacimiento},
+            data: {nombres:nombres,fechaNacimiento:fechaNacimiento,sinRequisitos:sinRequisitos},
             beforeSend: function(){
                 cargandoDefuncion("#contenedorRestoDelFormulario");
                 $("#mensajeFormIngresarDefuncion").html('');
