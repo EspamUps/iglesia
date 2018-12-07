@@ -214,7 +214,8 @@ class InicioController extends AbstractActionController
                                         </ul>
                                       </li>';
                                 }
-                                $menu_slide='<ul class="sidebar-menu">'.$menuTTHH.$submenu_slide.$menuMisas.$menuCatesismo.$menuCertificados.' <li>
+                                $menu_slide='<ul class="sidebar-menu">
+                                   '.$menuTTHH.$submenu_slide.$menuMisas.$menuCatesismo.$menuCertificados.' <li>
                                         <a  href="'.$this->getRequest()->getBaseUrl().'/inicio/salir" ><i class="fa fa-sign-out"></i><span>SALIR</span></a>
                                     </li></ul>';
                                 

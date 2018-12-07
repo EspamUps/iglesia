@@ -34,6 +34,9 @@ class AdministradorController extends AbstractActionController
 {
     public $dbAdapter;
     
+
+    
+    
     public function defuncionAction()
     {
         $this->layout("layout/administrador");
