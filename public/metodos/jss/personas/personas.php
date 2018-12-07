@@ -214,7 +214,7 @@ function seleccionarFila(ID)
     menues2.removeAttr("style");
     menues2.css({ 'cursor': 'pointer' });
     $("#filaTablaPersonas" + ID + " td").removeAttr("style");
-    $("#filaTablaPersonas" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
+    $("#filaTablaPersonas" + ID + " td").css({ 'background-color': 'black', 'color': 'white', 'cursor': 'pointer' });
 }
 
 function cargandoPersonas(contenedor){
@@ -261,9 +261,11 @@ function obtenerPersonas(){
                            },
                         },
                         {
-                           'targets': 6,
+                           'targets': 7,
                            'createdCell':  function (td, cellData, rowData, row, col) {
                                 $(td).attr('id','telefonoPersona'+row); 
+                                $(td).attr('title','Haga click para modificar el teléfono');
+                                
                                 $(td).attr('onclick','obtenerTelefonoModal('+row+','+rowData._j+',\''+rowData._idPersonaEncriptado+'\')'); 
                                 $(td).attr('data-target','#modalModificarTelefono'); 
                                 $(td).attr('data-toggle','modal'); 
