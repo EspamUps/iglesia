@@ -29,8 +29,7 @@ use Nel\Modelo\Entity\AdjuntoMatricula;
 use Nel\Modelo\Entity\HorarioCurso;
 use Nel\Modelo\Entity\ConfigurarCurso;
 use Nel\Modelo\Entity\NombreIglesia;
-use Nel\Modelo\Entity\DireccionIglesia;
-use Nel\Modelo\Entity\CargosAdministrativos;
+use Nel\Modelo\Entity\TipoAdjunto;
 use Nel\Modelo\Entity\Administrativos;
 use Zend\Session\Container;
 use Zend\Crypt\Password\Bcrypt;
@@ -974,6 +973,7 @@ class MatriculasController extends AbstractActionController
                         $objMetodos = new Metodos();
                         $objMatricula = new Matricula($this->dbAdapter);     
                         $objAdjunto = new Adjunto($this->dbAdapter);
+                        $objTipoAdjunto = new TipoAdjunto($this->dbAdapter);
                         $objAdjuntoMatricula = new AdjuntoMatricula($this->dbAdapter);
                         $objConfigurarCurso = new ConfigurarCurso($this->dbAdapter);
                         $post = array_merge_recursive(
@@ -1030,7 +1030,8 @@ class MatriculasController extends AbstractActionController
                                                     $resultado3 =$objAdjunto->ModificarEstadoAdjunto($resultado[0]['idAdjunto'], 0);
                                                     $mensaje = '<div class="alert alert-danger text-center" role="alert">NO SE MODIFICÓ EL ESTADO, POR FAVOR INTENTE MÁS TARDE</div>';
                                                 }else{
-                                                    $resAdjuntoMatricula = $objAdjuntoMatricula->IngresarAdjuntoMatricula($idAdjunto, $idMatricula, 2, 1);
+                                                    $tipoAdjunto = $objTipoAdjunto->FiltrarTipoAdjuntoPorIdentificador(2);
+                                                    $resAdjuntoMatricula = $objAdjuntoMatricula->IngresarAdjuntoMatricula($idAdjunto, $idMatricula, $tipoAdjunto[0]['idTipoAdjunto'], 1);
                                                     if(count($resAdjuntoMatricula)==0)
                                                     {
                                                         unlink($src);
