@@ -38,7 +38,10 @@ class FechaAsistencia extends TableGateway
         return $resultado;
     }
     
- 
+    public function FiltrarFechaAsistenciaPorFecha($fechaAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarFechaAsistenciaPorFecha('{$fechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
     
     
 

@@ -228,9 +228,14 @@ class ConfigurarCursoController extends AbstractActionController
             {
                 if($valueDiaHorarioR['identificadorDia']==$numeroDia)
                     {
-                    $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
-                    $idFechaAsistencia = $resultado[0]['idFechaAsistencia'];
-                    $this->generarasistenciascompletasAction($listaMatriculadosEnElCurso,$idFechaAsistencia,$objAsistencia);
+                        $fechaAsistenciaResult = $objFechaAsistencia->FiltrarFechaAsistenciaPorFecha($i);
+                        if(count($fechaAsistenciaResult)==0)
+                        {
+                            $resultado = $objFechaAsistencia->IngresarFechasAsistencia ($idConfigurarCurso, $i, 1);
+                            $idFechaAsistencia = $resultado[0]['idFechaAsistencia'];
+                            $this->generarasistenciascompletasAction($listaMatriculadosEnElCurso,$idFechaAsistencia,$objAsistencia);
+
+                        }
                     }
                 }
         }
