@@ -540,8 +540,11 @@ class CertificadosCursosController extends AbstractActionController
                             <br>'.$listaAdministrativo[0]['descripcion'].'</th>
                              </tr>';
             }
-         
-	
+        ini_set('date.timezone','America/Bogota'); 
+        $hoy = getdate();
+        $mes =date("m");
+	$fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
+        $hoy= date("F j, Y");    
         
         $tabla = '<br><br><br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
@@ -552,56 +555,15 @@ class CertificadosCursosController extends AbstractActionController
             <hr>
             <div class="box-body text-center"   >
               <!-- Minimal style -->
-              <h3  style="text-align:center; width:100%; color:#265c7b" ><b>CERTIFICADO DE APROBACIÓN</b></h3>
-
-               <div class="col-lg-1"></div>
-                <div class="col-lg-10">
-              <table style="text-align:center;width:100%;" class="table" >
-              <tbody>
-                <tr>
-                    <td><b>Código de matrícula:</b></td>
-                    <td style="text-align:left;">'.$resultado[0]['idMatricula'].' </td>
-                 </tr>
-                <tr>
-                    <td><b>Estudiante:</b></td>
-                    <td style="text-align:left;">'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
-                </tr>
-                <tr>
-                    <td><b>Cédula de ciudadanía:</b></td>
-                    <td style="text-align:left;">'.$resultado[0]['identificacion'].' </td>
-                 </tr>
-                  <tr>
-                    <td><b>Periodo lectivo:</b></td>
-                    <td style="text-align:left;">'.$listaPeriodo[0]['nombrePeriodo'].' </td>
-                 </tr>
-               
-                 <tr>
-                    <td><b>Nombre del curso:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
-                 </tr>
-                 <tr>
-                    <td><b>Nivel del curso:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
-                 </tr>
-                <tr>
-                    <td><b>Docente:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
-                 </tr>
-                 
-                  <tr>
-                    <td><b>Fecha de inicio de clases:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaInicio'].' </td>
-                 </tr>
-                  <tr>
-                    <td><b>Fecha de fin de clases:</b></td>
-                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaFin'].' </td>
-                 </tr>
-
-               </tbody>
-               </table>
-               </div>
-                <div class="col-lg-1"></div>
- 
+              <br><br>
+              <h4>Confiere el presente certificado a:</h4>
+              
+              <h3  style="text-align:center; width:100%; color:#265c7b" ><b>'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</b></h3>
+              <h4>Por haber asistido y aprobado el curso de '.$listaConfCurso[0]['nombreCurso'].' que se dictó en esta institución
+                  del '.$listaConfCurso[0]['fechaInicio'].' al '.$listaConfCurso[0]['fechaFin'].'.  </h4>
+               <br><br>
+              <p> Dado en '.$direccionIglesia.' y firmado en el '.$hoy.'</p>
+              
             </div>
             <!-- /.box-body -->
             <div class="box-footer text-center"  style="text-align:center; width:100%">
