@@ -544,7 +544,8 @@ class CertificadosCursosController extends AbstractActionController
         $hoy = getdate();
         $mes =date("m");
 	$fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
-        $hoy= date("F j, Y");    
+         $fechaHoy = $objMetodos->obtenerFechaEnLetraSinHora($fechaActual);
+        
         
         $tabla = '<br><br><br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
@@ -562,7 +563,7 @@ class CertificadosCursosController extends AbstractActionController
               <h4>Por haber asistido y aprobado el curso de '.$listaConfCurso[0]['nombreCurso'].' que se dictó en esta institución
                   del '.$listaConfCurso[0]['fechaInicio'].' al '.$listaConfCurso[0]['fechaFin'].'.  </h4>
                <br><br>
-              <p> Dado en '.$direccionIglesia.' y firmado en el '.$hoy.'</p>
+              <p> Dado y firmado el '.$fechaHoy.'</p>
               
             </div>
             <!-- /.box-body -->
