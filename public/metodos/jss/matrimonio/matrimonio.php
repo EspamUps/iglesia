@@ -58,57 +58,56 @@ function filtrarPersonaPorIdentificacion(event,idDom,contenedor){
         }
     }
 }
-
 function limpiarFormularioMatrimonio()
 {
     $("#contenedorRestoDelFormulario").html('');
     setTimeout(function() {$("#mensajeFormIngresarMatrimonio").html('');},1500);
 }
 function filtrarMatrimonioPorEsposoEsposa(){
-        var url = $("#rutaBase").text();
-        var identificacionEsposo = $("#identificacionEsposo").val();
-        var identificacionEsposa = $("#identificacionEsposa").val();
-        $.ajax({
-            url : url+'/matrimonio/filtrarmatrimonioporesposoyesposa',
-            type: 'post',
-            dataType: 'JSON',
-            data: {identificacionEsposo:identificacionEsposo,identificacionEsposa:identificacionEsposa},
-            beforeSend: function(){
-                cargandoMatrimonio("#contenedorRestoDelFormulario");
-                $("#mensajeFormIngresarMatrimonio").html('');
-                
-            },
-            uploadProgress: function(event,position,total,percentComplete){
-            },
-            success: function(data){  
-                if(data.validar == true){
-                    $("#contenedorRestoDelFormulario").html(data.tabla);
-                }else{
-                    $("#contenedorRestoDelFormulario").html(data.mensaje);
-                }
-                $("#btnBuscarPersona").button('reset');
-            },
-            complete: function(){
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                $("#contenedorRestoDelFormulario").html('');
-                if(xhr.status === 0){
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-                }else if(xhr.status == 404){
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-                }else if(xhr.status == 500){
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-                }else if(errorThrown === 'parsererror'){
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-                }else if(errorThrown === 'timeout'){
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-                }else if(errorThrown === 'abort'){
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-                }else{
-                    $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-                }
+    var url = $("#rutaBase").text();
+    var identificacionEsposo = $("#identificacionEsposo").val();
+    var identificacionEsposa = $("#identificacionEsposa").val();
+    $.ajax({
+        url : url+'/matrimonio/filtrarmatrimonioporesposoyesposa',
+        type: 'post',
+        dataType: 'JSON',
+        data: {identificacionEsposo:identificacionEsposo,identificacionEsposa:identificacionEsposa},
+        beforeSend: function(){
+            cargandoMatrimonio("#contenedorRestoDelFormulario");
+            $("#mensajeFormIngresarMatrimonio").html('');
+
+        },
+        uploadProgress: function(event,position,total,percentComplete){
+        },
+        success: function(data){  
+            if(data.validar == true){
+                $("#contenedorRestoDelFormulario").html(data.tabla);
+            }else{
+                $("#contenedorRestoDelFormulario").html(data.mensaje);
             }
-        }); 
+            $("#btnBuscarPersona").button('reset');
+        },
+        complete: function(){
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#contenedorRestoDelFormulario").html('');
+            if(xhr.status === 0){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
+            }else if(xhr.status == 404){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
+            }else if(xhr.status == 500){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
+            }else if(errorThrown === 'parsererror'){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
+            }else if(errorThrown === 'timeout'){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
+            }else if(errorThrown === 'abort'){
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
+            }else{
+                $("#mensajeFormIngresarMatrimonio").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
+            }
+        }
+    }); 
 }
 function seleccionarFila(ID)
 {
@@ -219,7 +218,6 @@ function obtenerMatrimonios(){
         }
     }); 
 }
-
 $(function(){
     $("#formIngresarMatrimonio").ajaxForm({
         beforeSend: function(){
