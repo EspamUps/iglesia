@@ -435,8 +435,7 @@ class CertificadosCursosController extends AbstractActionController
             
             if($estadoMatricula==1)
             {     
-                $labelEstadoMatricula= '<label style="background-color:#b1ffa1" class="form-control" >Habilitada</label>';   
-
+                
                 if($fechaActual>=$fechaInicioMat && $fechaActual<=$fechaFinMat)
                 $estadoCurso= 'Periodo de matrículas';
                 else if($fechaActual>= $fechaInicioClases && $fechaActual<=$fechaFinClases)
@@ -448,13 +447,15 @@ class CertificadosCursosController extends AbstractActionController
                 {
                     $listaAsistencias = $objAsistencia->FiltrarAsistenciaPorMatricula($idMatricula, 1);
                     $totalAsistencia = count($listaAsistencias);
-                    $asistenciasTrue = 0;
-                    foreach ($listaAsistencias as $valueAsistencia) {
-                        if($valueAsistencia['estadoAsistenciaTomada']==1)
-                        $asistenciasTrue=$asistenciasTrue+1;
+                    if($totalAsistencia>0){
+                        $asistenciasTrue = 0;
+                        foreach ($listaAsistencias as $valueAsistencia) {
+                            if($valueAsistencia['estadoAsistenciaTomada']==1)
+                            $asistenciasTrue=$asistenciasTrue+1;
+                        }
+
+                        $porcentajeAsistenciaTrue=$asistenciasTrue/$totalAsistencia;
                     }
-                    
-                    $porcentajeAsistenciaTrue=$asistenciasTrue/$totalAsistencia;
 
                     if($porcentajeAsistenciaTrue>=$porcentajeAsistenciaPermitido){
                           $botonDescargarCertificadoCurso = '<button  id="btnModificarEstadoMatricula'.$i.'" title="DESCARGAR CERTIFICADO DE CURSO DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-download"></i></button>';
@@ -471,22 +472,22 @@ class CertificadosCursosController extends AbstractActionController
             else
             {
                $estadoCurso ='Reprobado';
-               $labelEstadoMatricula= '<label style="background-color:#ddd" class="form-control"  >Deshabilitada</label>';
-
+              
             }
             
 
             $botones = $botonDescargarCertificadoCurso;
 
-             
+            $porcentaje = round($porcentajeAsistenciaTrue*100,2);
+            $porcentajePresentar = ''.$porcentaje.'%';
             $array1[$i] = array(
                 '_j'=>$j,
                 '_idMatriculaEncriptado'=>$idMatriculaEncriptado,                
                 'identificacion'=>$identificacionEstudiante,
                 'nombres'=>$nombresEstudiante,
                 'apellidos'=>$apellidosEstudiante,
-                'labelestadoMatricula' =>$labelEstadoMatricula,
                 'estadoCurso'=>$estadoCurso,
+                'porcentajeAsistencia'=>$porcentajePresentar,
                 'fechaMatricula'=>$fechaMatricula,
                 'opciones1'=>$botones
             );

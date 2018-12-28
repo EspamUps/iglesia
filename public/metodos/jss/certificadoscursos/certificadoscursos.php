@@ -1,59 +1,6 @@
 <script>
 
 
-function filtrarUsuarioPorIdentificacionEnMatricula(event){
-    var url = $("#rutaBase").text();
-    var identificacion = $("#identificacion").val();
-    var idConfCurso = $("#selectConfigurarCurso").val();
-    if(identificacion.length < 10){
-        $("#mensajeFormIngresoMatricula").html("");
-        $("#contenedorDatosEstudianteParaMatricular").html("");
-        $("#botonMatricular").html("");
-    }else{
-        $.ajax({
-            url : url+'/certificadoscursos/filtrarpersonaporidentificacion',
-            type: 'post',
-            dataType: 'JSON',
-            data: {identificacion:identificacion, idConfCurso:idConfCurso},
-            beforeSend: function(){
-                $("#mensajeFormIngresoMatricula").html('');
-                cargandoMatriculas('#contenedorDatosEstudianteParaMatricular');
-            },
-            uploadProgress: function(event,position,total,percentComplete){
-            },
-            success: function(data){ 
-                if(data.validar == true){
-                  $("#mensajeFormIngresoMatricula").html(data.mensaje);
-                  $("#contenedorDatosEstudianteParaMatricular").html(data.tabla);
-                  $("#botonMatricular").html(data.btnMatricular);
-                }else{
-                    $("#contenedorDatosEstudianteParaMatricular").html('');
-                }
-                $("#mensajeFormIngresoMatricula").html(data.mensaje);
-            },
-            complete: function(){
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                $("#contenedorDatosEstudianteParaMatricular").html('');
-                if(xhr.status === 0){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-                }else if(xhr.status == 404){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-                }else if(xhr.status == 500){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-                }else if(errorThrown === 'parsererror'){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-                }else if(errorThrown === 'timeout'){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-                }else if(errorThrown === 'abort'){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-                }else{
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-                }
-            }
-        }); 
-    }
-}
 function cargandoMatriculas(contenedor){
     var url = $("#rutaBase").text();
     $(contenedor).html('<img style="margin:0 auto 0 auto; text-aling:center; width: 10%;" class="img-responsive" src="'+url+'/public/librerias/images/pagina/cargando.gif">');
@@ -69,60 +16,6 @@ function seleccionarFila(ID)
     $("#filaTablaMatriculas" + ID + " td").removeAttr("style");
     $("#filaTablaMatriculas" + ID + " td").css({ 'background-color': 'black', 'color': 'white' });
 }
-
-function cargarFormularioIngresarMatricula()
-{
-    var url = $("#rutaBase").text();
-    var idConfCurso = $("#selectConfigurarCurso").val();
-
-    if(idConfCurso == 0){
-        $("#contenedorHorarioSeleccionado").html('');
-        $("#contenedorInfoGeneralHorarioSeleccionado").html("");
-    }else{
-        $.ajax({
-            url : url+'/certificadoscursos/cargarformularioingreso',
-            type: 'post',
-            dataType: 'JSON',
-            data: {id:idConfCurso},
-            beforeSend: function(){
-            },
-            uploadProgress: function(event,position,total,percentComplete){
-
-            },
-            success: function(data){ 
-                if(data.validar == true)
-                { 
-                    cargandoMatriculas("#contenedorFormIngresoMatricula");           
-                    $("#contenedorFormIngresoMatricula").html(data.div);
-                               
-                }else{
-                     $("#mensajeFormIngresoMatricula").html(data.mensaje);
-                }
-            },
-            complete: function(){
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                $("#contenedorFormIngresoMatricula").html('');
-                if(xhr.status === 0){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-                }else if(xhr.status == 404){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-                }else if(xhr.status == 500){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-                }else if(errorThrown === 'parsererror'){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-                }else if(errorThrown === 'timeout'){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-                }else if(errorThrown === 'abort'){
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-                }else{
-                    $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-                }
-            }
-        }); 
-    }
-}
-
 
 function obtenerMatriculas(){
     var url = $("#rutaBase").text();
@@ -192,18 +85,14 @@ function obtenerMatriculas(){
                         {
                             title: 'APELLIDOS',
                             data: 'apellidos'
-                        },
-                        {
-                            title: 'FECHA DE MATRICULA',
-                            data: 'fechaMatricula'
-                        },   
+                        },  
                         {
                             title: 'ESTADO CURSO',
                             data: 'estadoCurso'
                         },
                         {
-                            title: 'MATRÍCULA',
-                            data: 'labelestadoMatricula'
+                            title: 'PORCENTAJE ASISTENCIA',
+                            data: 'porcentajeAsistencia'
                         },
                         {
                             title: 'OPC.',
@@ -401,6 +290,8 @@ function filtrarHorarioCursoSeleccionado(){
         $("#mensajeFormIngresoMatricula").html("");
         $("#contenedorFormIngresoMatricula").html("");
         $("#contenedorDatosEstudianteParaMatricular").html("");
+        $("#contenedorInfoGeneralHorarioSeleccionado").html("");
+        $("#contenedorHorarioSeleccionado").html("");  
     }else{
         $.ajax({
             url : url+'/certificadoscursos/filtrardatoshorario',
@@ -454,113 +345,6 @@ function filtrarHorarioCursoSeleccionado(){
         }); 
     }
 } 
-
-function validarIngresoMatricula(f){
-    var _validar = false;
-    if(confirm("¿ESTAS SEGURO DE REGISTRAR ESTA MATRÍCULA?")){
-        _validar = true;
-    }
-    return _validar;
-}
-
-function limpiarFormIngresoMatriculas()
-{
-//    $('input[id="identificacion"]').val('');
-    $("#botonMatricular").html("");
-    $("#contenedorDatosEstudianteParaMatricular").html("");
-    
-    setTimeout(function() {$("#mensajeFormIngresoMatricula").html('');},1500);
-}
-
-$(function(){
-    $("#formIngresoMatricula").ajaxForm({
-        beforeSend: function(){
-            $("#mensajeFormIngresoMatricula").html('');
-            $("#btnGuardarMatricula").button('loading');
-        },
-        uploadProgress: function(event,position,total,percentComplete){
-
-        },
-        success: function(data){
-            if(data.validar==true){
-                limpiarFormIngresoMatriculas();
-                filtrarHorarioCursoSeleccionado();
-                cargarFormularioIngresarMatricula();
-                obtenerMatriculas();
-            }
-            $("#btnGuardarMatricula").button('reset');
-            $("#mensajeFormIngresoMatricula").html(data.mensaje);
-        },
-        complete: function(){
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            $("#btnGuardarMatricula").button('reset');
-            if(xhr.status === 0){
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-            }else if(xhr.status == 404){
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-            }else if(xhr.status == 500){
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-            }else if(errorThrown === 'parsererror'){
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-            }else if(errorThrown === 'timeout'){
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-            }else if(errorThrown === 'abort'){
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-            }else{
-                $("#mensajeFormIngresoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-            }
-        }
-    });    
-}); 
-
-function obtenerFormularioModificarEstadoMatricula(id,i,j){
-    var url = $("#rutaBase").text();
-    $.ajax({
-        url : url+'/certificadoscursos/obtenerFormularioModificarEstadoMatricula',
-        type: 'post',
-        dataType: 'JSON',
-        data: {id:id, i:i,j:j},
-        beforeSend: function(){
-            $("#mensajeModificarEstadoMatricula").html("");
-            
-        },
-        uploadProgress: function(event,position,total,percentComplete){
-        },
-        success: function(data){  
-     
-            if(data.validar == true){
-                $("#contenedorModificarEstadoMatricula").html(data.tabla);
-               
-            }else{
-                $("#contenedorModificarEstadoMatricula").html("");
-            }
-            $("#mensajeModificarEstadoMatricula").html(data.mensaje);
-        },
-        complete: function(){
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            $("#contenedorModificarEstadoMatricula").html("");
-            if(xhr.status === 0){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">NO HAY CONEXIÓN A INTERNET. VERIFICA LA RED</div>');
-            }else if(xhr.status == 404){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR [404]. PÁGINA NO ENCONTRADA</div>');
-            }else if(xhr.status == 500){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">ERROR DEL SERVIDOR [500]</div>');
-            }else if(errorThrown === 'parsererror'){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN JSON HA FALLADO </div>');
-            }else if(errorThrown === 'timeout'){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">TIEMPO DE ESPERA TERMINADO</div>');
-            }else if(errorThrown === 'abort'){
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">LA PETICIÓN AJAX FUE ABORTADA</div>');
-            }else{
-                $("#mensajeModificarEstadoMatricula").html('<div class="alert alert-danger text-center" role="alert">OCURRIÓ UN ERROR INESPERADO</div>');
-            }
-        }
-    }); 
-}
-
-
 
 
 </script>
