@@ -119,6 +119,7 @@ class InicioController extends AbstractActionController
                                             $valueAsignarM['identificadorModulo'] == 12 ||
                                             $valueAsignarM['identificadorModulo'] == 13||
                                             $valueAsignarM['identificadorModulo'] == 14||
+                                             $valueAsignarM['identificadorModulo'] == 19||
                                             $valueAsignarM['identificadorModulo'] == 16){
                                         $subMenuCatesismo=$subMenuCatesismo.'
                                         <li>

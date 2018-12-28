@@ -1,0 +1,101 @@
+<?php
+//estas librerias php son llamadas ya que contienen los metodos ajax para obtener y envias
+//datos al respectivo controlador
+$optionPeriodo = $this->optionPeriodo;
+include ($_SERVER['DOCUMENT_ROOT'].$this->basePath().'/public/metodos/jss/certificadoscursos/certificadoscursos.php');
+
+ ?>
+
+
+<div class="content-wrapper" style="min-height: 1123px;">
+    <br><br>
+    <section class="content-header">
+        <h1>
+            Certificados por Curso
+            <small>SWGP</small>
+        </h1>
+       
+    </section>
+    
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row ">
+                <form onKeypress="if(event.keyCode == 13) event.returnValue = false;"  onsubmit="return validarIngresoMatricula(this)" id="formIngresoMatricula" method="post" action="<?php echo $this->basePath();?>/matriculas/ingresarmatricula">
+                   
+                    <div class="col-lg-12 ">
+                        <div id="mensajeContenedorHorario"></div>
+                        <div class="form-group col-lg-4" id="contenedorDatosMatricula">
+                            <label for="selectPeriodo">PERIODO</label>
+                            <select onchange="filtrarlistaCursosPorPeriodoSeleccionado();" class="form-control" id="selectPeriodo" name="selectPeriodo">
+                            <?php echo $optionPeriodo;?>
+                            </select>
+                        </div>  
+                        <div class="form-group col-lg-4" id="contenedorlistacursos"> </div>
+                        <div class="form-group col-lg-4" id="contenedorlistahorarios"> </div>
+                        <div class="form-group col-lg-6" id="contenedorInfoGeneralHorarioSeleccionado"> </div>
+                        <div class="form-group col-lg-6" id="contenedorHorarioSeleccionado" >                       
+                        </div>  
+                    </div>
+                     <div class="col-lg-12 ">
+                        <div id="mensajeFormIngresoMatricula"> </div>
+                        <div class="form-group col-lg-4" id="contenedorFormIngresoMatricula">                                    
+                        </div>
+                        <div class="form-group col-lg-12" id="contenedorDatosEstudianteParaMatricular">  </div>
+                        <div id="botonMatricular">                        </div>
+                     </div>  
+                   
+                </form> 
+            </div>
+        </div>
+    </section>
+    
+    <section class="content">
+        <div class="box-body nav-tabs-custom">
+            <div class="row">
+                <div id="mensajeTablaMatriculasActuales">
+                    
+                </div>
+                
+                <div  class="col-lg-12" id="contenedorTablaMatriculasActuales">
+                 
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+   
+</div>
+<div class="example-modal">
+        <div class="modal " id="modalModificarEstadoMatricula">
+          <div class="modal-dialog modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">CANCELAR MATRÍCULA</h4>
+              </div>
+              <div class="modal-body">
+                  <div id="mensajeModificarEstadoMatricula">
+                      
+                  </div>
+                  <div class="progress text-center" id="progressDocDeshabilitarMat">
+                    <div id="progress-bar-DocDeshabilitarMat" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                        <h6 id="progresoDocDeshabilitarMat"></h6>
+                    </div>
+                    </div>
+                    <div class="text-center"><h6 id="megasDocDeshabilitarMat"></h6></div>
+                 
+                    
+                    <form  enctype="multipart/form-data" method="post" action="<?php echo $this->basePath();?>/matriculas/modificarestadomatricula" id="contenedorModificarEstadoMatricula">
+                    <br><div id="contenedorDatosDocDeshabilitarMat"></div>
+                   </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary pull-right btn-flat" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>

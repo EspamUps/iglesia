@@ -38,6 +38,10 @@ class Asistencia extends TableGateway
         return $resultado;
     }
     
+       public function FiltrarAsistenciaPorMatricula($idMatricula,$estadoFechaAsistencia){
+        $resultado = $this->getAdapter()->query("CALL Sp_FiltrarAsistenciaPorMatricula('{$idMatricula}', '{$estadoFechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $resultado;
+    }
 
 
 }

@@ -37,6 +37,10 @@ class FechaAsistencia extends TableGateway
         $resultado = $this->getAdapter()->query("CALL Sp_FiltrarFechaAsistencia('{$idFechaAsistencia}','{$estadoFechaAsistencia}')", Adapter::QUERY_MODE_EXECUTE)->toArray();
         return $resultado;
     }
+    
+ 
+    
+    
 
 
 }

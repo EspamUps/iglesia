@@ -691,4 +691,42 @@ class AdministradorController extends AbstractActionController
         }
         return new ViewModel($array);
     }
+    
+      public function certificadoscursosAction()
+    {
+        $this->layout("layout/administrador");
+        $sesionUsuario = new Container('sesionparroquia');
+        $array = array();
+        if(!$sesionUsuario->offsetExists('idUsuario')){
+            $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/inicio/inicio');
+        }else{
+            $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+            $idUsuario = $sesionUsuario->offsetGet('idUsuario');
+            $objAsignarModulo = new AsignarModulo($this->dbAdapter);
+            $AsignarModulo = $objAsignarModulo->FiltrarModuloPorIdentificadorYUsuario($idUsuario, 19);
+            if (count($AsignarModulo)==0)
+                $this->redirect()->toUrl($this->getRequest()->getBaseUrl().'/administrador/inicio');
+            else {       
+                
+                $objPeriodo = new Periodos($this->dbAdapter);
+                $objMetodosC = new MetodosControladores();
+                $objMetodos = new Metodos();
+                $validarprivilegio = $objMetodosC->ValidarPrivilegioAction($this->dbAdapter,$idUsuario, 17, 3);
+                $listaPeriodo = $objPeriodo->ObtenerPeriodosEstado(1);
+                $optionPeriodo = '<option value="0">SELECCIONE UN PERIODO</option>';
+                foreach ($listaPeriodo as $valueP) {
+                    $idPeriodoEncriptado = $objMetodos->encriptar($valueP['idPeriodo']);
+                    $optionPeriodo = $optionPeriodo.'<option value="'.$idPeriodoEncriptado.'">'.$valueP['nombrePeriodo'].'</option>';
+                }
+                
+                
+                $array = array(
+                    'validacionPrivilegio' =>  $validarprivilegio,
+                    'optionPeriodo' => $optionPeriodo
+                );
+                
+            }
+        }
+        return new ViewModel($array);
+    }
 }
