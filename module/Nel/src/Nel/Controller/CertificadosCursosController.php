@@ -428,9 +428,8 @@ class CertificadosCursosController extends AbstractActionController
             $identificacionEstudiante = $value['identificacion'];
             $nombresEstudiante = $value['primerNombre'].' '.$value['segundoNombre'];
             $apellidosEstudiante = $value['primerApellido'].' '.$value['segundoApellido'];
-            $fechaMatricula=$value['fechaMatricula'];
             $estadoMatricula = $value['estadoMatricula'];
-            $botonDescargarCertificadoCurso='';
+            $botonimprimir='';
             $porcentajeAsistenciaTrue=0;
             
             if($estadoMatricula==1)
@@ -458,8 +457,8 @@ class CertificadosCursosController extends AbstractActionController
                     }
 
                     if($porcentajeAsistenciaTrue>=$porcentajeAsistenciaPermitido){
-                          $botonDescargarCertificadoCurso = '<button  id="btnModificarEstadoMatricula'.$i.'" title="DESCARGAR CERTIFICADO DE CURSO DE '.$value['primerNombre'].' '.$value['primerApellido'].'" onclick="obtenerFormularioModificarEstadoMatricula(\''.$idMatriculaEncriptado.'\','.$i.','.$j.')" class="btn btn-success btn-sm btn-flat"><i class="fa fa-download"></i></button>';
-                          $estadoCurso = 'Aprobado';
+                         $botonimprimir =' <a title="IMPRIMIR CERTIFICADO DE APROBACIÓN DE '.$value['primerNombre'].' '.$value['primerApellido'].' " class="btn bg-purple btn-sm btn-flat"  target="_blank" href="'.$this->getRequest()->getBaseUrl().'/certificadoscursos/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'"><i class="fa  fa-file-pdf-o"></i></a> ';  
+                         $estadoCurso = 'Aprobado';
                     }else
                           $estadoCurso ='Reprobado';                    
                 }
@@ -476,7 +475,7 @@ class CertificadosCursosController extends AbstractActionController
             }
             
 
-            $botones = $botonDescargarCertificadoCurso;
+            $botones = $botonimprimir;
 
             $porcentaje = round($porcentajeAsistenciaTrue*100,2);
             $porcentajePresentar = ''.$porcentaje.'%';
@@ -488,7 +487,6 @@ class CertificadosCursosController extends AbstractActionController
                 'apellidos'=>$apellidosEstudiante,
                 'estadoCurso'=>$estadoCurso,
                 'porcentajeAsistencia'=>$porcentajePresentar,
-                'fechaMatricula'=>$fechaMatricula,
                 'opciones1'=>$botones
             );
             $j--;
@@ -504,167 +502,125 @@ class CertificadosCursosController extends AbstractActionController
     
    
    
-//    
-//     public function generarcomprobanteAction()
-//    {
-//        $this->layout("layout/administrador");
-//        $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
-//        $sesionUsuario = new Container('sesionparroquia');
-//        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
-//        
-//        $objMetodos = new Metodos();
-//        $objConfCurso = new ConfigurarCurso($this->dbAdapter);
-//        $objNombreIglesia = new NombreIglesia($this->dbAdapter);
-//        $objHorarioCurso = new HorarioCurso($this->dbAdapter);
-//        $objPeriodo = new Periodos($this->dbAdapter);
-//        $objPersona = new Persona($this->dbAdapter);
-//        $listaIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($idIglesia, 1);
-//        $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
-//        $idMatriculaEncriptado = $this->params()->fromQuery('id');
-//
-//       
-//        $idMatricula = $objMetodos->desencriptar($idMatriculaEncriptado);
-//        $objMat = new Matricula($this->dbAdapter);
-//        $resultado = $objMat->FiltrarMatricula($idMatricula);
-//        $listaConfCurso = $objConfCurso->FiltrarConfigurarCurso($resultado[0]['idConfigurarCurso']);
-//         $listaPeriodo = $objPeriodo->FiltrarPeriodo($listaConfCurso[0]['idPeriodo']);
-//        
-//        $objAdministrativos = new Administrativos($this->dbAdapter);
-//        $cuerpoTablaAdm ='';
-//        //el id 1 pertenece al parroco
-//        $listaAdministrativo = $objAdministrativos->FiltrarAdministrativosPorIdentificadorCargo(1);
-//            if(count($listaAdministrativo)>0)
-//            {
-//                $listaPersona = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
-//                $cuerpoTablaAdm = $cuerpoTablaAdm.'<tr> 
-//                            <th>_________________________________________<br>
-//                            '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'].' '.$listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].'
-//                            <br>'.$listaAdministrativo[0]['descripcion'].'</th>
-//                             </tr>';
-//            }
-//         
-//	
-//        $listaHorarioCurso = $objHorarioCurso->FiltrarHorarioCursoPorConfiguCurso($resultado[0]['idConfigurarCurso']);
-//         $cuerpoTablaHorario = '';
-//        foreach ($listaHorarioCurso as $valueHorarioCurso) {
-//            $horaInicio = strtotime ( '-1 second' , strtotime($valueHorarioCurso['horaInicio']));
-//            $horaInicio = date( 'H:i:s' , $horaInicio );
-//            $horaFin = strtotime ( '+1 second' , strtotime($valueHorarioCurso['horaFin']));
-//            $horaFin = date( 'H:i:s' , $horaFin );
-//            $horas = $horaInicio.' - '.$horaFin;
-//        $cuerpoTablaHorario = $cuerpoTablaHorario.'<tr class="text-center"><td class="text-center">'.$valueHorarioCurso['nombreDia'].'</td><td style="text-align:left;">'.$horas.'</td></tr>';}
-//                                
-//        $tablahorarios= '<table style="text-align:center; width:100%"  class="table " >
-//                        <thead>
-//                                <tr>
-//                                    <th style=" width:50%" colspan="2" >HORARIO DE CLASES</td>
-//                                </tr>
-//                               
-//                        </thead>
-//                            <tbody>
-//                                '.$cuerpoTablaHorario.'
-//                            </tbody>
-//                         </table>';
-//    
-//        $estado='HABILITADA';
-//        if($resultado[0]['estadoMatricula']==0)
-//            $estado='DESHABILITADA';
-//        
-//        
-//        
-//        $tabla = '<br><br><br><div class="box box-success">
-//            <div  style="text-align:center; width:100%; color:#777" >
-//              <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
-//             <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'<br>'.$direccionIglesia.'</label>
-//             <br> <label>Sistema Web de Gestión Parroquial</label>
-//            </div>
-//            <hr>
-//            <div class="box-body text-center"   >
-//              <!-- Minimal style -->
-//              <h2  style="text-align:center; width:100%; color:#3c8dbc" ><b>COMPROBANTE DE MATRÍCULA</b></h2>
-//               <div class="col-lg-1"></div>
-//                <div class="col-lg-10">
-//              <table style="text-align:center;width:100%;" class="table" >
-//              <tbody>
-//                <tr>
-//                    <td><b>Código de matrícula:</b></td>
-//                    <td style="text-align:left;">'.$resultado[0]['idMatricula'].' </td>
-//                 </tr>
-//                 <tr>
-//                    <td><b>Estado de matrícula:</b></td>
-//                    <td style="text-align:left;">'.$estado.' </td>
-//                 </tr>
-//                <tr>
-//                    <td><b>Estudiante:</b></td>
-//                    <td style="text-align:left;">'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
-//                </tr>
-//                <tr>
-//                    <td><b>Cédula de ciudadanía:</b></td>
-//                    <td style="text-align:left;">'.$resultado[0]['identificacion'].' </td>
-//                 </tr>
-//                 <tr>
-//                    <td><b>Fecha y hora de la matrícula:</b></td>
-//                    <td style="text-align:left;">'.$resultado[0]['fechaMatricula'].' </td>
-//                 </tr>
-//                  <tr>
-//                    <td><b>Periodo lectivo:</b></td>
-//                    <td style="text-align:left;">'.$listaPeriodo[0]['nombrePeriodo'].' </td>
-//                 </tr>
-//               
-//                 <tr>
-//                    <td><b>Nombre del curso:</b></td>
-//                    <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
-//                 </tr>
-//                 <tr>
-//                    <td><b>Nivel del curso:</b></td>
-//                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
-//                 </tr>
-//                <tr>
-//                    <td><b>Docente:</b></td>
-//                    <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
-//                 </tr>
-//                 
-//                  <tr>
-//                    <td><b>Fecha de inicio de clases:</b></td>
-//                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaInicio'].' </td>
-//                 </tr>
-//                  <tr>
-//                    <td><b>Fecha de fin de clases:</b></td>
-//                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaFin'].' </td>
-//                 </tr>
-//                  <tr>
-//                    <td><b>Precio del curso:</b></td>
-//                    <td style="text-align:left;">$ '.$listaConfCurso[0]['precio'].' </td>
-//                 </tr>
-//
-//               </tbody>
-//               </table>
-//               </div>
-//                <div class="col-lg-1"></div>
-//               <br>
-//               <div class="col-lg-4"></div>
-//             
-//               '.$tablahorarios.'
-//             <div class="col-lg-4"></div>
-//            </div>
-//            <!-- /.box-body -->
-//            <div class="box-footer text-center"  style="text-align:center; width:100%">
-//           <table class="table text-center" style="width:100%; padding-top:20%" > 
-//               '.$cuerpoTablaAdm.'                               
-//            </table>
-//             <p> <i> Comprobante de matrícula generado automáticamente por el Sistema Web de Gestión Parroquial.</i> </p>
-//            </div>
-//          </div>';
-//        
-//        
-//	$array =  array(
-//            'tabla'=>$tabla            
-//        );
-//        
-//        
-//        
-//	return new ViewModel($array);
-//
-//    }
+    
+     public function generarcomprobanteAction()
+    {
+        $this->layout("layout/administrador");
+        $this->dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter');
+        $sesionUsuario = new Container('sesionparroquia');
+        $idIglesia = $sesionUsuario->offsetGet('idIglesia');
+        
+        $objMetodos = new Metodos();
+        $objConfCurso = new ConfigurarCurso($this->dbAdapter);
+        $objNombreIglesia = new NombreIglesia($this->dbAdapter);
+        $objHorarioCurso = new HorarioCurso($this->dbAdapter);
+        $objPeriodo = new Periodos($this->dbAdapter);
+        $objPersona = new Persona($this->dbAdapter);
+        $listaIglesia = $objNombreIglesia->FiltrarNombreIglesiaEstado($idIglesia, 1);
+        $direccionIglesia = $sesionUsuario->offsetGet('direccionIgleisia');
+        $idMatriculaEncriptado = $this->params()->fromQuery('id');
+
+       
+        $idMatricula = $objMetodos->desencriptar($idMatriculaEncriptado);
+        $objMat = new Matricula($this->dbAdapter);
+        $resultado = $objMat->FiltrarMatricula($idMatricula);
+        $listaConfCurso = $objConfCurso->FiltrarConfigurarCurso($resultado[0]['idConfigurarCurso']);
+         $listaPeriodo = $objPeriodo->FiltrarPeriodo($listaConfCurso[0]['idPeriodo']);
+        
+        $objAdministrativos = new Administrativos($this->dbAdapter);
+        $cuerpoTablaAdm ='';
+        //el id 1 pertenece al parroco
+        $listaAdministrativo = $objAdministrativos->FiltrarAdministrativosPorIdentificadorCargo(1);
+            if(count($listaAdministrativo)>0)
+            {
+                $listaPersona = $objPersona->FiltrarPersona($listaAdministrativo[0]['idPersona']);
+                $cuerpoTablaAdm = $cuerpoTablaAdm.'<tr> 
+                            <th>_________________________________________<br>
+                            '.$listaPersona[0]['primerNombre'].' '.$listaPersona[0]['segundoNombre'].' '.$listaPersona[0]['primerApellido'].' '.$listaPersona[0]['segundoApellido'].'
+                            <br>'.$listaAdministrativo[0]['descripcion'].'</th>
+                             </tr>';
+            }
+         
+	
+        
+        $tabla = '<br><br><br><div class="box box-success">
+            <div  style="text-align:center; width:100%; color:#777" >
+              <img style="width:10%" src="'.$this->getRequest()->getBaseUrl().'/public/librerias/images/pagina/logoiglesia.png" >
+             <br> <label style="font-size:24px" class="box-title ">'.$listaIglesia[0]['nombreIglesia'].'<br>'.$direccionIglesia.'</label>
+             <br> <label>Sistema Web de Gestión Parroquial</label>
+            </div>
+            <hr>
+            <div class="box-body text-center"   >
+              <!-- Minimal style -->
+              <h3  style="text-align:center; width:100%; color:#265c7b" ><b>CERTIFICADO DE APROBACIÓN</b></h3>
+
+               <div class="col-lg-1"></div>
+                <div class="col-lg-10">
+              <table style="text-align:center;width:100%;" class="table" >
+              <tbody>
+                <tr>
+                    <td><b>Código de matrícula:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['idMatricula'].' </td>
+                 </tr>
+                <tr>
+                    <td><b>Estudiante:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['primerNombre'].' '.$resultado[0]['segundoNombre'].' '.$resultado[0]['primerApellido'].' '.$resultado[0]['segundoApellido'].'</td>
+                </tr>
+                <tr>
+                    <td><b>Cédula de ciudadanía:</b></td>
+                    <td style="text-align:left;">'.$resultado[0]['identificacion'].' </td>
+                 </tr>
+                  <tr>
+                    <td><b>Periodo lectivo:</b></td>
+                    <td style="text-align:left;">'.$listaPeriodo[0]['nombrePeriodo'].' </td>
+                 </tr>
+               
+                 <tr>
+                    <td><b>Nombre del curso:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['nombreCurso'].' </td>
+                 </tr>
+                 <tr>
+                    <td><b>Nivel del curso:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['nivelCurso'].' </td>
+                 </tr>
+                <tr>
+                    <td><b>Docente:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['primerNombre'].' '.$listaConfCurso[0]['segundoNombre'].' '.$listaConfCurso[0]['primerApellido'].' '.$listaConfCurso[0]['segundoApellido'].'</td>
+                 </tr>
+                 
+                  <tr>
+                    <td><b>Fecha de inicio de clases:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaInicio'].' </td>
+                 </tr>
+                  <tr>
+                    <td><b>Fecha de fin de clases:</b></td>
+                    <td style="text-align:left;">'.$listaConfCurso[0]['fechaFin'].' </td>
+                 </tr>
+
+               </tbody>
+               </table>
+               </div>
+                <div class="col-lg-1"></div>
+ 
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer text-center"  style="text-align:center; width:100%">
+           <table class="table text-center" style="width:100%; padding-top:20%" > 
+               '.$cuerpoTablaAdm.'                               
+            </table>
+             <p> <i> Comprobante de matrícula generado automáticamente por el Sistema Web de Gestión Parroquial.</i> </p>
+            </div>
+          </div>';
+        
+        
+	$array =  array(
+            'tabla'=>$tabla            
+        );
+        
+        
+        
+	return new ViewModel($array);
+
+    }
  
 }
