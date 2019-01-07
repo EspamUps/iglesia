@@ -404,7 +404,7 @@ class CertificadosCursosController extends AbstractActionController
     
      function CargarTablaMatriculasAction($listaConfigurarCurso,$listaMatriculas, $i, $j)
     {
-         
+        $objCurso = new Cursos($this->dbAdapter);
         $objAsistencia = new Asistencia($this->dbAdapter);
         $objMetodos = new Metodos();
         $array1 = array();
@@ -415,6 +415,7 @@ class CertificadosCursosController extends AbstractActionController
         $fechaActual = strtotime(date("d-m-Y"));
         $fechaInicioMat = strtotime($listaConfigurarCurso[0]['fechaInicioMatricula']);
         $fechaFinMat = strtotime($listaConfigurarCurso[0]['fechaFinMatricula']); 
+        $siguienteCurso = $objCurso->FiltrarCursoSiguiente($listaConfigurarCurso[0]['nivelCurso'], 1);
         foreach ($listaMatriculas as $value) {
             $fechaInicioClases = strtotime($value['fechaInicio']);
             $fechaFinClases =strtotime($value['fechaFin']);
@@ -457,8 +458,12 @@ class CertificadosCursosController extends AbstractActionController
                     }
 
                     if($porcentajeAsistenciaTrue>=$porcentajeAsistenciaPermitido){
+                        $estadoCurso = 'Aprobado';
+                        if(count($siguienteCurso)==0)
+                            $botonimprimir ='<span>APROBÓ TODOS LOS CURSOS REGISTRADOS EN EL SISTEMA</span>';
+                        else
                          $botonimprimir =' <a title="IMPRIMIR CERTIFICADO DE APROBACIÓN DE '.$value['primerNombre'].' '.$value['primerApellido'].' " class="btn bg-purple btn-sm btn-flat"  target="_blank" href="'.$this->getRequest()->getBaseUrl().'/certificadoscursos/generarcomprobante?id='.urlencode($idMatriculaEncriptado).'"><i class="fa  fa-file-pdf-o"></i></a> ';  
-                         $estadoCurso = 'Aprobado';
+                         
                     }else
                           $estadoCurso ='Reprobado';                    
                 }
@@ -554,7 +559,7 @@ class CertificadosCursosController extends AbstractActionController
         $mes =date("m");
 	$fechaActual = $hoy['year']."-".$mes."-".$hoy['mday'];
          $fechaHoy = $objMetodos->obtenerFechaEnLetraSinHora($fechaActual);
-        
+        $tabla='';
         if(count($siguienteCurso)>0)
         $tabla = '<br><div class="box box-success">
             <div  style="text-align:center; width:100%; color:#777" >
